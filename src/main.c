@@ -63,8 +63,6 @@ int main(int argc, char *argv[])
 	dst = argv[--argc];
 	src = argv[--argc];
 	
-		printf("%s < %s eval = %d", dst, src, eval);
-
 	int res;
 	wchar_t wstr[MAX_STR];
 
@@ -109,7 +107,7 @@ int main(int argc, char *argv[])
 	CONTINUE_DOWNLOAD **cd = malloc((1 + extra_chunks) * sizeof(*cd));
 	
 	{
-		int i = 0;
+		size_t i = 0;
 		for (; i < extra_chunks; ++i)
 		{
 			cd[i] = packet_alloc(CONTINUE_DOWNLOAD, CHUNK_SIZE);
@@ -214,5 +212,3 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
-
-
