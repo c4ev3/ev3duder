@@ -92,4 +92,13 @@ cccccccccccc cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
 */
 
+typedef struct
+{
+	EV3_PACKET_FIELDS
+	u8 replyType;
+	u8 bytes[];
+} VM_REPLY;
+extern VM_REPLY EXECUTE_FILE_REPLY_SUCCESS;
+
+
 #pragma pack(pop)

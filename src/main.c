@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include <hidapi.h>
 
@@ -51,19 +52,18 @@ static const u8 tone[] =
 
 int main(int argc, char *argv[])
 {
+	if (!( argc == 3 || (argc == 4 && argv[1][0] == '-' && argv[1][1] == 'e')))
+	{
+		fputs("USAGE: ev3_cp [-e] <pc_path> <ev3_path>\n", stderr);
+		return __LINE__;
+	}
 	const char *src, *dst;
-	BEGIN_DOWNLOAD_REPLY bdrep;
 
-	if (argc > 2)
-	{
-		src = argv[1];
-		dst = argv[2];
-	}
-	else // defaults to
-	{
-		dst = "../apps/a3f/a3f.rbf";
-		src = "hamada.rbf";
-	}
+	bool eval = argc == 4;	
+	dst = argv[--argc];
+	src = argv[--argc];
+	
+		printf("%s < %s eval = %d", dst, src, eval);
 
 	int res;
 	wchar_t wstr[MAX_STR];
@@ -107,6 +107,7 @@ int main(int argc, char *argv[])
 
 
 	CONTINUE_DOWNLOAD **cd = malloc((1 + extra_chunks) * sizeof(*cd));
+	
 	{
 		int i = 0;
 		for (; i < extra_chunks; ++i)
@@ -129,7 +130,8 @@ int main(int argc, char *argv[])
 #ifdef DEBUG
 	print_bytes(bd, len);
 #endif
-
+	BEGIN_DOWNLOAD_REPLY bdrep;
+	
 	res = hid_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
 	if (res < 0)
 		die("Unable to write BEGIN_DOWNLOAD.");
@@ -174,39 +176,41 @@ int main(int argc, char *argv[])
 		return __LINE__;
 	}
 
+	if (!eval) return 1;
+
 	const char run1[] = {0xC0, 0x08, 0x82, 0x01, 0x00, 0x84};
 	const char run2[] = {0x60, 0x64, 0x03, 0x01, 0x60, 0x64, 0x00};
 
 	size_t dst_sz = strlen(dst) + 1;
 
 	EXECUTE_FILE *run = packet_alloc(EXECUTE_FILE, sizeof (run1) + dst_sz + sizeof (run2));
-	memcpy((u8*)&run->bytes, run1, sizeof run1);
-	memcpy((u8*)&run->bytes + sizeof run1, dst, dst_sz);
-	memcpy((u8*)&run->bytes + sizeof run1 + dst_sz, run2, sizeof run2);
 	
-		print_bytes(run, run->packetLen + PREFIX_SIZE);
-
 	mempcpy(mempcpy(mempcpy((u8 *)&run->bytes, // run->bytes = [run1] + [dst] + [run2]
 	                        run1, sizeof run1),
-	               		dst, dst_sz),
+	               		dst,  dst_sz),
 	        		run2, sizeof run2);
-
-		print_bytes(run, run->packetLen + PREFIX_SIZE);
-
 
 	res = hid_write(handle, (u8 *)run, run->packetLen + PREFIX_SIZE);
 
 	if (res < 0)
 		die("Unable to write EXECUTE_FILE.");
 
-	res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+	VM_REPLY efrep;
+
+	res = hid_read_timeout(handle, (u8 *)&efrep, sizeof efrep + 2, TIMEOUT);
 	if (res == 0)
 		die("Request timed out.");
 	if (res < 0)
 		die("Unable to read.");
 
-	putchar('~');
-	print_bytes(&bdrep, sizeof(bdrep));
+	if (memcmp(&efrep, &EXECUTE_FILE_REPLY_SUCCESS, sizeof efrep) == 0)
+		printf("Program successfully started! (ret=%d)\n", efrep.bytes[0]);
+	else
+	{
+		fputs("Starting program failed.\nlast_reply=", stderr);
+		print_bytes(&efrep, 2 + 2 + 3);
+		return __LINE__;
+	}
 
 	return 0;
 }
