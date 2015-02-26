@@ -9,7 +9,7 @@
 #include "systemcmd.h"
 
 #define DEBUG 3
-
+#undef DEBUG
 #define print_bytes(buf, len) \
 	do {\
 		u8 *ptr = (u8*)buf;\
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
 		{
 			cd[i] = packet_alloc(CONTINUE_DOWNLOAD, CHUNK_SIZE);
 			ret = fread(cd[i]->fileChunk, 1, CHUNK_SIZE, fp);
-#if DEBUG > 2
+#if 1
 			printf("%d: %u bytes read.\n", i, ret);
 #endif
 		}
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 	bd->fileSize = fsize;
 	strcpy(bd->fileName, dst);
 
-#ifdef DEBUG
+#ifndef DEBUG
 	puts("=BEGIN_DOWNLOAD");
 	print_bytes(bd, PREFIX_SIZE + bd->packetLen);
 	puts("=cut");
@@ -159,7 +159,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Does the ev3 path exist? ");
 	default:
 		fprintf(stderr, "(BEGIN_DOWNLOAD was refused [ret=%u])\n", bdrep.ret);
-#ifdef DEBUG
+#ifndef DEBUG
 	puts("=BEGIN_DOWNLOAD_REPLY");
 	print_bytes(&bdrep, PREFIX_SIZE + bdrep.packetLen);
 	puts("=cut");
@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
 	}
 
 
-#ifdef DEBUG
+#ifndef DEBUG
 	puts("=BEGIN_DOWNLOAD_REPLY");
 	print_bytes(&bdrep, sizeof(bdrep));
 	putchar('\n');
@@ -187,7 +187,8 @@ int main(int argc, char *argv[])
 #endif
 		if (res < 0)
 			die("Unable to write CONTINUE_DOWNLOAD.");
-#if DEBUG > 1
+#if 1
+		if (0) break;
 		res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
 		if (res == 0)
 			die("Request timed out.");
@@ -199,14 +200,15 @@ int main(int argc, char *argv[])
 		print_bytes(&bdrep, PREFIX_SIZE + bdrep.packetLen);
 		puts("=cut");
 	}
-#else
 
-	}
-	res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+
+	printf("lol?");
+	/*res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
 	if (res == 0)
 		die("Request timed out.");
 	if (res < 0)
 		die("Unable to read.");
+	printf("lol!");*/
 #endif
 	if (memcmp(&bdrep, &CONTINUE_DOWNLOAD_REPLY_SUCCESS, sizeof bdrep - 3) == 0
 	        && (bdrep.ret == 0 || bdrep.ret == 8) //README: why sometimes EOF and others SUCCESS?
@@ -215,10 +217,6 @@ int main(int argc, char *argv[])
 	else
 	{
 		fputs("Transfer failed.\nlast_reply=", stderr);
-#if DEBUG < 2
-	}
-	{
-#endif
 
 		print_bytes(&bdrep, bdrep.packetLen);
 		return __LINE__;
