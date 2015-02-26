@@ -8,7 +8,7 @@
 #include "typedefs.h"
 #include "systemcmd.h"
 
-//define DEBUG
+#define DEBUG 3
 
 #define print_bytes(buf, len) \
 	do {\
@@ -36,7 +36,7 @@
 
 #define MAX_STR 256
 #define CHUNK_SIZE 1000 //FIXME: for some reason HIDAPI refuses sending more bytes?!
-//(((u16)-1 - sizeof (CONTINUE_DOWNLOAD) - PREFIX_SIZE)/1)
+//(((u16)~0 - sizeof (CONTINUE_DOWNLOAD) - PREFIX_SIZE)/1)
 
 #define packet_alloc(type, extra) _packet_alloc(sizeof(type), extra, &type##_INIT)
 static void *_packet_alloc(size_t size, size_t extra, void *init)
@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
 	}
 	const char *src, *dst;
 
-	bool eval = argc == 4;	
+	bool eval = argc == 4;
 	dst = argv[--argc];
 	src = argv[--argc];
-	
+
 	int res;
 	wchar_t wstr[MAX_STR];
 
@@ -99,24 +99,28 @@ int main(int argc, char *argv[])
 	size_t extra_chunks = fsize / CHUNK_SIZE;
 	size_t final_chunk_sz = fsize % CHUNK_SIZE;
 
-	printf("Attempting file upload (%ldb total; %u chunks): ", fsize, extra_chunks + 1);
+	printf("Attempting file upload (%ldb total; %u chunks): \n", fsize, extra_chunks + 1);
 	fseek(fp, 0, SEEK_SET);
 
 
 
 	CONTINUE_DOWNLOAD **cd = malloc((1 + extra_chunks) * sizeof(*cd));
-	
 	{
+		size_t ret;
 		size_t i = 0;
 		for (; i < extra_chunks; ++i)
 		{
 			cd[i] = packet_alloc(CONTINUE_DOWNLOAD, CHUNK_SIZE);
-			fread(cd[i]->fileChunk, CHUNK_SIZE, 1, fp);
+			ret = fread(cd[i]->fileChunk, 1, CHUNK_SIZE, fp);
+#if DEBUG > 2
+			printf("%d: %u bytes read.\n", i, ret);
+#endif
 		}
 
 		cd[i] = packet_alloc(CONTINUE_DOWNLOAD, final_chunk_sz);
 
-		fread(cd[i]->fileChunk, final_chunk_sz, 1, fp);
+		ret = fread(cd[i]->fileChunk, 1, final_chunk_sz, fp);
+		printf("%d: %u bytes read.\n", i, ret);
 		fclose(fp);
 	}
 
@@ -126,9 +130,12 @@ int main(int argc, char *argv[])
 	strcpy(bd->fileName, dst);
 
 #ifdef DEBUG
-	print_bytes(bd, len);
+	puts("=BEGIN_DOWNLOAD");
+	print_bytes(bd, PREFIX_SIZE + bd->packetLen);
+	puts("=cut");
 #endif
-	BEGIN_DOWNLOAD_REPLY bdrep;
+
+
 	
 	res = hid_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
 	if (res < 0)
@@ -136,6 +143,7 @@ int main(int argc, char *argv[])
 
 	fputs("Checking reply: \n", stdout);
 
+	BEGIN_DOWNLOAD_REPLY bdrep;
 
 	res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
 	if (res == 0)
@@ -143,26 +151,63 @@ int main(int argc, char *argv[])
 	if (res < 0)
 		die("Unable to read.");
 
+	switch (bdrep.ret)
+	{
+	case 0x0:
+		break;
+	case 0x9:
+		fprintf(stderr, "Does the ev3 path exist? ");
+	default:
+		fprintf(stderr, "(BEGIN_DOWNLOAD was refused [ret=%u])\n", bdrep.ret);
 #ifdef DEBUG
-	putchar(">");
+	puts("=BEGIN_DOWNLOAD_REPLY");
+	print_bytes(&bdrep, PREFIX_SIZE + bdrep.packetLen);
+	puts("=cut");
+#endif
+		return __LINE__;
+	}
+
+
+#ifdef DEBUG
+	puts("=BEGIN_DOWNLOAD_REPLY");
 	print_bytes(&bdrep, sizeof(bdrep));
 	putchar('\n');
 	printf("current handle is %u\n", bdrep.fileHandle);
+	puts("=cut");
 #endif
 
-	for (size_t j = 0; j <= extra_chunks; ++j)
+	for (size_t i = 0; i <= extra_chunks; ++i)
 	{
-		cd[j]->fileHandle = bdrep.fileHandle;
-		res = hid_write(handle, (u8 *)cd[j], cd[j]->packetLen + PREFIX_SIZE);
+		cd[i]->fileHandle = bdrep.fileHandle;
+		res = hid_write(handle, (u8 *)cd[i], cd[i]->packetLen + PREFIX_SIZE);
+#if DEBUG > 7
+		printf("=CONTINUE_DOWNLOAD");;
+		print_bytes(cd[i], cd[i]->packetLen + PREFIX_SIZE);
+		puts("=cut");
+#endif
 		if (res < 0)
 			die("Unable to write CONTINUE_DOWNLOAD.");
+#if DEBUG > 1
+		res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+		if (res == 0)
+			die("Request timed out.");
+		if (res < 0)
+			die("Unable to read.");
+
+		printf("=CONTINUE_DOWNLOAD_REPLY(chunk=%u, data=%ub)\n", i,
+		       cd[i]->packetLen - (sizeof(CONTINUE_DOWNLOAD) - PREFIX_SIZE));
+		print_bytes(&bdrep, PREFIX_SIZE + bdrep.packetLen);
+		puts("=cut");
+	}
+#else
+
 	}
 	res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
 	if (res == 0)
 		die("Request timed out.");
 	if (res < 0)
 		die("Unable to read.");
-
+#endif
 	if (memcmp(&bdrep, &CONTINUE_DOWNLOAD_REPLY_SUCCESS, sizeof bdrep - 3) == 0
 	        && (bdrep.ret == 0 || bdrep.ret == 8) //README: why sometimes EOF and others SUCCESS?
 	   )
@@ -170,7 +215,12 @@ int main(int argc, char *argv[])
 	else
 	{
 		fputs("Transfer failed.\nlast_reply=", stderr);
-		print_bytes(&bdrep, sizeof(bdrep));
+#if DEBUG < 2
+	}
+	{
+#endif
+
+		print_bytes(&bdrep, bdrep.packetLen);
 		return __LINE__;
 	}
 
@@ -182,11 +232,11 @@ int main(int argc, char *argv[])
 	size_t dst_sz = strlen(dst) + 1;
 
 	EXECUTE_FILE *run = packet_alloc(EXECUTE_FILE, sizeof (run1) + dst_sz + sizeof (run2));
-	
+
 	mempcpy(mempcpy(mempcpy((u8 *)&run->bytes, // run->bytes = [run1] + [dst] + [run2]
 	                        run1, sizeof run1),
-	               		dst,  dst_sz),
-	        		run2, sizeof run2);
+	                dst,  dst_sz),
+	        run2, sizeof run2);
 
 	res = hid_write(handle, (u8 *)run, run->packetLen + PREFIX_SIZE);
 
