@@ -1,4 +1,4 @@
-BIN_NAME = ev3_cp
+BIN_NAME = ev3duder	
 # ^ exe should be removed
 
 #CXX = g++
@@ -13,7 +13,7 @@ OBJDIR = build
 
 #LIBS = -lpsapi
 
-SRCS = src/main.c src/cmd_defaults.c
+SRCS = src/main.c src/cmd_defaults.c src/ev3_exec.c src/ev3_test.c src/ev3_up.c
 
 LIBS = -Llib/ -lhidapi 
 INC += -Iinclude/

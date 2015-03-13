@@ -1,4 +1,4 @@
-#include "typedefs.h"
+#include "defs.h"
 
 #define HID_LAYER \
 	u8 hidLayer;
@@ -39,7 +39,7 @@ typedef struct
 } BEGIN_DOWNLOAD;
 extern BEGIN_DOWNLOAD BEGIN_DOWNLOAD_INIT;
 
-typedef struct __attribute__((packed))
+typedef struct
 {
 	EV3_REPLY_FIELDS
 
@@ -48,13 +48,14 @@ typedef struct __attribute__((packed))
 
 
 
-typedef struct __attribute__((packed))
+typedef struct
 {
 	EV3_COMMAND_FIELDS
 
 	u8 fileHandle;
 	char fileChunk[];
 } CONTINUE_DOWNLOAD;
+
 extern CONTINUE_DOWNLOAD CONTINUE_DOWNLOAD_INIT;
 
 typedef BEGIN_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY;
@@ -72,6 +73,7 @@ typedef struct
 
 	u8 bytes[];
 } VM_CMD;
+
 typedef VM_CMD EXECUTE_FILE;
 extern EXECUTE_FILE EXECUTE_FILE_INIT;
 /*
@@ -98,7 +100,15 @@ typedef struct
 	u8 replyType;
 	u8 bytes[];
 } VM_REPLY;
+
 extern VM_REPLY EXECUTE_FILE_REPLY_SUCCESS;
 
 
 #pragma pack(pop)
+//_packet_alloc(sizeof(type), extra, &type##_INIT)
+// note: this V is a GNU extension (Compund statement expressions or something)
+#define packet_alloc(type, extra) ({ 					\
+   	void *ptr = malloc(sizeof(type) + extra); 				\
+   	memcpy(ptr, &type##_INIT, sizeof(type));					\
+	((SYSTEM_CMD *)ptr)->packetLen = sizeof(type) + extra - PREFIX_SIZE;	\
+	ptr;})
