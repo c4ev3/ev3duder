@@ -13,12 +13,14 @@
 #define ProductID 0x005 /* EV3 */
 #define SerialID NULL
 
-extern struct error ev3_up(FILE*, const char*);
-extern struct error ev3_dl(const char*, FILE*);
-extern struct error ev3_test(void);
-extern struct error ev3_exec(const char*);
-extern struct error ev3_ls(const char*);
-extern struct error ev3_raw(const char*, size_t len);
+extern struct error up(FILE*, const char*);
+extern struct error dl(const char*, FILE*);
+extern struct error test(void);
+extern struct error exec(const char*);
+extern struct error ls(const char*);
+extern struct error rm(const char*);
+extern struct error raw(const char*, size_t len);
+extern struct error mkdir(const char*);
 
 //TODO: use these instead of struct error:
 const char *errstr;
@@ -26,13 +28,15 @@ const char *errstr;
 void params_print()
 {
     puts(	"USAGE: ev3duder [ up loc rem | dl rem loc | exec rem | kill rem |"	"\n"
-            "                 cp rem rem | mv rem rem | rm rem | ls [rem] | tree [rem] |"	"\n"
-            "                 shell | raw space_seperated_hex_bytes | test ]"					"\n"
+            "                  cp rem rem | mv rem rem | rm rem | ls [rem] | tree [rem] |"	"\n"
+            "                  shell str | cd rem | pwd | test ]"					"\n"
             "\n"
             "       rem = remote (EV3) system path, loc = (local file system) path"	"\n");
 }
-enum ARGS             {ARG_TEST, ARG_UP, ARG_EXEC, ARG_LS, ARG_RAW, ARG_END};
-const char *args[] =  {"test",   "up",   "exec", "ls", "raw", NULL};
+enum ARGS             {ARG_TEST, ARG_UP, ARG_EXEC, ARG_LS, ARG_RM, ARG_MKDIR, ARG_CD, ARG_PWD, ARG_RAW, ARG_END};
+const char *args[] =  {"test",   "up",   "exec", "ls", "rm", "mkdir", "cd", "pwd", "raw", NULL};
+
+const char envvar[] = "ev3_cd";
 
 hid_device *handle;
 
@@ -60,7 +64,7 @@ int main(int argc, char *argv[])
     {
     case ARG_TEST:
         assert(argc == 0);
-        ret = ev3_test();
+        ret = test();
         break;
 
     case ARG_UP:
@@ -72,13 +76,13 @@ int main(int argc, char *argv[])
                 printf("File <%s> doesn't exist.\n", argv[0]);
                 return ERR_IO;
             }
-            ret = ev3_up(fp, argv[1]);
+            ret = up(fp, argv[1]);
         }
         break;
 
     case ARG_EXEC:
         assert(argc == 1);
-        ret = ev3_exec(argv[0]);
+        ret = exec(argv[0]);
         break;
 
     case ARG_END:
@@ -89,10 +93,49 @@ int main(int argc, char *argv[])
         assert(argc <= 1);
         {
         const char* arg = argv[0] ?: ".";
-        ret = ev3_ls(arg);
+        ret = ls(arg);
         }
         break;
-    case ARG_RAW:
+
+    case ARG_MKDIR:
+        assert(argc == 1);
+        ret = mkdir(argv[0]);
+        break;
+    case ARG_RM:
+        assert(argc == 1);
+        {
+          if(strchr(argv[0], '*'))
+          {
+            printf("This will probably remove more than one file. Are you sure to proceed? (Y/n)");
+            char ch;
+            scanf("%c", &ch);
+            if ((ch | ' ') == 'n') // check if 'n' or 'N'
+              break;
+            fflush(stdin); // technically UB, but POSIX and Windows allow for it
+          }
+          ret = rm(argv[0]);
+          }
+        break;
+    case ARG_CD:
+        assert(argc == 1);
+        {
+        size_t wd_len = strlen(argv[0]); 
+        char *wd = malloc(sizeof envvar - 1 + wd_len + 1);
+// *INDENT-OFF*
+        *(mempcpy(mempcpy(wd, envvar,  sizeof envvar),
+                              argv[0], wd_len))
+                            = '\0'; // hehe
+// *INDENT-ON*
+        wd[sizeof envvar -1] = '=';
+        putenv(wd);
+        puts(getenv(envvar));
+        }
+        break;
+    case ARG_PWD:
+        assert(argc == 0);
+        puts(getenv(envvar));
+        return 0;
+    case 100*ARG_RAW:
         assert(argc > 0);
         if(0){
           size_t lens[argc];
@@ -104,7 +147,7 @@ int main(int argc, char *argv[])
           for (int i = 0; i < argc; i++)
               ptr = mempcpy(ptr, argv[i], lens[i]);        
           *ptr = '\0'; 
-          ret = ev3_raw(cmd, lens_total);
+          ret = raw(cmd, lens_total);
         }
         else
          {

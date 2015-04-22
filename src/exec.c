@@ -13,7 +13,7 @@ extern hid_device *handle;
 static const u8 run1[] = {0xC0, 0x08, 0x82, 0x01, 0x00, 0x84};
 static const u8 run2[] = {0x60, 0x64, 0x03, 0x01, 0x60, 0x64, 0x00};
 
-struct error ev3_exec(const char *exec)
+struct error exec(const char *exec)
 {
     int res;
     VM_REPLY reply;

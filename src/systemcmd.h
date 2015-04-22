@@ -29,6 +29,11 @@ typedef struct
 
 	u8 bytes[];
 } SYSTEM_CMD;
+typedef struct
+{
+  EV3_REPLY_FIELDS
+  u8 bytes[];
+} SYSTEM_REPLY;
 
 typedef struct
 {
@@ -90,7 +95,26 @@ typedef struct
     u32 listSize;
 } CONTINUE_LIST_FILES;
 
+typedef struct
+{
+    EV3_COMMAND_FIELDS
 
+    u8 path[];
+} CREATE_DIR; 
+
+extern CREATE_DIR CREATE_DIR_INIT;
+
+typedef SYSTEM_REPLY CREATE_DIR_REPLY;
+
+typedef struct
+{
+    EV3_COMMAND_FIELDS
+
+    u8 path[];
+} DELETE_FILE; 
+extern DELETE_FILE DELETE_FILE_INIT;
+
+typedef SYSTEM_REPLY DELETE_FILE_REPLY;
 
 #define EV3_VM_COMMAND_FIELDS \
 	HID_LAYER \

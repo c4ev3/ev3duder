@@ -13,7 +13,7 @@ static const u8 tone[] = "\x0\x0F\x00\0\0\x80\x00\x00\x94\x01\x81\x02\x82\xE8\x0
 
 #define MAX_STR 256
 
-struct error ev3_test()
+struct error test()
 {
 	wchar_t wstr[MAX_STR];
 	int res;
