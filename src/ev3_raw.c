@@ -53,41 +53,17 @@ static const char * const bdrep_str[] =
 	[ILLEGAL_CONNECTION] 	= "ILLEGAL_CONNECTION",
 };
 
-struct error ev3_up(FILE *fp, const char *dst)
+struct error ev3_raw(const char *cmd, size_t len)
 {
 	int res;
+  u8 *buf = malloc(l     
 
-	fseek(fp, 0, SEEK_END);
-	long fsize = ftell(fp); // file size limit is min(LONG_MAX, 4gb)
-	size_t extra_chunks   = fsize / CHUNK_SIZE;
-	size_t final_chunk_sz = fsize % CHUNK_SIZE;
-
-	fprintf(stderr, "Attempting file upload (%ldb total; %zu chunks): \n", fsize, extra_chunks + 1);
-	fseek(fp, 0, SEEK_SET);
-
-	CONTINUE_DOWNLOAD **cd = malloc((1 + extra_chunks) * sizeof(*cd));
-	{
-		size_t ret;
-		size_t i = 0;
-		for (; i < extra_chunks; ++i)
-		{
-			cd[i] = packet_alloc(CONTINUE_DOWNLOAD, CHUNK_SIZE);
-			ret = fread(cd[i]->fileChunk, 1, CHUNK_SIZE, fp);
-		}
-
-		cd[i] = packet_alloc(CONTINUE_DOWNLOAD, final_chunk_sz);
-
-		ret = fread(cd[i]->fileChunk, 1, final_chunk_sz, fp);
-		(void) ret;
-		fclose(fp);
-	}
-
-	//TODO: read in chunks, whatif long isnt big enough
+		//TODO: read in chunks, whatif long isnt big enough
 	BEGIN_DOWNLOAD *bd = packet_alloc(BEGIN_DOWNLOAD, strlen(dst) + 1);
 	bd->fileSize = fsize;
 	strcpy(bd->fileName, dst);
 
-	res = hid_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
+	res = hid_write(handle, (u8*)cmd, bd->packetLen + PREFIX_SIZE);
 	if (res < 0) return (struct error)
 	{.category = ERR_HID, .msg = "Unable to write BEGIN_DOWNLOAD.", .reply = hid_error(handle)};
 

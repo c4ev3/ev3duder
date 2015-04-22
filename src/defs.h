@@ -18,7 +18,7 @@ typedef int64_t i64;
 	} while (0)
 
 #ifndef _GNU_SOURCE
-#define mempcpy(dst, src, len) (memcpy((dst), (src), (len)) + (len))
+#define mempcpy(dst, src, len) ((char*)memcpy((dst), (src), (len)) + (len))
 #endif
 
 #define print_bytes(buf, len) \
@@ -27,4 +27,11 @@ typedef int64_t i64;
 		for (int i = 0; i != len; i++, ptr++) fprintf(stderr, "%02x ", *ptr);\
 	} while (0*putc('\n', stderr))
 
+#define print_chars(buf, len) \
+	do {\
+		char *ptr = buf;\
+		for (int i = 0; i != len; i++, ptr++) fprintf(stderr, "%c ", *ptr);\
+	} while (0*putc('\n', stderr))
+
 #define TIMEOUT 2000 /* in milliseconds */
+

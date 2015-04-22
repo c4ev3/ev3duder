@@ -61,6 +61,37 @@ extern CONTINUE_DOWNLOAD CONTINUE_DOWNLOAD_INIT;
 typedef BEGIN_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY;
 extern CONTINUE_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY_SUCCESS;
 
+typedef struct
+{
+    EV3_COMMAND_FIELDS
+
+    u16 maxBytes;
+    u8 path[];
+} LIST_FILES;
+extern LIST_FILES LIST_FILES_INIT;
+
+typedef struct
+{
+	EV3_REPLY_FIELDS
+
+    u32 listSize; // when listSize < maxBytes; reached EO List?
+    u8 handle; // for CONTINUE_LIST_FILES 
+    char list[]; 
+    // \n seperated; which is strange as POSIX allows for it;
+    // \0 might've been a more sensible choice
+    // UTF-8 encoded. 
+} LIST_FILES_REPLY;
+
+typedef struct
+{
+    EV3_COMMAND_FIELDS
+
+    u8 handle;
+    u32 listSize;
+} CONTINUE_LIST_FILES;
+
+
+
 #define EV3_VM_COMMAND_FIELDS \
 	HID_LAYER \
 	EV3_PACKET_FIELDS \
@@ -76,6 +107,7 @@ typedef struct
 
 typedef VM_CMD EXECUTE_FILE;
 extern EXECUTE_FILE EXECUTE_FILE_INIT;
+
 /*
 typedef struct
 {
@@ -112,3 +144,4 @@ extern VM_REPLY EXECUTE_FILE_REPLY_SUCCESS;
    	memcpy(ptr, &type##_INIT, sizeof(type));					\
 	((SYSTEM_CMD *)ptr)->packetLen = sizeof(type) + extra - PREFIX_SIZE;	\
 	ptr;})
+

@@ -32,3 +32,4 @@ struct error ev3_test()
 	}
 		return (struct error) {.category = ERR_UNK, .msg = "\nAttempting beep..", .reply = NULL};
 }
+
