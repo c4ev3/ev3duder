@@ -36,7 +36,7 @@ void params_print()
 enum ARGS             {ARG_TEST, ARG_UP, ARG_EXEC, ARG_LS, ARG_RM, ARG_MKDIR, ARG_CD, ARG_PWD, ARG_RAW, ARG_END};
 const char *args[] =  {"test",   "up",   "exec", "ls", "rm", "mkdir", "cd", "pwd", "raw", NULL};
 
-const char envvar[] = "ev3_cd";
+const char settings_file[] = ".ev3duder";
 
 hid_device *handle;
 
@@ -60,6 +60,15 @@ int main(int argc, char *argv[])
     argc -= 2;
     argv += 2;
     struct error ret;
+    char *wd = malloc(FILENAME_MAX);
+    *wd = '\0'; // default value
+    FILE *fp;
+    if((fp = fopen(settings_file, "r")))
+    {
+      fgets(wd, FILENAME_MAX, fp);
+      fclose(fp);
+    }
+
     switch (i)
     {
     case ARG_TEST:
@@ -119,21 +128,14 @@ int main(int argc, char *argv[])
     case ARG_CD:
         assert(argc == 1);
         {
-        size_t wd_len = strlen(argv[0]); 
-        char *wd = malloc(sizeof envvar - 1 + wd_len + 1);
-// *INDENT-OFF*
-        *(mempcpy(mempcpy(wd, envvar,  sizeof envvar),
-                              argv[0], wd_len))
-                            = '\0'; // hehe
-// *INDENT-ON*
-        wd[sizeof envvar -1] = '=';
-        putenv(wd);
-        puts(getenv(envvar));
+        FILE *fp = fopen(settings_file, "w");
+        fputs(argv[0], fp);
+        fclose(fp); 
         }
-        break;
+        return 0;
     case ARG_PWD:
         assert(argc == 0);
-        puts(getenv(envvar));
+        puts(wd);
         return 0;
     case 100*ARG_RAW:
         assert(argc > 0);
