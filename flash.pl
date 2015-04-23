@@ -4,22 +4,23 @@ $|++;
 use IPC::System::Simple;
 use autodie 'system';
 use strict;
-my $slash = "/";
+
+local $/ = '/';
 my $name = $ARGV[0];
 
-my $localBinary 	= 'test'.$slash.'' .$name;
+my $localBinary 	= "test$/" . $name;
 my $remoteBinary 	= '../prjs/SD_Card/' . $name;
-my $localLauncher 	= 'test'.$slash.'myapps'.$slash. $name . 'Starter.rbf'; 
+my $localLauncher 	= "test$/myapps$/". $name . 'Starter.rbf'; 
 my $remoteLauncher 	= '../prjs/SD_Card/myapps/' . $name . 'Starter.rbf';
 
 printf("\n1- Attempting getting binary <%s> to <%s>\n", $localBinary, $remoteBinary);
-system('.'.$slash.'ev3duder' , 'up', $localBinary, $remoteBinary);
+system(".$/ev3duder" , 'up', $localBinary, $remoteBinary);
 
 printf("\n2- Attempting getting starter <%s> to <%s>\n", $localLauncher, $remoteLauncher);
-system('.'.$slash.'ev3duder', 'up', $localLauncher, $remoteLauncher);
+system(".$/ev3duder", 'up', $localLauncher, $remoteLauncher);
 
 printf("\n3- Attempting start of starter <%s>\n", $remoteLauncher);
-system('.'.$slash.'ev3duder', 'exec', $remoteLauncher);
+system(".$/ev3duder", 'exec', $remoteLauncher);
 
 printf("\n4- All is well!\n");
 

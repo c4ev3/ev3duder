@@ -1,5 +1,5 @@
 #include "defs.h"
-
+// inheritance :^)
 #define HID_LAYER \
 	u8 hidLayer;
 
@@ -19,7 +19,7 @@
 	u8 cmd; \
 	u8 ret;
 
-#define PREFIX_SIZE 3
+#define PREFIX_SIZE 3 // bytes not covered by packetLen (3B = 1B hidLayer + 2B packetLen itself)
 
 #pragma pack(push, 1) //README: __attribute__((packed)) doesn't work for whatever reason
 
@@ -35,12 +35,13 @@ typedef struct
   u8 bytes[];
 } SYSTEM_REPLY;
 
+/// upload to EV3
 typedef struct
 {
 	EV3_COMMAND_FIELDS
 
 	u32 fileSize;
-	char fileName[];
+	char fileName[]; // relative to "lms2012/sys", First folder must be apps, prjs or tools
 } BEGIN_DOWNLOAD;
 extern BEGIN_DOWNLOAD BEGIN_DOWNLOAD_INIT;
 
@@ -66,6 +67,7 @@ extern CONTINUE_DOWNLOAD CONTINUE_DOWNLOAD_INIT;
 typedef BEGIN_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY;
 extern CONTINUE_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY_SUCCESS;
 
+/// List files on EV3
 typedef struct
 {
     EV3_COMMAND_FIELDS
@@ -82,9 +84,7 @@ typedef struct
     u32 listSize; // when listSize < maxBytes; reached EO List?
     u8 handle; // for CONTINUE_LIST_FILES 
     char list[]; 
-    // \n seperated; which is strange as POSIX allows for it;
-    // \0 might've been a more sensible choice
-    // UTF-8 encoded. 
+    // \n seperated; UTF-8 encoded. 
 } LIST_FILES_REPLY;
 
 typedef struct
@@ -93,7 +93,9 @@ typedef struct
 
     u8 handle;
     u32 listSize;
-} CONTINUE_LIST_FILES;
+} CONTINUE_LIST_FILES; 
+
+/// create directory
 
 typedef struct
 {
@@ -106,6 +108,8 @@ extern CREATE_DIR CREATE_DIR_INIT;
 
 typedef SYSTEM_REPLY CREATE_DIR_REPLY;
 
+// delete file
+
 typedef struct
 {
     EV3_COMMAND_FIELDS
@@ -116,6 +120,35 @@ extern DELETE_FILE DELETE_FILE_INIT;
 
 typedef SYSTEM_REPLY DELETE_FILE_REPLY;
 
+/// set bluetooth pin
+
+typedef SYSTEM_CMD BLUETOOTHPIN;
+/*typedef struct
+{
+    EV3_COMMAND_FIELDS
+
+    u8 mac_len;
+    u8 mac[mac_len]; // asciiz hex; no colons
+    u8 pin_len;
+    u8 pen[pin_len]; // asciiz
+} BLUETOOTHPIN;*/ /* implement with mempcpy like in exec.c */ 
+
+extern BLUETOOTHPIN BLUETOOTHPIN_INIT;
+
+typedef struct{
+  EV3_REPLY_FIELDS
+
+  BLUETOOTHPIN echo; // GNU C extension
+} BLUETOOTHPIN_REPLY;
+
+/// Force brick into Firmware update mode
+
+typedef SYSTEM_CMD ENTERFWUPDATE; 
+extern ENTERFWUPDATE ENTERFWUPDATE_INIT;
+
+//no reply
+
+/// VM stuff
 #define EV3_VM_COMMAND_FIELDS \
 	HID_LAYER \
 	EV3_PACKET_FIELDS \
@@ -161,8 +194,8 @@ extern VM_REPLY EXECUTE_FILE_REPLY_SUCCESS;
 
 
 #pragma pack(pop)
-//_packet_alloc(sizeof(type), extra, &type##_INIT)
-// note: this V is a GNU extension (Compund statement expressions or something)
+// for variably sized packets. Allocates space, initializes and adjusts packetLen field
+// note: this V is a GNU extension (Compund statement expression or something)
 #define packet_alloc(type, extra) ({ 					\
    	void *ptr = malloc(sizeof(type) + extra); 				\
    	memcpy(ptr, &type##_INIT, sizeof(type));					\

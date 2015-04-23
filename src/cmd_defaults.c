@@ -18,6 +18,12 @@ CREATE_DIR_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0x9B };
 DELETE_FILE
 DELETE_FILE_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0x9C };
 
+BLUETOOTHPIN
+BLUETOOTHPIN_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0x9F};
+
+ENTERFWUPDATE
+ENTERFWUPDATE_INIT = {.hidLayer = 0x00, .replyType = 0x00, .cmd = 0xA0};
+
 EXECUTE_FILE
 EXECUTE_FILE_INIT = {.hidLayer = 0x00, .replyType = 0x00, .alloc = 0x0800};
 
