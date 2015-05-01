@@ -27,21 +27,28 @@ const char *errstr;
 
 void params_print()
 {
-    puts(	"USAGE: ev3duder [ up loc rem | dl rem loc | exec rem | kill rem |"	"\n"
-            "                  cp rem rem | mv rem rem | rm rem | ls [rem] | tree [rem] |"	"\n"
-            "                  shell str | cd rem | pwd | test ]"					"\n"
-            "\n"
-            "       rem = remote (EV3) system path, loc = (local file system) path"	"\n");
+    puts(	"USAGE: ev3duder "
+        "[ up loc rem | dl rem loc | exec rem | kill rem |\n"
+        "                  "
+        "cp rem rem | mv rem rem | rm rem | ls [rem] | tree [rem] |\n"
+        "                  "
+        "shell str | cd rem | pwd | test ]\n"
+        "\n"
+        "       "
+        "rem = remote (EV3) system path, loc = (local file system) path"	"\n");
 }
-enum ARGS             {ARG_TEST, ARG_UP, ARG_EXEC, ARG_LS, ARG_RM, ARG_MKDIR, ARG_CD, ARG_PWD, ARG_RAW, ARG_END};
+enum ARGS {ARG_TEST, ARG_UP, ARG_EXEC, ARG_LS, ARG_RM, ARG_MKDIR, ARG_CD, ARG_PWD, ARG_RAW, ARG_END};
 const char *args[] =  {"test",   "up",   "exec", "ls", "rm", "mkdir", "cd", "pwd", "raw", NULL};
 
 const char settings_file[] = ".ev3duder";
 
 hid_device *handle;
 
-int main(int argc, char *argv[])
+int main(int orig_argc, char *orig_argv[])
 {
+    int argc = orig_argc;
+    char **argv = orig_argv;
+
     if (argc == 1)
     {
         params_print();

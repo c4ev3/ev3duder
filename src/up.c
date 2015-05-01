@@ -13,13 +13,12 @@ extern hid_device *handle;
 #define VendorID 0x694 /* LEGO GROUP */
 #define ProductID 0x005 /* EV3 */
 #define SerialID NULL
-#define TIMEOUT 2000 /* in milli seconds */
+#define TIMEOUT 2000 /* in milliseconds */
 
 
 #define MAX_STR 256
 
-#define CHUNK_SIZE 1000 //FIXME: for some reason HIDAPI refuses sending more bytes?!
-//(((u16)~0 - sizeof (CONTINUE_DOWNLOAD) - PREFIX_SIZE)/1)
+#define CHUNK_SIZE 1000 // EV3's HID driver doesn't do packets > 1024B
 
 enum {
 	SUCCESS = 0,

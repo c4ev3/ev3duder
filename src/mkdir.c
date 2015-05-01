@@ -35,7 +35,7 @@ static const char * const bdrep_str[] =
 	[FILE_EXITS] 		= "FILE_EXITS",
 	[END_OF_FILE] 		= "END_OF_FILE",
 	[SIZE_ERROR] 		= "SIZE_ERROR\tCan't write here. Is SD Card properly inserted?",
-	[UNKNOWN_ERROR] 	= "UNKNOWN_ERROR\tNo such file or directory",
+	[UNKNOWN_ERROR] 	= "UNKNOWN_ERROR\tNo such directory",
 	[ILLEGAL_FILENAME] 	= "ILLEGAL_FILENAME",
 	[ILLEGAL_CONNECTION] 	= "ILLEGAL_CONNECTION",
 };
