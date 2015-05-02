@@ -35,7 +35,8 @@ $(OBJS): $(OBJDIR)/%.o: $(SRCDIR)/%.c
 -include $(OBJDIR)/*.d
 
 # CC=/path/to/cross/cc will need to be passed to make
-win32: FLAGS += -municode
+# TODO: remove all %zu prints altogether
+win32: FLAGS += -municode -Wno-unused-value -D__USE_MINGW_ANSI_STDIO=1
 win32: all
 
 debug: FLAGS += -g
