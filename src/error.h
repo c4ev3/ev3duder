@@ -1,6 +1,28 @@
+#ifndef EV3DUDER_ERROR_H
+#define EV3DUDER_ERROR_H
+
 #include "defs.h"
-enum ERR {ERR_UNK = 0, ERR_ARG, ERR_IO, ERR_HID, ERR_VM, ERR_SYS, ERR_END};
+enum ERR {ERR_UNK = 0, ERR_ARG, ERR_IO, ERR_FTOOBIG, ERR_NOMEM, ERR_HID, ERR_VM, ERR_SYS, ERR_END};
 enum {VM_OK = 0x03, VM_ERROR = 0x05};
 
-struct error { enum ERR category; const char *msg; size_t reply_len; const void *reply;};
+enum {
+    SUCCESS = 0,
+    UNKNOWN_HANDLE,
+    HANDLE_NOT_READY,
+    CORRUPT_FILE,
+    NO_HANDLES_AVAILABLE,
+    NO_PERMISSION,
+    ILLEGAL_PATH,
+    FILE_EXITS,
+    END_OF_FILE,
+    SIZE_ERROR,
+    UNKNOWN_ERROR,
+    ILLEGAL_FILENAME,
+    ILLEGAL_CONNECTION,
+
+    ERRORS_END
+};
+extern const wchar_t * const ev3_error[ERRORS_END + 1];
+
+#endif
 

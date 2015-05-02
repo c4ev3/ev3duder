@@ -1,4 +1,9 @@
+#ifndef EV3DUDER_DEFS_H
+#define EV3DUDER_DEFS_H
+
 #include <stdint.h>
+#include <stddef.h>
+
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -8,6 +13,9 @@ typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
 typedef int64_t i64;
+
+extern const char *errmsg;
+extern const wchar_t *hiderr;
 
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array)[0])
 
@@ -34,4 +42,6 @@ typedef int64_t i64;
 	} while (0*putc('\n', stderr))
 
 #define TIMEOUT 2000 /* in milliseconds */
+
+#endif
 

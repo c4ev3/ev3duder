@@ -7,169 +7,135 @@
 #include "defs.h"
 #include "systemcmd.h"
 #include "error.h"
+#include "funcs.h"
+
 extern hid_device *handle;
-
-
-#define VendorID 0x694 /* LEGO GROUP */
-#define ProductID 0x005 /* EV3 */
-#define SerialID NULL
-#define TIMEOUT 2000 /* in milliseconds */
-
-
-#define MAX_STR 256
 
 #define CHUNK_SIZE 1000 // EV3's HID driver doesn't do packets > 1024B
 
-enum {
-	SUCCESS = 0,
-	UNKNOWN_HANDLE,
-	HANDLE_NOT_READY,
-	CORRUPT_FILE,
-	NO_HANDLES_AVAILABLE,
-	NO_PERMISSION,
-	ILLEGAL_PATH,
-	FILE_EXITS,
-	END_OF_FILE,
-	SIZE_ERROR,
-	UNKNOWN_ERROR,
-	ILLEGAL_FILENAME,
-	ILLEGAL_CONNECTION
-};
-static const char * const bdrep_str[] =
+int up(FILE *fp, const char *dst)
 {
-	[SUCCESS] 		= "SUCCESS",
-	[UNKNOWN_HANDLE] 	= "UNKNOWN_HANDLE",
-	[HANDLE_NOT_READY] 	= "HANDLE_NOT_READY",
-	[CORRUPT_FILE] 		= "CORRUPT_FILE",
-	[NO_HANDLES_AVAILABLE] 	= "NO_HANDLES_AVAILABLE\tPath doesn't resolve to a valid file",
-	[NO_PERMISSION] 	= "NO_PERMISSION",
-	[ILLEGAL_PATH] 		= "ILLEGAL_PATH",
-	[FILE_EXITS] 		= "FILE_EXITS",
-	[END_OF_FILE] 		= "END_OF_FILE",
-	[SIZE_ERROR] 		= "SIZE_ERROR\tCan't write here. Is SD Card properly inserted?",
-	[UNKNOWN_ERROR] 	= "UNKNOWN_ERROR",
-	[ILLEGAL_FILENAME] 	= "ILLEGAL_FILENAME",
-	[ILLEGAL_CONNECTION] 	= "ILLEGAL_CONNECTION",
-};
+    int res;
 
-struct error up(FILE *fp, const char *dst)
-{
-	int res;
+    fseek(fp, 0, SEEK_END);
+    long fsize = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    if ((unsigned long)fsize > (u32)-1)
+      return ERR_FTOOBIG;   
 
-	fseek(fp, 0, SEEK_END);
-	long fsize = ftell(fp); // file size limit is min(LONG_MAX, 4gb)
-	size_t extra_chunks   = fsize / CHUNK_SIZE;
-	size_t final_chunk_sz = fsize % CHUNK_SIZE;
+    size_t extra_chunks   = fsize / CHUNK_SIZE;
+    size_t final_chunk_sz = fsize % CHUNK_SIZE;
 
-	fprintf(stderr, "Attempting file upload (%ldb total; %zu chunks): \n", fsize, extra_chunks + 1);
-	fseek(fp, 0, SEEK_SET);
+    fprintf(stderr, "Attempting file upload (%ldb total; %zu chunks): \n", fsize, extra_chunks + 1);
 
-	CONTINUE_DOWNLOAD **cd = malloc((1 + extra_chunks) * sizeof(*cd));
-	{
-		size_t ret;
-		size_t i = 0;
-		for (; i < extra_chunks; ++i)
-		{
-			cd[i] = packet_alloc(CONTINUE_DOWNLOAD, CHUNK_SIZE);
-			ret = fread(cd[i]->fileChunk, 1, CHUNK_SIZE, fp);
-		}
+    CONTINUE_DOWNLOAD **cd = malloc((1 + extra_chunks) * sizeof(*cd));
+    {
+        size_t ret;
+        size_t i = 0;
+        for (; i < extra_chunks; ++i)
+        {
+            cd[i] = packet_alloc(CONTINUE_DOWNLOAD, CHUNK_SIZE);
+            ret = fread(cd[i]->fileChunk, 1, CHUNK_SIZE, fp);
+        }
 
-		cd[i] = packet_alloc(CONTINUE_DOWNLOAD, final_chunk_sz);
+        cd[i] = packet_alloc(CONTINUE_DOWNLOAD, final_chunk_sz);
 
-		ret = fread(cd[i]->fileChunk, 1, final_chunk_sz, fp);
-		(void) ret;
-		fclose(fp);
-	}
+        ret = fread(cd[i]->fileChunk, 1, final_chunk_sz, fp);
+        (void) ret;
+        fclose(fp);
+    }
 
-	//TODO: read in chunks, whatif long isnt big enough
-	BEGIN_DOWNLOAD *bd = packet_alloc(BEGIN_DOWNLOAD, strlen(dst) + 1);
-	bd->fileSize = fsize;
-	strcpy(bd->fileName, dst);
+    //TODO: read in chunks, whatif long isnt big enough
+    BEGIN_DOWNLOAD *bd = packet_alloc(BEGIN_DOWNLOAD, strlen(dst) + 1);
+    bd->fileSize = fsize;
+    strcpy(bd->fileName, dst);
 
-	res = hid_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
-	if (res < 0) return (struct error)
-	{.category = ERR_HID, .msg = "Unable to write BEGIN_DOWNLOAD.", .reply = hid_error(handle)};
+    res = hid_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
+    if (res < 0)
+    {
+        errmsg = "Unable to write BEGIN_DOWNLOAD.";
+        hiderr = hid_error(handle);
+        return ERR_HID;
+    }
+    fputs("Checking reply: \n", stderr);
 
-	fputs("Checking reply: \n", stderr);
+    BEGIN_DOWNLOAD_REPLY bdrep;
 
-	BEGIN_DOWNLOAD_REPLY bdrep;
+    res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+    if (res <= 0)
+    {
+        errmsg = "Unable to read BEGIN_DOWNLOAD";
+        hiderr = hid_error(handle);
+        return ERR_HID;
+    }
 
-	res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
-	if (res <= 0) return (struct error)
-	{.category = ERR_HID, .msg = "Unable to read BEGIN_DOWNLOAD_REPLY", .reply = hid_error(handle)};
+    if (bdrep.type == VM_ERROR)
+    {
+        if (bdrep.ret < ARRAY_SIZE(ev3_error))
+            hiderr = ev3_error[bdrep.ret];
+        else
+            hiderr = L"ERROR_OUT_OF_BOUNDS";
 
-	if (bdrep.type == VM_ERROR)
-	{
-		const char *msg;
-		if (bdrep.ret < ARRAY_SIZE(bdrep_str))
-			msg = bdrep_str[bdrep.ret];
-		else
-			msg = "ERROR_OUT_OF_BOUNDS";
-
-		return (struct error)
-		{.category = ERR_VM, .msg = "BEGIN_DOWNLOAD was denied.", .reply = msg};
-	}
+        errmsg = "BEGIN_DOWNLOAD was denied.";
+        return ERR_VM;
+    }
 
 
 #ifdef DEBUG
-	fputs("=BEGIN_DOWNLOAD_REPLY", stderr);
-	print_bytes(&bdrep, sizeof(bdrep));
-	putc('\n', stderr);
-	fprintf(stderr, "current handle is %u\n", bdrep.fileHandle);
-	fputs("=cut", stderr);
+    fputs("=BEGIN_DOWNLOAD_REPLY", stderr);
+    print_bytes(&bdrep, sizeof(bdrep));
+    putc('\n', stderr);
+    fprintf(stderr, "current handle is %u\n", bdrep.fileHandle);
+    fputs("=cut", stderr);
 #endif
 
-	for (size_t i = 0; i <= extra_chunks; ++i)
-	{
-		cd[i]->fileHandle = bdrep.fileHandle;
-		res = hid_write(handle, (u8 *)cd[i], cd[i]->packetLen + PREFIX_SIZE);
+    for (size_t i = 0; i <= extra_chunks; ++i)
+    {
+        cd[i]->fileHandle = bdrep.fileHandle;
+        res = hid_write(handle, (u8 *)cd[i], cd[i]->packetLen + PREFIX_SIZE);
 #if DEBUG > 7
-		fprintf(stderr, "=CONTINUE_DOWNLOAD");;
-		print_bytes(cd[i], cd[i]->packetLen + PREFIX_SIZE);
-		fputs("=cut", stderr);
+        fprintf(stderr, "=CONTINUE_DOWNLOAD");;
+        print_bytes(cd[i], cd[i]->packetLen + PREFIX_SIZE);
+        fputs("=cut", stderr);
 #endif
-		if (res < 0) return (struct error)
-		{.category = ERR_HID, .msg = "Unable to write CONTINUE_DOWNLOAD.", .reply = hid_error(handle)};
+        if (res < 0)
+        {
+            errmsg = "Unable to write CONTINUE_DOWNLOAD.";
+            hiderr = hid_error(handle);
+            return ERR_HID;
+        }
+        res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+        if (res <= 0)
+        {
+            errmsg = "Unable to read CONTINUE_DOWNLOADhiderr";
+            hiderr = hid_error(handle);
+            return ERR_HID;
+        }
 
-		res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
-		if (res <= 0) return (struct error)
-		{.category = ERR_HID, .msg = "Unable to read CONTINUE_DOWNLOAD_REPLY", .reply = hid_error(handle)};
+        fprintf(stderr,"=CONTINUE_DOWNLOAD_REPLY(chunk=%zu, data=%zub)\n", i,
+                cd[i]->packetLen - (sizeof(CONTINUE_DOWNLOAD) - PREFIX_SIZE));
+        print_bytes(&bdrep, PREFIX_SIZE + bdrep.packetLen);
+        fputs("=cut", stderr);
+    }
 
+    if (bdrep.type == VM_ERROR)
+    {
+        if (bdrep.ret < ARRAY_SIZE(ev3_error))
+            hiderr = ev3_error[bdrep.ret];
+        else
+            hiderr = L"ERROR_OUT_OF_BOUNDS";
 
-		fprintf(stderr,"=CONTINUE_DOWNLOAD_REPLY(chunk=%zu, data=%zub)\n", i,
-		       cd[i]->packetLen - (sizeof(CONTINUE_DOWNLOAD) - PREFIX_SIZE));
-		print_bytes(&bdrep, PREFIX_SIZE + bdrep.packetLen);
-		fputs("=cut", stderr);
-	}
+        fputs("Transfer failed.\nlast_reply=", stderr);
 
+        print_bytes(&bdrep, bdrep.packetLen);
 
-	//printf("lol?");
-	/*res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
-	if (res == 0)
-		die("Request timed out.");
-	if (res < 0)
-		die("Unable to read.");
-	printf("lol!");*/
+        errmsg = "CONTINUE_DOWNLOAD was denied.";
+        return ERR_VM;
+    }
 
-	if (bdrep.type == VM_ERROR)
-	{
-		const char * msg;
-		if (bdrep.ret < ARRAY_SIZE(bdrep_str))
-			msg = bdrep_str[bdrep.ret];
-		else
-			msg = "ERROR_OUT_OF_BOUNDS";
+    fprintf(stderr, "Transfer has been successful! (ret=%d)\n", bdrep.type);
 
-		fputs("Transfer failed.\nlast_reply=", stderr);
-
-		print_bytes(&bdrep, bdrep.packetLen);
-
-		return (struct error)
-		{.category = ERR_VM, .msg = "CONTINUE_DOWNLOAD was denied.", .reply = msg};
-	}
-
-	fprintf(stderr, "Transfer has been successful! (ret=%d)\n", bdrep.type);
-
-	return (struct error)
-	{.category = ERR_UNK, .msg = "`upload` was successful.", .reply = NULL};
+    errmsg = "`upload` was successful.";
+    return ERR_UNK;
 }
 

@@ -1,3 +1,6 @@
+#ifndef EV3DUDER_SYSTEMCMD_H
+#define EV3DUDER_SYSTEMCMD_H
+
 #include "defs.h"
 // inheritance :^)
 #define HID_LAYER \
@@ -196,9 +199,14 @@ extern VM_REPLY EXECUTE_FILE_REPLY_SUCCESS;
 #pragma pack(pop)
 // for variably sized packets. Allocates space, initializes and adjusts packetLen field
 // note: this V is a GNU extension (Compund statement expression or something)
-#define packet_alloc(type, extra) ({ 					\
-   	void *ptr = malloc(sizeof(type) + extra); 				\
+#define packet_alloc(type, extra) ({ 				         	\
+    void *ptr = NULL;                                 \
+    if ((sizeof(type) + extra < (u16)-1)              \
+   	&& (ptr = malloc(sizeof(type) + extra))) {     		\
    	memcpy(ptr, &type##_INIT, sizeof(type));					\
-	((SYSTEM_CMD *)ptr)->packetLen = sizeof(type) + extra - PREFIX_SIZE;	\
+	((SYSTEM_CMD *)ptr)->packetLen = (u16)(sizeof(type) + extra - PREFIX_SIZE);                                          \
+  }                                                   \
 	ptr;})
+
+#endif
 
