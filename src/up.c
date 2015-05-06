@@ -2,14 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <hidapi.h>
+#include "ev3_io.h"
 
 #include "defs.h"
 #include "systemcmd.h"
 #include "error.h"
 #include "funcs.h"
-
-extern hid_device *handle;
 
 #define CHUNK_SIZE 1000 // EV3's HID driver doesn't do packets > 1024B
 
@@ -50,29 +48,29 @@ int up(FILE *fp, const char *dst)
     bd->fileSize = fsize;
     strcpy(bd->fileName, dst);
 
-    res = hid_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
+    res = ev3_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
     if (res < 0)
     {
         errmsg = "Unable to write BEGIN_DOWNLOAD.";
-        hiderr = hid_error(handle);
+        hiderr = ev3_error(handle);
         return ERR_HID;
     }
     fputs("Checking reply: \n", stderr);
 
     BEGIN_DOWNLOAD_REPLY bdrep;
 
-    res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+    res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
     if (res <= 0)
     {
         errmsg = "Unable to read BEGIN_DOWNLOAD";
-        hiderr = hid_error(handle);
+        hiderr = ev3_error(handle);
         return ERR_HID;
     }
 
     if (bdrep.type == VM_ERROR)
     {
-        if (bdrep.ret < ARRAY_SIZE(ev3_error))
-            hiderr = ev3_error[bdrep.ret];
+        if (bdrep.ret < ARRAY_SIZE(ev3_error_msgs))
+            hiderr = ev3_error_msgs[bdrep.ret];
         else
             hiderr = L"ERROR_OUT_OF_BOUNDS";
 
@@ -92,7 +90,7 @@ int up(FILE *fp, const char *dst)
     for (size_t i = 0; i <= extra_chunks; ++i)
     {
         cd[i]->fileHandle = bdrep.fileHandle;
-        res = hid_write(handle, (u8 *)cd[i], cd[i]->packetLen + PREFIX_SIZE);
+        res = ev3_write(handle, (u8 *)cd[i], cd[i]->packetLen + PREFIX_SIZE);
 #if DEBUG > 7
         fprintf(stderr, "=CONTINUE_DOWNLOAD");;
         print_bytes(cd[i], cd[i]->packetLen + PREFIX_SIZE);
@@ -101,14 +99,14 @@ int up(FILE *fp, const char *dst)
         if (res < 0)
         {
             errmsg = "Unable to write CONTINUE_DOWNLOAD.";
-            hiderr = hid_error(handle);
+            hiderr = ev3_error(handle);
             return ERR_HID;
         }
-        res = hid_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+        res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
         if (res <= 0)
         {
             errmsg = "Unable to read CONTINUE_DOWNLOADhiderr";
-            hiderr = hid_error(handle);
+            hiderr = ev3_error(handle);
             return ERR_HID;
         }
 
@@ -120,8 +118,8 @@ int up(FILE *fp, const char *dst)
 
     if (bdrep.type == VM_ERROR)
     {
-        if (bdrep.ret < ARRAY_SIZE(ev3_error))
-            hiderr = ev3_error[bdrep.ret];
+        if (bdrep.ret < ARRAY_SIZE(ev3_error_msgs))
+            hiderr = ev3_error_msgs[bdrep.ret];
         else
             hiderr = L"ERROR_OUT_OF_BOUNDS";
 

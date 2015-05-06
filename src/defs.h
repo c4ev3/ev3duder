@@ -14,9 +14,6 @@ typedef int16_t i16;
 typedef int32_t i32;
 typedef int64_t i64;
 
-extern const char *errmsg;
-extern const wchar_t *hiderr;
-
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof(array)[0])
 
 #define die(msg) \

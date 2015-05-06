@@ -9,20 +9,22 @@ OBJDIR = build
 
 #LIBS = -lpsapi
 
-SRCS = src/main.c src/cmd_defaults.c src/exec.c src/test.c src/up.c src/ls.c src/rm.c src/mkdir.c src/errors.c
+SRCS = src/main.c src/cmd_defaults.c src/exec.c src/test.c src/up.c src/ls.c src/rm.c src/mkdir.c
 
 # TODO: Apple's ld doesn't support interleaving -Bstatic
 LIBS = -Llib/ -lhidapi 
 INC += -Iinclude/
  
-OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o) 
 print-%  : ; @echo $* = $($*)
 ####################
 ifeq ($(OS),Windows_NT)
 RM = del /Q
 FLAGS += -municode
 BIN_NAME := $(addsuffix .exe, $(BIN_NAME))
+else
+SRCS += src/btunix.c
 endif
+OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o) 
 
 .DEFAULT: all
 all: binary

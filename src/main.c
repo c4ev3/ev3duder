@@ -1,10 +1,14 @@
+#define MAIN
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <assert.h>
-#include <hidapi.h>
 #include <wchar.h>
+
+#include <hidapi.h>
+#include "btserial.h"
+#include "ev3_io.h"
 
 #include "defs.h"
 #include "systemcmd.h"
@@ -16,10 +20,7 @@
 #define ProductID 0x005 /* EV3 */
 #define SerialID NULL
 
-const char *errmsg;
-const wchar_t *hiderr;
-
-void params_print()
+static void params_print()
 {
     puts(	"USAGE: ev3duder "
             "[ up loc rem | dl rem loc | exec rem | kill rem |\n"
@@ -40,15 +41,15 @@ void params_print()
     ARG(ls)              \
     ARG(rm)              \
     ARG(mkdir)           \
+    ARG(mkrbf)           \
     ARG(end)
 
 #define MK_ENUM(x) ARG_##x,
 #define MK_STR(x) T(#x),
 enum ARGS { FOREACH_ARG(MK_ENUM) };
-const tchar *args[] = { FOREACH_ARG(MK_STR) };
+static const tchar *args[] = { FOREACH_ARG(MK_STR) };
+static tchar * tstrjoin(tchar *, tchar *, size_t *);
 
-hid_device *handle;
-tchar * tstrjoin(tchar *, tchar *, size_t *);
 int main(int argc, tchar *argv[])
 {
     if (argc == 1)
@@ -56,12 +57,32 @@ int main(int argc, tchar *argv[])
         params_print();
         return ERR_ARG;
     }
-    handle = hid_open(VendorID, ProductID, SerialID);
-    if (!handle)
+   
+    if ((handle = hid_open(VendorID, ProductID, SerialID)))
     {
-        puts("EV3 not found. Is it properly plugged into the USB port?");
-        return ERR_HID;
+      puts("USB connection established.");
+      // the things you do for type safety...
+      ev3_write = (int (*)(void*, const u8*, size_t))hid_write;
+      ev3_read_timeout = (int (*)(void*, u8*, size_t, int))hid_read_timeout;
+      ev3_error = (const wchar_t* (*)(void*))hid_error;
     }
+    else if ((handle = bt_open()))
+    {
+      fputs("Bluetooth serial connection established.", stderr);
+      ev3_write = bt_write;
+      ev3_read_timeout = bt_read;
+      ev3_error = bt_error;
+    }
+    else if (strcmp(argv[1], "-i") == 0)
+    {
+        argv++; 
+        argc--;
+    } else {
+        puts("EV3 not found. Either plug it into the USB port or pair over Bluetooth. ");
+        return ERR_HID; // TODO: rename
+    }
+   puts("~~~~~unreachable~~~~~"); 
+
 
     int i;
     for (i = 0; i < ARG_end; ++i)
@@ -131,6 +152,25 @@ int main(int argc, tchar *argv[])
         ret = mkdir(U8(path, len));
         }
         break;
+    case ARG_mkrbf:
+        assert(argc == 2);
+        {
+        FILE *fp = tfopen(argv[1], "w");
+        if (!fp)
+          return ERR_IO;
+        char part1[] = 
+"LEGO\x52\x00\x00\x00\x68\x00\x01\x00\x00\x00\x00\x00\x1C\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x60\x80";
+        char part2[] = "\x44\x85\x82\xE8\x03\x40\x86\x40\x0A";
+        size_t path_sz = tstrlen(argv[0]);
+        char *path = U8(argv[0], path_sz);
+        u32 static_sz = (u32)(sizeof part1 -1 + path_sz + 1 + sizeof part2 -1);
+        memcpy(&part1[4], &static_sz, 4);
+        fwrite(part1, sizeof part1 - 1, 1, fp);
+        fwrite(path, path_sz + 1, 1, fp);
+        fwrite(part2, sizeof part2 - 1, 1, fp);
+        fclose(fp);
+        }
+        return ERR_UNK;
     case ARG_rm:
         assert(argc == 1);
         {
@@ -164,7 +204,7 @@ int main(int argc, tchar *argv[])
     // maybe \n to stderr?
     return ret;
 }
-tchar *tstrjoin(tchar *s1, tchar *s2, size_t *len)
+static tchar *tstrjoin(tchar *s1, tchar *s2, size_t *len)
 {
     if (s1 == NULL || *s1 == '\0') {
       if (s2 != NULL)

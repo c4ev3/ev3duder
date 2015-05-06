@@ -2,15 +2,23 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <hidapi.h>
+#include "ev3_io.h"
 
 #include "defs.h"
 #include "systemcmd.h"
 #include "error.h"
 #include "funcs.h"
 
-extern hid_device *handle;
-
+/**
+ * @brief List files and directories at \p path. path is always relative to <em>/home/root/lms2012/prjs/sys/<em>
+ * @param [in] loc Local FILE*s
+ * @param [in] rem Remote EV3 UTF-8 encoded path strings
+ *
+ * @retval error according to enum #ERR
+ * @see http://topikachu.github.io/python-ev3/UIdesign.html
+ * @bug Doesn't handle replies over 1000 byte in length.
+ *      implementation of \p CONTINUTE_LIST_FILES would be required
+ */
 int ls(const char *path)
 {
     int res;
@@ -20,29 +28,29 @@ int ls(const char *path)
     memcpy(list->path, path, path_sz);
 
     print_bytes(list, list->packetLen + PREFIX_SIZE);
-    res = hid_write(handle, (u8 *)list, list->packetLen + PREFIX_SIZE);
+    res = ev3_write(handle, (u8 *)list, list->packetLen + PREFIX_SIZE);
     if (res < 0)
     {
         errmsg = "Unable to write BEGIN_DOWNLOAD.";
-        hiderr = hid_error(handle);
+        hiderr = ev3_error(handle);
         return ERR_HID;
     }
     fputs("Checking reply: \n", stderr);
     size_t listrep_sz = sizeof(LIST_FILES_REPLY) + list->maxBytes;
     LIST_FILES_REPLY *listrep = malloc(listrep_sz);
 
-    res = hid_read_timeout(handle, (u8 *)listrep, listrep_sz, TIMEOUT);
+    res = ev3_read_timeout(handle, (u8 *)listrep, listrep_sz, TIMEOUT);
     if (res <= 0)
     {
         errmsg = "Unable to read LIST_FILEShiderr";
-        hiderr = hid_error(handle);
+        hiderr = ev3_error(handle);
         return ERR_HID;
     }
 
     if (listrep->type == VM_ERROR)
     {
-        if (listrep->ret < ARRAY_SIZE(ev3_error))
-            hiderr = ev3_error[listrep->ret];
+        if (listrep->ret < ARRAY_SIZE(ev3_error_msgs))
+            hiderr = ev3_error_msgs[listrep->ret];
         else
             hiderr = L"ERROR_OUT_OF_BOUNDS";
         fputs("Operation failed.\nlast_reply=", stderr);
