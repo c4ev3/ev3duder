@@ -31,7 +31,7 @@ int ls(const char *path)
     res = ev3_write(handle, (u8 *)list, list->packetLen + PREFIX_SIZE);
     if (res < 0)
     {
-        errmsg = "Unable to write BEGIN_DOWNLOAD.";
+        errmsg = "Unable to write LIST_FILES.";
         hiderr = ev3_error(handle);
         return ERR_HID;
     }
@@ -42,7 +42,7 @@ int ls(const char *path)
     res = ev3_read_timeout(handle, (u8 *)listrep, listrep_sz, TIMEOUT);
     if (res <= 0)
     {
-        errmsg = "Unable to read LIST_FILEShiderr";
+        errmsg = "Unable to read LIST_FILES";
         hiderr = ev3_error(handle);
         return ERR_HID;
     }

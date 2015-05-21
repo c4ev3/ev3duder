@@ -46,7 +46,7 @@ typedef struct
 	u32 fileSize;
 	char fileName[]; // relative to "lms2012/sys", First folder must be apps, prjs or tools
 } BEGIN_DOWNLOAD;
-extern BEGIN_DOWNLOAD BEGIN_DOWNLOAD_INIT;
+extern const BEGIN_DOWNLOAD BEGIN_DOWNLOAD_INIT;
 
 typedef struct
 {
@@ -65,11 +65,12 @@ typedef struct
 	char fileChunk[];
 } CONTINUE_DOWNLOAD;
 
-extern CONTINUE_DOWNLOAD CONTINUE_DOWNLOAD_INIT;
+extern const CONTINUE_DOWNLOAD CONTINUE_DOWNLOAD_INIT;
 
 typedef BEGIN_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY;
-extern CONTINUE_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY_SUCCESS;
+extern const CONTINUE_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY_SUCCESS;
 
+	
 /// List files on EV3
 typedef struct
 {
@@ -78,8 +79,10 @@ typedef struct
     u16 maxBytes;
     u8 path[];
 } LIST_FILES;
-extern LIST_FILES LIST_FILES_INIT;
+extern const LIST_FILES LIST_FILES_INIT;
 
+typedef LIST_FILES BEGIN_GETFILE;
+extern const BEGIN_GETFILE BEGIN_GETFILE_INIT;
 typedef struct
 {
 	EV3_REPLY_FIELDS
@@ -107,7 +110,7 @@ typedef struct
     u8 path[];
 } CREATE_DIR; 
 
-extern CREATE_DIR CREATE_DIR_INIT;
+extern const CREATE_DIR CREATE_DIR_INIT;
 
 typedef SYSTEM_REPLY CREATE_DIR_REPLY;
 
@@ -119,7 +122,7 @@ typedef struct
 
     u8 path[];
 } DELETE_FILE; 
-extern DELETE_FILE DELETE_FILE_INIT;
+extern const DELETE_FILE DELETE_FILE_INIT;
 
 typedef SYSTEM_REPLY DELETE_FILE_REPLY;
 
@@ -136,7 +139,7 @@ typedef SYSTEM_CMD BLUETOOTHPIN;
     u8 pen[pin_len]; // asciiz
 } BLUETOOTHPIN;*/ /* implement with mempcpy like in exec.c */ 
 
-extern BLUETOOTHPIN BLUETOOTHPIN_INIT;
+extern const BLUETOOTHPIN BLUETOOTHPIN_INIT;
 
 typedef struct{
   EV3_REPLY_FIELDS
@@ -147,7 +150,7 @@ typedef struct{
 /// Force brick into Firmware update mode
 
 typedef SYSTEM_CMD ENTERFWUPDATE; 
-extern ENTERFWUPDATE ENTERFWUPDATE_INIT;
+extern const ENTERFWUPDATE ENTERFWUPDATE_INIT;
 
 //no reply
 
@@ -166,7 +169,7 @@ typedef struct
 } VM_CMD;
 
 typedef VM_CMD EXECUTE_FILE;
-extern EXECUTE_FILE EXECUTE_FILE_INIT;
+extern const EXECUTE_FILE EXECUTE_FILE_INIT;
 
 /*
 typedef struct
@@ -193,7 +196,7 @@ typedef struct
 	u8 bytes[];
 } VM_REPLY;
 
-extern VM_REPLY EXECUTE_FILE_REPLY_SUCCESS;
+extern const VM_REPLY EXECUTE_FILE_REPLY_SUCCESS;
 
 
 #pragma pack(pop)

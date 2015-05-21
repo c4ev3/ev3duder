@@ -49,6 +49,12 @@ static void params_print()
 enum ARGS { FOREACH_ARG(MK_ENUM) };
 static const tchar *args[] = { FOREACH_ARG(MK_STR) };
 static tchar * tstrjoin(tchar *, tchar *, size_t *);
+static tchar* tchrsub(tchar *s, tchar old, tchar new);
+#ifdef _WIN32
+#define SANITIZE(s) (tchrsub((s), '/', '\\'))
+#else
+#define SANITIZE
+#endif
 
 int main(int argc, tchar *argv[])
 {
@@ -81,8 +87,7 @@ int main(int argc, tchar *argv[])
         puts("EV3 not found. Either plug it into the USB port or pair over Bluetooth. ");
         return ERR_HID; // TODO: rename
     }
-   puts("~~~~~unreachable~~~~~"); 
-
+	
 
     int i;
     for (i = 0; i < ARG_end; ++i)
@@ -102,15 +107,15 @@ int main(int argc, tchar *argv[])
     case ARG_up:
         assert(argc == 2);
         {
-            FILE *fp = tfopen(argv[0], "rb");
-            size_t len;
-            tchar *path = tstrjoin(cd, argv[1], &len); 
-            if (!fp)
-            {
-                printf("File <%" PRIts "> doesn't exist.\n", argv[0]);
-                return ERR_IO;
-            }
-            ret = up(fp, U8(path, len));
+		FILE *fp = tfopen(SANITIZE(argv[0]), "rb");
+		size_t len;
+		tchar *path = tstrjoin(cd, argv[1], &len); 
+		if (!fp)
+		{
+			printf("File <%" PRIts "> doesn't exist.\n", argv[0]);
+			return ERR_IO;
+		}
+		ret = up(fp, U8(path, len));
         }
         break;
 
@@ -129,10 +134,10 @@ int main(int argc, tchar *argv[])
     case ARG_pwd:
         assert(argc <= 1);
         {
-        size_t len;
-        tchar *path = tstrjoin(cd, argv[0], &len); 
-        printf("path:%" PRIts " (len=%zu)\nUse export CD=dir to cd to dir\n",
-            path ?: T("."), len);  
+		size_t len;
+		tchar *path = tstrjoin(cd, argv[0], &len); 
+		printf("path:%" PRIts " (len=%zu)\nuse export cd=dir to cd to dir\n",
+			path ?: T("."), len);  
         }
         return ERR_UNK;
     case ARG_ls:
@@ -155,7 +160,7 @@ int main(int argc, tchar *argv[])
     case ARG_mkrbf:
         assert(argc == 2);
         {
-        FILE *fp = tfopen(argv[1], "w");
+        FILE *fp = tfopen(SANITIZE(argv[1]), "w");
         if (!fp)
           return ERR_IO;
         char part1[] = 
@@ -174,21 +179,21 @@ int main(int argc, tchar *argv[])
     case ARG_rm:
         assert(argc == 1);
         {
-            if(tstrchr(argv[0], '*'))
-            {
-                printf("This will probably remove more than one file. Are you sure to proceed? (Y/n)");
-                char ch;
-                scanf("%c", &ch);
-                if ((ch | ' ') == 'n') // check if 'n' or 'N'
-                {
-                    ret = ERR_UNK;
-                    break;
-                }
-                fflush(stdin); // technically UB, but POSIX and Windows allow for it
-            }
-            size_t len;
-            tchar *path = tstrjoin(cd, argv[0], &len); 
-            ret = rm(U8(path, len));
+		if(tstrchr(argv[0], '*'))
+		{
+			printf("This will probably remove more than one file. Are you sure to proceed? (Y/n)");
+			char ch;
+			scanf("%c", &ch);
+			if ((ch | ' ') == 'n') // check if 'n' or 'N'
+			{
+				ret = ERR_UNK;
+				break;
+			}
+			fflush(stdin); // technically UB, but POSIX and Windows allow for it
+		}
+		size_t len;
+		tchar *path = tstrjoin(cd, argv[0], &len); 
+		ret = rm(U8(path, len));
         }
         break;
     default:
@@ -231,5 +236,16 @@ static tchar *tstrjoin(tchar *s1, tchar *s2, size_t *len)
            );
     ret[s1_sz] = '/';
     return ret;
+}
+static tchar* tchrsub(tchar *s, tchar old, tchar new)
+{
+	tchar *ptr = s;
+	if (ptr == NULL || *ptr == T('\0'))
+		return NULL;
+	do
+	{
+		if (*ptr == old) *ptr = new;
+	}while(*++ptr);
+	return s;
 }
 

@@ -1,7 +1,7 @@
 #include <wchar.h>
 #include "error.h"
 
-const wchar_t * const ev3_error[] =
+const wchar_t * const ev3_error_msgs[] =
 {
     [SUCCESS] 		        = L"SUCCESS",
     [UNKNOWN_HANDLE] 	    = L"UNKNOWN_HANDLE",
