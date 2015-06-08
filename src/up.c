@@ -105,7 +105,7 @@ int up(FILE *fp, const char *dst)
         res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
         if (res <= 0)
         {
-            errmsg = "Unable to read CONTINUE_DOWNLOADhiderr";
+            errmsg = "Unable to read CONTINUE_DOWNLOAD";
             hiderr = ev3_error(handle);
             return ERR_HID;
         }

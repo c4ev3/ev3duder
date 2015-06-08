@@ -19,12 +19,13 @@
  * @bug Doesn't handle replies over 1000 byte in length.
  *      implementation of \p CONTINUTE_LIST_FILES would be required
  */
+#define MAX_READ 1024
 int ls(const char *path)
 {
     int res;
     size_t path_sz = strlen(path) + 1;
     LIST_FILES *list = packet_alloc(LIST_FILES, path_sz);
-    list->maxBytes = 0xffff;
+    list->maxBytes = MAX_READ;
     memcpy(list->path, path, path_sz);
 
     print_bytes(list, list->packetLen + PREFIX_SIZE);
@@ -60,8 +61,61 @@ int ls(const char *path)
         errmsg = "`LIST_FILES` was denied.";
         return ERR_VM;
     }
-    puts(listrep->list);
-    //README: it's assumed that the folder structure fits into ONE HID packet. if not additional code for handling CONTINUTE_LIST_FILES is required
+    fputs(listrep->list, stdout);
+	//
+// From the LEGO docs:  - LIST_FILES should work as long as list does not exceed 1014 bytes. CONTINUE_LISTFILES has NOT been implemented yet.
+#if !LEGO_FIXED_CONTINUE_LIST_FILES
+	
+#else
+	size_t read_so_far = listrep->packetLen + 2 - offsetof(LIST_FILES_REPLY, list);
+	size_t total = listrep->listSize;
+    CONTINUE_LIST_FILES listcon = CONTINUE_LIST_FILES_INIT;
+	listcon.handle =listrep->handle;
+	listcon.listSize = 100;
+//	fprintf(stderr, "read %zu from total %zu bytes.\n", read_so_far, total);
+	size_t listconrep_sz = sizeof(CONTINUE_LIST_FILES_REPLY) + MAX_READ;
+	CONTINUE_LIST_FILES_REPLY *listconrep = malloc(listconrep_sz);
+	int ret = listconrep->ret;
+	while(ret != END_OF_FILE)
+	{
+	CONTINUE_LIST_FILES_REPLY *listconrep = malloc(listconrep_sz);
+	res = ev3_write(handle, (u8*)&listcon, sizeof listcon);
+    if (res < 0)
+    {
+		errmsg = "Unable to write LIST_FILES";
+        hiderr = ev3_error(handle);
+        return ERR_HID;
+    }
+
+	    res = ev3_read_timeout(handle, (u8 *)listconrep, listconrep_sz, TIMEOUT);
+    	if (res <= 0)
+    	{
+			errmsg = "Unable to read LIST_FILES_REPLY";
+			hiderr = ev3_error(handle);
+			return ERR_HID;
+    	}
+		if (listconrep->type == VM_ERROR)
+		{
+			if (listconrep->ret < ARRAY_SIZE(ev3_error_msgs))
+				hiderr = ev3_error_msgs[listconrep->ret];
+			else
+				hiderr = L"ERROR_OUT_OF_BOUNDS";
+			fputs("Operation failed.\nlast_reply=", stderr);
+			print_bytes(listconrep, listconrep->packetLen);
+
+
+			errmsg = "`LIST_FILES` was denied.";
+			return ERR_VM;
+		}	
+		fprintf(stdout, "%s", listconrep->list);
+		listcon.handle = listconrep->handle;
+		listcon.listSize = MAX_READ;
+	size_t read_so_far = listconrep->packetLen + 2 - offsetof(CONTINUE_LIST_FILES_REPLY, list);
+	fflush(stdout);
+	//fprintf(stderr, "read %zu from total %zu bytes.\n", read_so_far, listconrep_sz);
+	ret = listconrep->ret;
+	}
+#endif
 
     errmsg = "`LIST_FILES` was successful.";
     return ERR_UNK;
