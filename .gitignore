@@ -50,3 +50,6 @@ Temporary Items
 ev3duder
 #doxygen
 doc
+#vim
+*.swp
+*.swo

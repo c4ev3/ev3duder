@@ -8,6 +8,11 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <errno.h>
+
+#include <signal.h>
+#include <setjmp.h>
+#include <sys/time.h>
 
 #include "defs.h"
 #define BT "/dev/cu.EV3-SerialPort"
@@ -15,61 +20,76 @@
 static void handle_sigint(int signo);
 void *bt_open()
 {
-  signal(SIGINT, handle_sigint); 
-  int *fd = malloc(sizeof(int));
-  *fd = open(BT, O_RDWR | O_NONBLOCK);
-  fprintf(stderr, "bt_open reporting. fd = %d ",*fd);
-  return fd;
+	//  signal(SIGINT, handle_sigint); 
+	int *fd = malloc(sizeof(int));
+	*fd = open(BT, O_RDWR);
+	return *fd != -1 ? fd : NULL;
 }
 
 int bt_write(void* fd_, const u8* buf, size_t count)
 {
-  size_t sent;
-  int fd = *(int*)fd_;
-  for (size_t ret = sent = 0; sent < count; sent += ret)
-  {
-    //ssize_t ret = write(fd, buf+sent, count-sent);
-    ssize_t ret = write(fd, buf, count);
-    if (ret < 0)
-    {
-      // set some error msg
-      break; 
-    }
-  }
-  return sent;
+	size_t sent;
+	int fd = *(int*)fd_;
+	buf++;count--; // omit HID report number
+	for (ssize_t ret = sent = 0; sent < count; sent += ret)
+	{
+		ret = write(fd, buf, count-sent);
+		if (ret == -1)
+		{
+			// set some error msg
+			break; 
+		}
+	}
+	return sent;
+}
+static jmp_buf env;
+static void handle_alarm(int sig)
+{
+	(void)sig; longjmp(env, 1);
 }
 int bt_read(void* fd_, u8* buf, size_t count, int milliseconds)
-{
-  int fd = *(int*)fd_;
-  if(0 && milliseconds > -1)
-  {
-    struct termios termios;
-    tcgetattr(fd, &termios);
-    termios.c_lflag &= ~ICANON;
-    termios.c_cc[VTIME] = milliseconds / 100; 
-    tcsetattr(fd, TCSANOW, &termios);
-  }// else blocking wait
-
-  size_t recvd;
-  for (size_t ret = recvd = 0; recvd < count; recvd += ret)
-  {
-    ssize_t ret = read(fd, buf+recvd, count-recvd);
-    if (ret < 0)
-    {
-      // set some error msg maybe save errno in static field
-      break; 
-    }
-  }
-  return recvd;
+{ // goto <3
+	(void)count;
+	(void)milliseconds;
+	int fd = *(int*)fd_;
+	size_t recvd =0;
+	size_t packet_len = 2;
+	signal(SIGALRM, handle_alarm);
+	struct itimerval timer;
+	milliseconds = 1;
+	if (milliseconds != -1)
+	{
+		timer.it_value.tv_sec = milliseconds / 1000;
+		timer.it_value.tv_usec = milliseconds % 1000 * 1000;
+	}
+	if (setjmp(env) == 0)
+	{
+again:
+		for (ssize_t ret=recvd; recvd < packet_len; recvd += ret)
+		{
+			if (milliseconds != -1) {
+				setitimer(ITIMER_REAL, &timer, NULL);
+				ret = read(fd, buf+recvd, packet_len-recvd);
+				alarm(0);
+			}else
+			ret = read(fd, buf+recvd, packet_len-recvd);
+			if (ret == -1)
+			{
+				perror("read failed");
+				return -1; 
+			}
+			// bug one should handle disconnects during transfer. if this happens read keeps returning zeros
+		}
+		if (recvd == 2)
+		{
+			packet_len += buf[0] | (buf[1] << 8);
+			if (packet_len > 2*count) //TODO: remove 2*
+				return -1;
+			goto again;
+		}
+	}
+	return recvd;
 
 }
 const wchar_t *bt_error(void* fd_) { (void)fd_; return L"Errors not implemented yet";}
-static void handle_sigint(int signo)
-{
-  switch(signo)
-  {
-    case SIGINT:
-      exit(1);
-  } 
-}
 

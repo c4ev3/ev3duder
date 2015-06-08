@@ -23,7 +23,7 @@
 static void params_print()
 {
     puts(	"USAGE: ev3duder "
-            "[ up loc rem | dl rem loc | exec rem | kill rem |\n"
+            "[ up loc rem | dl rem loc | run rem | exec cmd | kill rem |\n"
             "                  "
             "cp rem rem | mv rem rem | rm rem | ls [rem] | tree [rem] |\n"
             "                  "
@@ -36,12 +36,13 @@ static void params_print()
     ARG(test)            \
     ARG(up)              \
     ARG(dl)              \
-    ARG(exec)            \
+    ARG(run)            \
     ARG(pwd)             \
     ARG(ls)              \
     ARG(rm)              \
     ARG(mkdir)           \
     ARG(mkrbf)           \
+    ARG(exec)           \
     ARG(end)
 
 #define MK_ENUM(x) ARG_##x,
@@ -66,7 +67,7 @@ int main(int argc, tchar *argv[])
    
     if ((handle = hid_open(VendorID, ProductID, SerialID)))
     {
-      puts("USB connection established.");
+      fputs("USB connection established.\n", stderr);
       // the things you do for type safety...
       ev3_write = (int (*)(void*, const u8*, size_t))hid_write;
       ev3_read_timeout = (int (*)(void*, u8*, size_t, int))hid_read_timeout;
@@ -75,7 +76,7 @@ int main(int argc, tchar *argv[])
 #ifndef _WIN32
     else if ((handle = bt_open()))
     {
-      fputs("Bluetooth serial connection established.", stderr);
+      fputs("Bluetooth serial connection established.\n", stderr);
       ev3_write = bt_write;
       ev3_read_timeout = bt_read;
       ev3_error = bt_error;
@@ -125,12 +126,29 @@ int main(int argc, tchar *argv[])
         }
         break;
 
-    case ARG_exec:
+    case ARG_dl:
+        assert(argc <= 2);
+        {
+		FILE *fp;
+		size_t len;
+		if (argc == 2 && !(fp = tfopen(SANITIZE(argv[1]), "rb")))
+			{
+				printf("File <%" PRIts "> doesn't exist.\n", argv[1]);
+				return ERR_IO;
+			}
+		fp = NULL;
+
+		tchar *path = tstrjoin(cd, argv[0], &len); 
+
+		ret = dl(U8(path, len), fp);
+        }
+        break;
+    case ARG_run:
         assert(argc == 1);
         {
         size_t len;
         tchar *path = tstrjoin(cd, argv[0], &len); 
-        ret = exec(U8(path, len));
+        ret = run(U8(path, len));
         }
         break;
 
@@ -171,6 +189,7 @@ int main(int argc, tchar *argv[])
         FILE *fp = tfopen(SANITIZE(argv[1]), "wb");
         if (!fp)
           return ERR_IO;
+<<<<<<< HEAD
         char part1[] = 
 "LEGO\x52\x00\x00\x00\x68\x00\x01\x00\x00\x00\x00\x00\x1C\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x60\x80";
         char part2[] = "\x44\x85\x82\xE8\x03\x40\x86\x40\n";
@@ -182,9 +201,31 @@ int main(int argc, tchar *argv[])
         fwrite(part1, sizeof part1 - 1, 1, fp);
         fwrite(path, path_sz + 1, 1, fp);
         fwrite(part2, sizeof part2 - 1, 1, fp);
+=======
+		char *buf;
+        size_t path_sz = tstrlen(argv[0]);
+		size_t bytes = mkrbf(&buf, U8(argv[0], path_sz));
+        fwrite(buf, bytes, 1, fp);
+>>>>>>> 6826c0479e2be630229fa559e9747059f76894a0
         fclose(fp);
         }
         return ERR_UNK;
+	case ARG_exec: //FIXME: dumping on disk and reading is stupid
+		assert(argc >= 1);
+		{
+		char *buf;
+		size_t bytes = mkrbf(&buf, U8(argv[0], tstrlen(argv[0])));
+		FILE *fp = tmpfile();
+        if (!fp)
+          return ERR_IO;
+        fwrite(buf, bytes, 1, fp);
+		rewind(fp);
+		ret = up(fp, "/tmp/Executing shell cmd.rbf");
+		if (ret != ERR_UNK)
+			break;
+		ret = run("/tmp/Executing shell cmd.rbf");
+		}
+		break;
     case ARG_rm:
         assert(argc == 1);
         {
@@ -211,9 +252,9 @@ int main(int argc, tchar *argv[])
     }
 
     if (ret == ERR_HID)
-        fprintf(stdout, "%ls\n", (wchar_t*)hiderr);
+        fprintf(stderr, "%ls\n", (wchar_t*)hiderr);
     else
-        fprintf(stdout, "%s (%s)\n", errmsg, (char*)hiderr ?: "null");
+        fprintf(stderr, "%s (%ls)\n", errmsg, hiderr ?: L"null");
 
     // maybe \n to stderr?
     return ret;

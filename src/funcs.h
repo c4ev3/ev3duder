@@ -33,14 +33,15 @@ extern int up(FILE* loc, const char *rem);
 extern int dl(const char *rem, FILE* loc);
 //! print HID information, beep and exit
 extern int test(void);
-//! execute remote .rbf file \p rem via VM
-extern int exec(const char *rem);
+//! run remote .rbf file \p rem via VM
+extern int run(const char *rem);
 //! list contents of remote directory \p rem
 extern int ls(const char *rem);
 //! remove remote file or directory \p rem
 extern int rm(const char *rem);
 //! create directory \p rem on remote system
 extern int mkdir(const char *rem);
-
+//! fill \p *buf with a rbf file executing \p cmd
+extern size_t mkrbf(char **buf, const char *cmd);
 #endif
 

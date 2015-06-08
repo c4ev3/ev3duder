@@ -9,7 +9,7 @@ OBJDIR = build
 
 #LIBS = -lpsapi
 
-SRCS = src/main.c src/cmd_defaults.c src/exec.c src/test.c src/up.c src/ls.c src/rm.c src/mkdir.c
+SRCS = src/main.c src/cmd_defaults.c src/run.c src/test.c src/up.c src/ls.c src/rm.c src/mkdir.c src/mkrbf.c src/dl.c
 
 # TODO: Apple's ld doesn't support interleaving -Bstatic
 LIBS = -Llib/ -lhidapi 

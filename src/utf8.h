@@ -29,7 +29,7 @@
 #define tstrlen(str) strlen(str)
 #define tgetenv(str) getenv(str)
 #define PRIts "s"
-#define U8(path, len) path 
+#define U8(path, len) ((void)len, path) 
 #endif
 
 #endif

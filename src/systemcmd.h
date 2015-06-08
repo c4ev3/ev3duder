@@ -70,7 +70,45 @@ extern const CONTINUE_DOWNLOAD CONTINUE_DOWNLOAD_INIT;
 typedef BEGIN_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY;
 extern const CONTINUE_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY_SUCCESS;
 
+// download from EV3
+
+typedef struct
+{
+	EV3_COMMAND_FIELDS
+
+	u32 maxBytes;
+	char fileName[];
+} BEGIN_UPLOAD;
+
+typedef struct
+{
+	EV3_REPLY_FIELDS
+		
+	u32 fileSize;
+	u8 fileHandle;
+	u8 bytes[];
+} BEGIN_UPLOAD_REPLY;
+
+typedef struct
+{
+	EV3_COMMAND_FIELDS
+
+	u8 fileHandle;
+	u32 maxBytes;
+} CONTINUE_UPLOAD;
 	
+typedef struct
+{
+	EV3_REPLY_FIELDS
+
+	u8 fileHandle;
+	u8 bytes[];
+} CONTINUE_UPLOAD_REPLY;
+	
+extern const CONTINUE_UPLOAD CONTINUE_UPLOAD_INIT;
+extern const BEGIN_UPLOAD BEGIN_UPLOAD_INIT;
+
+
 /// List files on EV3
 typedef struct
 {
@@ -100,8 +138,17 @@ typedef struct
     u8 handle;
     u32 listSize;
 } CONTINUE_LIST_FILES; 
-
+extern const CONTINUE_LIST_FILES CONTINUE_LIST_FILES_INIT;
 /// create directory
+
+typedef struct
+{
+	EV3_REPLY_FIELDS
+
+    u8 handle; // for CONTINUE_LIST_FILES 
+    char list[]; 
+    // \n seperated; UTF-8 encoded. 
+} CONTINUE_LIST_FILES_REPLY;
 
 typedef struct
 {
