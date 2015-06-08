@@ -3,10 +3,6 @@
  * @authot Ahmad Fatoum
  * @license (c) Ahmad Fatoum. Code available under terms of the GNU General Public License
  */
-#include <unistd.h>
-#include <termios.h>
-#include <stdio.h>
-#include <fcntl.h>
 
 #include "defs.h"
 void *bt_open(void);

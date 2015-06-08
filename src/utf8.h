@@ -15,7 +15,8 @@
 #define PRIts "ls"
 #define U8(wstr, len) ({\
   int u8sz = WideCharToMultiByte(CP_UTF8, 0, wstr, len, NULL, 0, NULL, NULL); \
-  char *u8str = malloc(u8sz); \
+  char *u8str = malloc(u8sz +1); \
+  u8str[u8sz] = '\0'; \
   WideCharToMultiByte(CP_UTF8, 0, wstr, len, u8str, u8sz, NULL, NULL); \
   u8str; })
 #else

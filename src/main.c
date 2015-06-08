@@ -72,14 +72,16 @@ int main(int argc, tchar *argv[])
       ev3_read_timeout = (int (*)(void*, u8*, size_t, int))hid_read_timeout;
       ev3_error = (const wchar_t* (*)(void*))hid_error;
     }
+#ifndef _WIN32
     else if ((handle = bt_open()))
     {
       fputs("Bluetooth serial connection established.", stderr);
       ev3_write = bt_write;
       ev3_read_timeout = bt_read;
       ev3_error = bt_error;
-    }
-    else if (strcmp(argv[1], "-i") == 0)
+	  }
+#endif
+    else if (tstrcmp(argv[1], T("-i")) == 0)
     {
         argv++; 
         argc--;
@@ -96,7 +98,11 @@ int main(int argc, tchar *argv[])
     argc -= 2;
     argv += 2;
     int ret;
+#ifdef CD
     tchar *cd = tgetenv(T("CD"));
+#else
+	tchar *cd = NULL;
+#endif
     switch (i)
     {
     case ARG_test:
@@ -144,8 +150,10 @@ int main(int argc, tchar *argv[])
         assert(argc <= 1);
         {
         size_t len;
-        tchar *path = tstrjoin(cd, argv[0], &len); 
+        tchar *path = tstrjoin(cd, argv[0], &len);
+		printf("%zu", len);
         ret = ls(len ? U8(path, len) : ".");
+		
         }
         break;
 
@@ -160,15 +168,16 @@ int main(int argc, tchar *argv[])
     case ARG_mkrbf:
         assert(argc == 2);
         {
-        FILE *fp = tfopen(SANITIZE(argv[1]), "w");
+        FILE *fp = tfopen(SANITIZE(argv[1]), "wb");
         if (!fp)
           return ERR_IO;
         char part1[] = 
 "LEGO\x52\x00\x00\x00\x68\x00\x01\x00\x00\x00\x00\x00\x1C\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x60\x80";
-        char part2[] = "\x44\x85\x82\xE8\x03\x40\x86\x40\x0A";
+        char part2[] = "\x44\x85\x82\xE8\x03\x40\x86\x40\n";
         size_t path_sz = tstrlen(argv[0]);
         char *path = U8(argv[0], path_sz);
         u32 static_sz = (u32)(sizeof part1 -1 + path_sz + 1 + sizeof part2 -1);
+		printf("total:%u bytes\n", static_sz);
         memcpy(&part1[4], &static_sz, 4);
         fwrite(part1, sizeof part1 - 1, 1, fp);
         fwrite(path, path_sz + 1, 1, fp);
