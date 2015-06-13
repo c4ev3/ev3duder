@@ -3,8 +3,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
-#include <assert.h>
 #include <wchar.h>
+
+#undef assert
+#define assert(cond) do{ if (!(cond)) if (handle) {ev3_close(handle);exit(ERR_ARG);}}while(0)
 
 #include <hidapi.h>
 #include "btserial.h"
@@ -18,7 +20,6 @@
 
 #define VendorID 0x694 /* LEGO GROUP */
 #define ProductID 0x005 /* EV3 */
-#define SerialID NULL
 
 static void params_print()
 {
@@ -27,7 +28,7 @@ static void params_print()
             "                  "
             "cp rem rem | mv rem rem | rm rem | ls [rem] | tree [rem] |\n"
             "                  "
-            "shell str | pwd [rem] | test ]\n"
+            "shell str | pwd [rem] | cat [rem] | test ]\n"
             "\n"
             "       "
             "rem = remote (EV3) system path, loc = (local file system) path"	"\n");
@@ -39,6 +40,7 @@ static void params_print()
     ARG(run)            \
     ARG(pwd)             \
     ARG(ls)              \
+    ARG(cat)              \
     ARG(rm)              \
     ARG(mkdir)           \
     ARG(mkrbf)           \
@@ -64,30 +66,43 @@ int main(int argc, tchar *argv[])
         params_print();
         return ERR_ARG;
     }
-   
-    if ((handle = hid_open(VendorID, ProductID, SerialID)))
+	const tchar *device = NULL;
+	tchar buffer[32];
+	FILE *fp;
+
+	if (tstrcmp(argv[1], T("-d")) == 0)
+	{	
+		device = argv[2];
+		argv+=2;
+		argc-=2;
+#ifdef _WIN32 //FIXME: do that in the plugin
+	}else if ((fp = fopen("C:\\ev3\\uploader\\.ev3duder", "r")))
+#else
+	}else if ((fp = fopen(".ev3duder", "r")))
+	#endif
+{
+			fgetts(buffer, sizeof buffer, fp);
+			device = buffer;
+	}
+	
+    if ((handle = hid_open(VendorID, ProductID, NULL))) // TODO: last one is SerialID, make it specifiable via commandline
     {
       fputs("USB connection established.\n", stderr);
       // the things you do for type safety...
       ev3_write = (int (*)(void*, const u8*, size_t))hid_write;
       ev3_read_timeout = (int (*)(void*, u8*, size_t, int))hid_read_timeout;
       ev3_error = (const wchar_t* (*)(void*))hid_error;
-    }
-#ifndef _WIN32
-    else if ((handle = bt_open()))
+	  ev3_close = hid_close;
+	}
+    else if ((handle = bt_open(device)))
     {
-      fputs("Bluetooth serial connection established.\n", stderr);
+      fprintf(stderr, "Bluetooth serial connection established (%" PRIts ").\n", device);
       ev3_write = bt_write;
       ev3_read_timeout = bt_read;
       ev3_error = bt_error;
-	  }
-#endif
-    else if (tstrcmp(argv[1], T("-i")) == 0)
-    {
-        argv++; 
-        argc--;
+	  ev3_close = bt_close;
     } else {
-        puts("EV3 not found. Either plug it into the USB port or pair over Bluetooth. ");
+        puts("EV3 not found. Either plug it into the USB port or pair over Bluetooth.");
         return ERR_HID; // TODO: rename
     }
 	
@@ -169,7 +184,6 @@ int main(int argc, tchar *argv[])
         {
         size_t len;
         tchar *path = tstrjoin(cd, argv[0], &len);
-		printf("%zu", len);
         ret = ls(len ? U8(path, len) : ".");
 		
         }
@@ -184,29 +198,17 @@ int main(int argc, tchar *argv[])
         }
         break;
     case ARG_mkrbf:
-        assert(argc == 2);
+        assert(argc >= 2);
         {
         FILE *fp = tfopen(SANITIZE(argv[1]), "wb");
         if (!fp)
           return ERR_IO;
-<<<<<<< HEAD
-        char part1[] = 
-"LEGO\x52\x00\x00\x00\x68\x00\x01\x00\x00\x00\x00\x00\x1C\x00\x00\x00\x00\x00\x00\x00\x08\x00\x00\x00\x60\x80";
-        char part2[] = "\x44\x85\x82\xE8\x03\x40\x86\x40\n";
-        size_t path_sz = tstrlen(argv[0]);
-        char *path = U8(argv[0], path_sz);
-        u32 static_sz = (u32)(sizeof part1 -1 + path_sz + 1 + sizeof part2 -1);
-		printf("total:%u bytes\n", static_sz);
-        memcpy(&part1[4], &static_sz, 4);
-        fwrite(part1, sizeof part1 - 1, 1, fp);
-        fwrite(path, path_sz + 1, 1, fp);
-        fwrite(part2, sizeof part2 - 1, 1, fp);
-=======
+	  
 		char *buf;
         size_t path_sz = tstrlen(argv[0]);
 		size_t bytes = mkrbf(&buf, U8(argv[0], path_sz));
         fwrite(buf, bytes, 1, fp);
->>>>>>> 6826c0479e2be630229fa559e9747059f76894a0
+		
         fclose(fp);
         }
         return ERR_UNK;
@@ -250,7 +252,9 @@ int main(int argc, tchar *argv[])
         ret = ERR_ARG;
         printf("<%" PRIts "> hasn't been implemented yet.", argv[0]);
     }
-
+	
+	if (handle)
+		ev3_close(handle);
     if (ret == ERR_HID)
         fprintf(stderr, "%ls\n", (wchar_t*)hiderr);
     else
