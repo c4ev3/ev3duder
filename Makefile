@@ -20,6 +20,7 @@ print-%  : ; @echo $* = $($*)
 ifeq ($(OS),Windows_NT)
 RM = del /Q
 FLAGS += -municode
+SRCS += src/btwin.c
 BIN_NAME := $(addsuffix .exe, $(BIN_NAME))
 else
 SRCS += src/btunix.c

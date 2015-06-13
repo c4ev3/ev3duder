@@ -18,6 +18,7 @@
  * @see http://topikachu.github.io/python-ev3/UIdesign.html
  * @bug Doesn't handle replies over 1000 byte in length.
  *      implementation of \p CONTINUTE_LIST_FILES would be required
+ *		EDIT: CONTINUE_LIST_FILES isn't even implemented in "firmware".
  */
 #define MAX_READ 1024
 int ls(const char *path)
@@ -61,7 +62,7 @@ int ls(const char *path)
         errmsg = "`LIST_FILES` was denied.";
         return ERR_VM;
     }
-    fputs(listrep->list, stdout);
+    fwrite(listrep->list, 1, listrep->packetLen - 10, stdout); // No NUL Termination over Serial COM for whatever reason.
 	//
 // From the LEGO docs:  - LIST_FILES should work as long as list does not exceed 1014 bytes. CONTINUE_LISTFILES has NOT been implemented yet.
 #if !LEGO_FIXED_CONTINUE_LIST_FILES

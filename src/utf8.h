@@ -19,6 +19,7 @@
   u8str[u8sz] = '\0'; \
   WideCharToMultiByte(CP_UTF8, 0, wstr, len, u8str, u8sz, NULL, NULL); \
   u8str; })
+#define fgetts fgetws
 #else
 
 #define tchar char
@@ -28,6 +29,7 @@
 #define tstrchr(str, chr) strchr(str, chr)
 #define tstrlen(str) strlen(str)
 #define tgetenv(str) getenv(str)
+#define fgetts fgets
 #define PRIts "s"
 #define U8(path, len) ((void)len, path) 
 #endif

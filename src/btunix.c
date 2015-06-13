@@ -18,11 +18,11 @@
 #define BT "/dev/cu.EV3-SerialPort"
 // ^ TODO: add ability to find differently named EV3's
 static void handle_sigint(int signo);
-void *bt_open()
+void *bt_open(const char *file)
 {
-	//  signal(SIGINT, handle_sigint); 
+	//  signal(SIGINT, handle_sigint);
 	int *fd = malloc(sizeof(int));
-	*fd = open(BT, O_RDWR);
+	*fd = open(file ?: BT, O_RDWR);
 	return *fd != -1 ? fd : NULL;
 }
 
@@ -48,7 +48,7 @@ static void handle_alarm(int sig)
 	(void)sig; longjmp(env, 1);
 }
 int bt_read(void* fd_, u8* buf, size_t count, int milliseconds)
-{ // goto <3
+{ //FIXME: goto <3
 	(void)count;
 	(void)milliseconds;
 	int fd = *(int*)fd_;
@@ -68,7 +68,7 @@ again:
 		for (ssize_t ret=recvd; recvd < packet_len; recvd += ret)
 		{
 			if (milliseconds != -1) {
-				setitimer(ITIMER_REAL, &timer, NULL);
+				setitimer(ITIMER_REAL, &timer, NULL);  //TODO: maybe move this out the loop? would handle diosconnects that way
 				ret = read(fd, buf+recvd, packet_len-recvd);
 				alarm(0);
 			}else
@@ -90,6 +90,10 @@ again:
 	}
 	return recvd;
 
+}
+void bt_close(void *handle)
+{
+	close(*(int*)handle);
 }
 const wchar_t *bt_error(void* fd_) { (void)fd_; return L"Errors not implemented yet";}
 
