@@ -255,10 +255,11 @@ int main(int argc, tchar *argv[])
 	
 	if (handle)
 		ev3_close(handle);
+	FILE *out = ret == EXIT_SUCCESS ? stderr : stdout;
     if (ret == ERR_HID)
-        fprintf(stderr, "%ls\n", (wchar_t*)hiderr);
+        fprintf(out, "%ls\n", hiderr);
     else
-        fprintf(stderr, "%s (%ls)\n", errmsg, hiderr ?: L"null");
+        fprintf(out, "%s (%ls)\n", errmsg, hiderr ?: L"null");
 
     // maybe \n to stderr?
     return ret;
