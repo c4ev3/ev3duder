@@ -10,13 +10,14 @@
 #include "funcs.h"
 
 #define CHUNK_SIZE 1000 // EV3's HID driver doesn't do packets > 1024B
-int dl(const char *path, FILE *fp)
+int dl( const char *path, FILE *fp)
 {
     int res;
 	size_t path_sz = strlen(path) + 1;
 	if (!fp)
 		fp = fopen(strrchr(path, '/') + 1, "w");
 
+    //TODO: read in chunks, whatif long isnt big enough
     BEGIN_UPLOAD *bu = packet_alloc(BEGIN_UPLOAD, path_sz);
     memcpy(bu->fileName, path, path_sz);
 	bu->maxBytes = CHUNK_SIZE;

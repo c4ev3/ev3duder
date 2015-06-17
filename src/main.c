@@ -146,7 +146,7 @@ int main(int argc, tchar *argv[])
         {
 		FILE *fp;
 		size_t len;
-		if (argc == 2 && !(fp = tfopen(SANITIZE(argv[1]), "rb")))
+		if (argc == 2 && !(fp = tfopen(SANITIZE(argv[1]), "wb")))
 			{
 				printf("File <%" PRIts "> doesn't exist.\n", argv[1]);
 				return ERR_IO;

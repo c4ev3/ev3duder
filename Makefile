@@ -19,6 +19,7 @@ INC += -Ihidapi/hidapi/
  
 print-%  : ; @echo $* = $($*)
 ####################
+CREATE_BUILD_DIR = $(shell mkdir build)
 ifeq ($(OS),Windows_NT)
 
 ## MinGW
@@ -33,7 +34,6 @@ SRCS += src/btwin.c
 HIDSRC += hidapi/windows/hid.c
 HIDFLAGS +=  -mwindows -lsetupapi
 BIN_NAME := $(addsuffix .exe, $(BIN_NAME))
-VOID = NUL
 else
 
 UNAME = $(shell uname -s)
@@ -49,7 +49,6 @@ endif
 
 ## ALL UNICES
 SRCS += src/btunix.c
-VOID = /dev/null
 endif
 OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
@@ -57,7 +56,6 @@ OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 all: binary
 
 binary: $(OBJS) $(OBJDIR)/hid.o
-	-@mkdir build || true
 	$(CC) $(OBJS) $(OBJDIR)/hid.o $(FLAGS) $(HIDFLAGS) $(LIBS) -o $(BIN_NAME)
 # static enables valgrind to act better -DDEBUG!
 $(OBJS): $(OBJDIR)/%.o: $(SRCDIR)/%.c
