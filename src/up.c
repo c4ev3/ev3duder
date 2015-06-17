@@ -78,24 +78,11 @@ int up(FILE *fp, const char *dst)
         return ERR_VM;
     }
 
-
-#ifdef DEBUG
-    fputs("=BEGIN_DOWNLOAD_REPLY", stderr);
-    print_bytes(&bdrep, sizeof(bdrep));
-    putc('\n', stderr);
-    fprintf(stderr, "current handle is %u\n", bdrep.fileHandle);
-    fputs("=cut", stderr);
-#endif
-
     for (size_t i = 0; i <= extra_chunks; ++i)
     {
         cd[i]->fileHandle = bdrep.fileHandle;
         res = ev3_write(handle, (u8 *)cd[i], cd[i]->packetLen + PREFIX_SIZE);
-#if DEBUG > 7
-        fprintf(stderr, "=CONTINUE_DOWNLOAD");;
-        print_bytes(cd[i], cd[i]->packetLen + PREFIX_SIZE);
-        fputs("=cut", stderr);
-#endif
+
         if (res < 0)
         {
             errmsg = "Unable to write CONTINUE_DOWNLOAD.";
@@ -110,10 +97,6 @@ int up(FILE *fp, const char *dst)
             return ERR_HID;
         }
 
-        fprintf(stderr,"=CONTINUE_DOWNLOAD_REPLY(chunk=%zu, data=%zub)\n", i,
-                cd[i]->packetLen - (sizeof(CONTINUE_DOWNLOAD) - PREFIX_SIZE));
-        print_bytes(&bdrep, PREFIX_SIZE + bdrep.packetLen);
-        fputs("=cut", stderr);
     }
 
     if (bdrep.type == VM_ERROR)
