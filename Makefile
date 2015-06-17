@@ -42,6 +42,7 @@ ifeq ($(UNAME),Linux)
 HIDSRC += hidapi/libusb/hid.c
 HIDFLAGS += `pkg-config libusb-1.0 --cflags`
 LDFLAGS += `pkg-config libusb-1.0 --libs` -lrt -lpthread
+INSTALL = $(shell sh udev.sh)
 endif
 
 ## OS X
@@ -82,6 +83,10 @@ debug: FLAGS += -g
 debug: LIBS := $(LIBS)
 debug: LIBS += 
 debug: binary
+
+.PHONY: install
+install: binary ev3-udev.rules udev.sh
+	$(INSTALL)
 
 .PHONY: clean
 clean:
