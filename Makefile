@@ -19,6 +19,7 @@ INC += -Ihidapi/hidapi/
  
 print-%  : ; @echo $* = $($*)
 ####################
+CREATE_BUILD_DIR := $(shell mkdir build)
 ifeq ($(OS),Windows_NT)
 
 ## MinGW
@@ -31,15 +32,16 @@ endif
 FLAGS += -municode -Wno-unused-value -D__USE_MINGW_ANSI_STDIO=1
 SRCS += src/btwin.c
 HIDSRC += hidapi/windows/hid.c
-HIDFLAGS +=  -mwindows -lsetupapi
+LDFLAGS +=  -mwindows -lsetupapi
 BIN_NAME := $(addsuffix .exe, $(BIN_NAME))
-VOID = NUL
 else
 
 UNAME = $(shell uname -s)
 ## Linux
 ifeq ($(UNAME),Linux)
 HIDSRC += hidapi/linux/hid.c
+HIDFLAGS += `pkg-config libusb-1.0 --cflags`
+LDFLAGS += `pkg-config libudev --libs` -lrt
 endif
 
 ## OS X
@@ -49,7 +51,6 @@ endif
 
 ## ALL UNICES
 SRCS += src/btunix.c
-VOID = /dev/null
 endif
 OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
@@ -57,15 +58,14 @@ OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 all: binary
 
 binary: $(OBJS) $(OBJDIR)/hid.o
-	-@mkdir build || true
-	$(CC) $(OBJS) $(OBJDIR)/hid.o $(FLAGS) $(HIDFLAGS) $(LIBS) -o $(BIN_NAME)
+	$(CC) $(OBJS) $(OBJDIR)/hid.o $(LDFLAGS) $(LIBS) -o $(BIN_NAME)
 # static enables valgrind to act better -DDEBUG!
 $(OBJS): $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) -c $< -MMD $(FLAGS) $(INC) -o $@
 -include $(OBJDIR)/*.d
 
 $(OBJDIR)/hid.o: $(HIDSRC)
-	$(CC) -c $< -o $@ $(INC)
+	$(CC) -c $< -o $@ $(INC) $(HIDFLAGS)
 
 
 # CC=/path/to/cross/cc will need to be passed to make
