@@ -7,8 +7,8 @@
 ##################################################
 
 BIN_NAME = ev3duder	
-# tip: clang -Weverything shows all GNU extensions
-FLAGS += -std=c99 -Wall -Wextra
+# tip: CC=clang FLAGS=-Weverything shows all GNU extensions
+override FLAGS += -std=c99 -Wall -Wextra
 SRCDIR = src
 OBJDIR = build
 
@@ -39,14 +39,21 @@ else
 UNAME = $(shell uname -s)
 ## Linux
 ifeq ($(UNAME),Linux)
-HIDSRC += hidapi/linux/hid.c
+HIDSRC += hidapi/libusb/hid.c
 HIDFLAGS += `pkg-config libusb-1.0 --cflags`
-LDFLAGS += `pkg-config libudev --libs` -lrt
+LDFLAGS += `pkg-config libusb-1.0 --libs` -lrt -lpthread
 endif
 
 ## OS X
 ifeq ($(UNAME),Darwin)
 HIDSRC += hidapi/mac/hid.c
+endif
+
+## BSD
+ifeq ($(findstring BSD, $(UNAME)), BSD)
+HIDSRC += hidapi/libusb/hid.c
+LDFLAGS += -L/usr/local/lib -lusb -liconv -pthread
+INC += -I/usr/local/include
 endif
 
 ## ALL UNICES
