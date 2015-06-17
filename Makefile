@@ -1,46 +1,74 @@
-BIN_NAME = ev3duder	
-# ^ exe should be removed
-# CC = gcc
-# tip: clang -Weverything shows all GNU extensions
-override FLAGS += -std=c99 -Wall -Wextra
+##################################################
+# Cross-Platform Makefile for the ev3duder utility
+#
+# Ahmad Fatoum
+# Hochschule Aschaffenburg
+# 2015-06-17
+##################################################
 
+BIN_NAME = ev3duder	
+# tip: clang -Weverything shows all GNU extensions
+FLAGS += -std=c99 -Wall -Wextra
 SRCDIR = src
 OBJDIR = build
-
-#LIBS = -lpsapi
 
 SRCS = src/main.c src/cmd_defaults.c src/run.c src/test.c src/up.c src/ls.c src/rm.c src/mkdir.c src/mkrbf.c src/dl.c
 
 # TODO: Apple's ld doesn't support interleaving -Bstatic
-LIBS = -Llib/ -lhidapi 
-INC += -Iinclude/
+INC += -Ihidapi/hidapi/
  
 print-%  : ; @echo $* = $($*)
 ####################
 ifeq ($(OS),Windows_NT)
+
+## MinGW
+ifneq ($(shell uname -o),Cygwin) 
 RM = del /Q
-FLAGS += -municode
-SRCS += src/btwin.c
-BIN_NAME := $(addsuffix .exe, $(BIN_NAME))
-else
-SRCS += src/btunix.c
 endif
-OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o) 
+
+## Win32
+# TODO: remove all %zu prints altogether
+FLAGS += -municode -Wno-unused-value -D__USE_MINGW_ANSI_STDIO=1
+SRCS += src/btwin.c
+HIDSRC += hidapi/windows/hid.c
+HIDFLAGS +=  -mwindows -lsetupapi
+BIN_NAME := $(addsuffix .exe, $(BIN_NAME))
+VOID = NUL
+else
+
+UNAME = $(shell uname -s)
+## Linux
+ifeq ($(UNAME),Linux)
+HIDSRC += hidapi/linux/hid.c
+endif
+
+## OS X
+ifeq ($(UNAME),Darwin)
+HIDSRC += hidapi/mac/hid.c
+endif
+
+## ALL UNICES
+SRCS += src/btunix.c
+VOID = /dev/null
+endif
+OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 
 .DEFAULT: all
 all: binary
 
-binary: $(OBJS)
-	$(CC) $(OBJS) $(FLAGS) $(LIBS) -o $(BIN_NAME)
+binary: $(OBJS) $(OBJDIR)/hid.o
+	-@mkdir build || true
+	$(CC) $(OBJS) $(OBJDIR)/hid.o $(FLAGS) $(HIDFLAGS) $(LIBS) -o $(BIN_NAME)
 # static enables valgrind to act better -DDEBUG!
 $(OBJS): $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) -c $< -MMD $(FLAGS) $(INC) -o $@
 -include $(OBJDIR)/*.d
 
+$(OBJDIR)/hid.o: $(HIDSRC)
+	$(CC) -c $< -o $@ $(INC)
+
+
 # CC=/path/to/cross/cc will need to be passed to make
-# TODO: remove all %zu prints altogether
-win32: FLAGS += -municode -Wno-unused-value -D__USE_MINGW_ANSI_STDIO=1
-win32: all
 
 debug: FLAGS += -g
 debug: LIBS := $(LIBS)
