@@ -22,9 +22,10 @@ print-%  : ; @echo $* = $($*)
 CREATE_BUILD_DIR := $(shell mkdir build)
 ifeq ($(OS),Windows_NT)
 
-## MinGW
-ifneq ($(shell uname -o),Cygwin) 
+## No rm?
+ifneq (, $(shell where rm 2>NUL)) 
 RM = del /Q
+# Powershell, cygwin and msys all provide rm
 endif
 
 ## Win32
@@ -48,6 +49,7 @@ endif
 ## OS X
 ifeq ($(UNAME),Darwin)
 HIDSRC += hidapi/mac/hid.c
+LDFLAGS += -framework IOKit -framework CoreFoundation
 endif
 
 ## BSD
