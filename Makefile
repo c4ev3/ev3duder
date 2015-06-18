@@ -49,6 +49,7 @@ endif
 ## OS X
 ifeq ($(UNAME),Darwin)
 HIDSRC += hidapi/mac/hid.c
+LDFLAGS += -framework IOKit -framework CoreFoundation
 endif
 
 ## BSD
