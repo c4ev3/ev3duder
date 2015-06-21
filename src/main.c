@@ -110,7 +110,10 @@ int main(int argc, tchar *argv[])
       ev3_error = bt_error;
 	  ev3_close = bt_close;
     } else {
-        puts("EV3 not found. Either plug it into the USB port or pair over Bluetooth.\nInsufficient access to the usb device might be a reason too, try sudo.");
+        puts("EV3 not found. Either plug it into the USB port or pair over Bluetooth.\n"); 
+#ifdef __linux__
+		puts("Insufficient access to the usb device might be a reason too, try sudo.");
+#endif
         return ERR_HID; // TODO: rename
     }
 	

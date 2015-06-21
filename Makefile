@@ -19,7 +19,7 @@ INC += -Ihidapi/hidapi/
  
 print-%  : ; @echo $* = $($*)
 ####################
-CREATE_BUILD_DIR := $(shell mkdir build)
+CREATE_BUILD_DIR := $(shell mkdir build 2>&1)
 ifeq ($(OS),Windows_NT)
 
 ## No rm?
