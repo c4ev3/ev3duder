@@ -51,6 +51,7 @@ static void params_print()
 #define MK_STR(x) T(#x),
 enum ARGS { FOREACH_ARG(MK_ENUM) };
 static const tchar *args[] = { FOREACH_ARG(MK_STR) };
+static const tchar *offline_args[] = { MK_STR(mkrbf) };
 static tchar * tstrjoin(tchar *, tchar *, size_t *);
 static tchar* tchrsub(tchar *s, tchar old, tchar new);
 #ifdef _WIN32
@@ -59,17 +60,19 @@ static tchar* tchrsub(tchar *s, tchar old, tchar new);
 #define SANITIZE
 #endif
 
+
 int main(int argc, tchar *argv[])
 {
+	handle = NULL;
     if (argc == 1)
     {
         params_print();
         return ERR_ARG;
     }
+
 	const tchar *device = NULL;
 	tchar buffer[32];
 	FILE *fp;
-
 	if (tstrcmp(argv[1], T("-d")) == 0)
 	{	
 		device = argv[2];
@@ -84,7 +87,12 @@ int main(int argc, tchar *argv[])
 			fgetts(buffer, sizeof buffer, fp);
 			device = buffer;
 	}
+    int i;
+
+    for (i = 0; i < (int)ARRAY_SIZE(offline_args); ++i)
+        if (tstrcmp(argv[1], offline_args[i]) == 0) break;
 	
+	if (i == ARRAY_SIZE(offline_args))
     if ((handle = hid_open(VendorID, ProductID, NULL))) // TODO: last one is SerialID, make it specifiable via commandline
     {
       fputs("USB connection established.\n", stderr);
@@ -107,7 +115,6 @@ int main(int argc, tchar *argv[])
     }
 	
 
-    int i;
     for (i = 0; i < ARG_end; ++i)
         if (tstrcmp(argv[1], args[i]) == 0) break;
 
