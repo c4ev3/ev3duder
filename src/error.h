@@ -1,6 +1,14 @@
+/**
+ * @file error.h
+ * @author Ahmad Fatoum
+ * @license Copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @brief Error enumerations and decriptions
+ */
+
 #ifndef EV3DUDER_ERROR_H
 #define EV3DUDER_ERROR_H
 #undef EXTERN
+//! For avoiding the need to separately define and declare stuff
 #ifdef MAIN
 #define EXTERN
 #else
@@ -8,12 +16,20 @@
 #endif
 
 #include "defs.h"
+//! Errors returnable from \p main
 enum ERR {ERR_UNK = 0, ERR_ARG, ERR_IO, ERR_FTOOBIG, ERR_NOMEM, ERR_HID, ERR_VM, ERR_SYS, ERR_END};
+//! Statuses from VM
 enum {VM_OK = 0x03, VM_ERROR = 0x05};
 
+//! global variable for last error message
 EXTERN const char *errmsg;
+//! global variable for last hid error message
 EXTERN const wchar_t *hiderr;
 
+/**
+ * Errors returned from VM
+ * \see https://github.com/mindboards/ev3sources/blob/master/lms2012/c_com/source/c_com.h 
+ */
 enum {
     SUCCESS = 0,
     UNKNOWN_HANDLE,
@@ -31,6 +47,10 @@ enum {
 
     ERRORS_END
 };
+/**
+ * \p ev3_error description strings, found by trial and error
+ * \see https://github.com/mindboards/ev3sources/blob/master/lms2012/c_com/source/c_com.h 
+ */
 EXTERN const wchar_t * const ev3_error_msgs[ERRORS_END + 1]
 #ifdef MAIN
 = {

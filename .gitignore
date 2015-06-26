@@ -14,8 +14,7 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
-# Windows shortcuts
-*.lnk
+# Windows shortcuts *.lnk
 
 # =========================
 # Operating System Files
@@ -53,3 +52,8 @@ doc
 #vim
 *.swp
 *.swo
+*.pyc
+
+doc/
+html/
+latex/

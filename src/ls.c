@@ -1,3 +1,9 @@
+/**
+ * @file ls.c
+ * @author Ahmad Fatoum
+ * @license Copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @brief Lists files on brick
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

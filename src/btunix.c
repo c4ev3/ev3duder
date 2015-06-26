@@ -1,7 +1,8 @@
 /**
- * @file io.c - Input/Output wrappers for Bluetooth
- * @authot Ahmad Fatoum
- * @license (c) Ahmad Fatoum. Code available under terms of the GNU General Public License
+ * @file btunix.c
+ * @author Ahmad Fatoum
+ * @license Copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @brief Unix bluetooth I/O wrappers
  */
 #include <unistd.h>
 #include <termios.h>
@@ -17,7 +18,12 @@
 #include "defs.h"
 #define BT "/dev/cu.EV3-SerialPort"
 // ^ TODO: add ability to find differently named EV3's
-static void handle_sigint(int signo);
+/**
+ * \param [in] device path to SerialPort or NULL
+ * \return &fd pointer to file descriptor for use with bt_{read,write,close,error}
+ * \brief open(2)s serial port  described by device. `NULL` leads to default action
+ * \bug default value should be enumerating. Not hardcoded like in \p BT
+ */ 
 void *bt_open(const char *file)
 {
 	//  signal(SIGINT, handle_sigint);
@@ -26,6 +32,14 @@ void *bt_open(const char *file)
 	return *fd != -1 ? fd : NULL;
 }
 
+/**
+ * \param [in] handle handle returned by bt_open
+ * \param [in] buf byte string to write, the first byte is omitted
+ * \param [in] count number of characters to be written (including leading ignored byte)
+ * \return status -1 on error. bytes read otherwise.	
+ * \brief writes buf[1] till buf[count - 2] to device
+ * \bug the first byte is omitted for compatiblity with the leading report byte demanded by \p hid_write. Wrapping HIDAPI could fix this.
+ */ 
 int bt_write(void* fd_, const u8* buf, size_t count)
 {
 	size_t sent;
@@ -47,10 +61,18 @@ static void handle_alarm(int sig)
 {
 	(void)sig; longjmp(env, 1);
 }
+
+/**
+ * \param [in] device handle returned by bt_open
+ * \param [in] buf buffer to write to 
+ * \param [in] count number of characters to be read
+ * \param [in] milliseconds number of milliseconds to wait at maximum. -1 is indefinitely
+ * \return status -1 on error. bytes read otherwise.	
+ * \brief writes buf[1] till buf[count - 2] to device
+ * \bug the milliseconds part needs to be tested more throughly
+ */ 
 int bt_read(void* fd_, u8* buf, size_t count, int milliseconds)
-{ //FIXME: goto <3
-	(void)count;
-	(void)milliseconds;
+{
 	int fd = *(int*)fd_;
 	size_t recvd =0;
 	size_t packet_len = 2;
@@ -62,9 +84,8 @@ int bt_read(void* fd_, u8* buf, size_t count, int milliseconds)
 		timer.it_value.tv_sec = milliseconds / 1000;
 		timer.it_value.tv_usec = milliseconds % 1000 * 1000;
 	}
-	if (setjmp(env) == 0)
+	while(setjmp(env) == 0)
 	{
-again:
 		for (ssize_t ret=recvd; recvd < packet_len; recvd += ret)
 		{
 			if (milliseconds != -1) {
@@ -83,17 +104,30 @@ again:
 		if (recvd == 2)
 		{
 			packet_len += buf[0] | (buf[1] << 8);
-			if (packet_len > 2*count) //TODO: remove 2*
+			if (packet_len > 2*count) //FIXME: remove 2*
 				return -1;
-			goto again;
+			continue;
 		}
+		break;
 	}
 	return recvd;
 
 }
+
+/**
+ * \param [in] device handle returned by bt_open
+ * \brief Closes the file descriptor opened by \p bt_open
+ */
 void bt_close(void *handle)
 {
 	close(*(int*)handle);
+	free(handle);
 }
+/**
+ * \param [in] device handle returned by bt_open
+ * \return message An error string
+ * \brief Returns an error string describing the last error occured
+ * \bug it's useless. Could use wprintf and strerror
+ */
 const wchar_t *bt_error(void* fd_) { (void)fd_; return L"Errors not implemented yet";}
 

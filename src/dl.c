@@ -64,7 +64,7 @@ int dl(const char *path, FILE *fp)
     CONTINUE_UPLOAD cu = CONTINUE_UPLOAD_INIT;
 	cu.fileHandle =burep->fileHandle;
 	cu.maxBytes = CHUNK_SIZE + sizeof(BEGIN_UPLOAD_REPLY) - sizeof(CONTINUE_UPLOAD_REPLY);
-//	fprintf(stderr, "read %zu from total %zu bytes.\n", read_so_far, total);
+	fprintf(stderr, "read %zu from total %zu bytes.\n", read_so_far, total);
 	CONTINUE_UPLOAD_REPLY *curep = file_chunk;
 	int ret = curep->ret;
 	while(ret != END_OF_FILE)
