@@ -13,7 +13,7 @@
  * \brief open a bluetooth device described by device. `NULL` leads to default action
  * \see implementation at btwin.c and btunix.c
  */ 
-void *bt_open(const char *device);
+union handle bt_open(const char *device);
 
 /**
  * \param [in] device handle returned by bt_open
@@ -24,7 +24,7 @@ void *bt_open(const char *device);
  * \bug the first byte is omitted for compatiblity with the leading report byte demanded by \p hid_write. Wrapping HIDAPI could fix this.
  * \see implementation at btwin.c and btunix.c
  */ 
-int bt_write(void* device, const u8* buf, size_t count);
+int bt_write(union handle device, const u8* buf, size_t count);
 
 /**
  * \param [in] device handle returned by bt_open
@@ -36,14 +36,14 @@ int bt_write(void* device, const u8* buf, size_t count);
  * \bug the milliseconds part needs to be tested more throughly
  * \see implementation at btwin.c and btunix.c
  */ 
-int bt_read(void* device, u8* buf, size_t count, int milliseconds);
+int bt_read(union handle device, u8* buf, size_t count, int milliseconds);
 
 /**
  * \param [in] device handle returned by bt_open
  * \brief Closes the resource opened by \p bt_open
  * \see implementation at btwin.c and btunix.c
  */
- void bt_close(void*);
+ void bt_close(union handle);
 /**
  * \param [in] device handle returned by bt_open
  * \return message An error string
@@ -51,5 +51,5 @@ int bt_read(void* device, u8* buf, size_t count, int milliseconds);
  * \see implementation at btwin.c and btunix.c
  * \bug it's useless
  */
-const wchar_t *bt_error(void* device); 
+const wchar_t *bt_error(union handle device); 
 
