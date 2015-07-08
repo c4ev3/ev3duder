@@ -1,0 +1,81 @@
+\hypertarget{up_8c}{}\section{src/up.c File Reference}
+\label{up_8c}\index{src/up.\+c@{src/up.\+c}}
+
+
+uploads a file to the ev3  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}ev3\+\_\+io.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packets.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}funcs.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{up_8c_aea3cfda4f3a9f978ec759f206cf186fe}{C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E}~1000
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{up_8c_a01133633b700f5000c647deccfac9e3e}{up} (F\+I\+L\+E $\ast$fp, const char $\ast$dst)
+\begin{DoxyCompactList}\small\item\em Uploads file to the ev3. path is always relative to {\itshape /home/root/lms2012/prjs/sys/{\itshape  }}\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+uploads a file to the ev3 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 2.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{up_8c_aea3cfda4f3a9f978ec759f206cf186fe}{}\index{up.\+c@{up.\+c}!C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E@{C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E}}
+\index{C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E@{C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E}!up.\+c@{up.\+c}}
+\subsubsection[{C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E~1000}\label{up_8c_aea3cfda4f3a9f978ec759f206cf186fe}
+
+
+Definition at line 19 of file up.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{up_8c_a01133633b700f5000c647deccfac9e3e}{}\index{up.\+c@{up.\+c}!up@{up}}
+\index{up@{up}!up.\+c@{up.\+c}}
+\subsubsection[{up}]{\setlength{\rightskip}{0pt plus 5cm}int up (
+\begin{DoxyParamCaption}
+\item[{F\+I\+L\+E $\ast$}]{fp, }
+\item[{const char $\ast$}]{dst}
+\end{DoxyParamCaption}
+)}\label{up_8c_a01133633b700f5000c647deccfac9e3e}
+
+
+Uploads file to the ev3. path is always relative to {\itshape /home/root/lms2012/prjs/sys/{\itshape  }}
+
+upload local file {\ttfamily loc} to remote destination {\ttfamily rem} 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fp} & Local F\+I\+L\+E$\ast$ to upload \\
+\hline
+\mbox{\tt in}  & {\em dst} & destination path to upload to (U\+T\+F-\/8 encoded) \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000017}{Bug}]might not handle files bigger than 2gb \+:-\/) \end{DoxyRefDesc}
+
+
+Definition at line 28 of file up.\+c.
+

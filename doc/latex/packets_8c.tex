@@ -1,0 +1,151 @@
+\hypertarget{packets_8c}{}\section{src/packets.c File Reference}
+\label{packets_8c}\index{src/packets.\+c@{src/packets.\+c}}
+
+
+contains inital values for all these packets  
+
+
+{\ttfamily \#include \char`\"{}packets.\+h\char`\"{}}\\*
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const \hyperlink{struct_b_e_g_i_n___d_o_w_n_l_o_a_d}{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D} \hyperlink{packets_8c_a1a8e47c8020b4f9b9bdedad3e65bb076}{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T} = \{ .hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x92 \}
+\item 
+const \hyperlink{struct_c_o_n_t_i_n_u_e___d_o_w_n_l_o_a_d}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D} \hyperlink{packets_8c_a001c6aae152f0f58751b55ef30b9f3b5}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T} = \{ .hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x93\}
+\item 
+const \hyperlink{packets_8h_a5c3eeff36f033cce69ffb89725c3da42}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y} \hyperlink{packets_8c_a50aa732c81162fe89378a59ea49ae658}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S} = \{.packet\+Len = 6, .type = 0x03, .\+cmd = 0x93, .\+ret = 0x08\}
+\item 
+const \hyperlink{struct_b_e_g_i_n___u_p_l_o_a_d}{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D} \hyperlink{packets_8c_acc3a31580cb57d0ae2b4aedeca33ca06}{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T} = \{ .hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x94 \}
+\item 
+const \hyperlink{struct_c_o_n_t_i_n_u_e___u_p_l_o_a_d}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D} \hyperlink{packets_8c_a5bafb2c19e3680b581d83885a8ca9e30}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T} = \{ .hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x95\}
+\item 
+const \hyperlink{struct_l_i_s_t___f_i_l_e_s}{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} \hyperlink{packets_8c_a598dc2599231eda5a07b376409bcf034}{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T} = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x99 \}
+\item 
+const \hyperlink{struct_c_o_n_t_i_n_u_e___l_i_s_t___f_i_l_e_s}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} \hyperlink{packets_8c_af9dc585e5fb5caacf92652490a69c370}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T} = \{.hid\+Layer =0x00, .\+packet\+Len =7, .\+reply\+Type = 0x01, .\+cmd = 0x9\+A\}
+\item 
+const \hyperlink{packets_8h_a6ceb579e59ce635ca6dca88e851a6aab}{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E} \hyperlink{packets_8c_a0fedab4058d7adf4fe5cde7d3613efab}{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T} = \{.hid\+Layer =0x00, .\+reply\+Type = 0x01, .\+cmd = 0x96 \}
+\item 
+const \hyperlink{struct_c_r_e_a_t_e___d_i_r}{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R} \hyperlink{packets_8c_ab1bc0391422d7ecb2027d1fba985bc16}{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T} = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x9\+B \}
+\item 
+const \hyperlink{struct_d_e_l_e_t_e___f_i_l_e}{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E} \hyperlink{packets_8c_a504c49842231bcde5d16b62eb057dddc}{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T} = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x9\+C \}
+\item 
+const \hyperlink{packets_8h_ac3a1ac8c2841ebbffc2c5b6aa98a167f}{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N} \hyperlink{packets_8c_aca1d211b0e7261ae3c50d644eb91112b}{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T} = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x9\+F\}
+\item 
+const \hyperlink{packets_8h_a4f97cca46444f0b0f8d3e0be20466a56}{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E} \hyperlink{packets_8c_abea37b01508cc72e924c64fb8f7507d4}{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T} = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x00, .\+cmd = 0x\+A0\}
+\item 
+const \hyperlink{packets_8h_af5dec87ff7ff77f0f99b25ada3c9cf67}{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E} \hyperlink{packets_8c_ae348866057beb74f99b60ce709943cfe}{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T} = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x00, .\+alloc = 0x0800\}
+\item 
+const \hyperlink{struct_v_m___r_e_p_l_y}{V\+M\+\_\+\+R\+E\+P\+L\+Y} \hyperlink{packets_8c_ab3823273ec98b105f3dc6313169518b2}{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S} = \{.packet\+Len = 3, .reply\+Type = 0x02\}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+contains inital values for all these packets 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 2.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Variable Documentation}
+\hypertarget{packets_8c_a1a8e47c8020b4f9b9bdedad3e65bb076}{}\index{packets.\+c@{packets.\+c}!B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}}
+\index{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D} B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T = \{ .hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x92 \}}\label{packets_8c_a1a8e47c8020b4f9b9bdedad3e65bb076}
+
+
+Definition at line 10 of file packets.\+c.
+
+\hypertarget{packets_8c_a0fedab4058d7adf4fe5cde7d3613efab}{}\index{packets.\+c@{packets.\+c}!B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}}
+\index{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E} B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T = \{.hid\+Layer =0x00, .\+reply\+Type = 0x01, .\+cmd = 0x96 \}}\label{packets_8c_a0fedab4058d7adf4fe5cde7d3613efab}
+
+
+Definition at line 31 of file packets.\+c.
+
+\hypertarget{packets_8c_acc3a31580cb57d0ae2b4aedeca33ca06}{}\index{packets.\+c@{packets.\+c}!B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}}
+\index{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D} B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T = \{ .hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x94 \}}\label{packets_8c_acc3a31580cb57d0ae2b4aedeca33ca06}
+
+
+Definition at line 19 of file packets.\+c.
+
+\hypertarget{packets_8c_aca1d211b0e7261ae3c50d644eb91112b}{}\index{packets.\+c@{packets.\+c}!B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T@{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T}}
+\index{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T@{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N} B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x9\+F\}}\label{packets_8c_aca1d211b0e7261ae3c50d644eb91112b}
+
+
+Definition at line 40 of file packets.\+c.
+
+\hypertarget{packets_8c_a001c6aae152f0f58751b55ef30b9f3b5}{}\index{packets.\+c@{packets.\+c}!C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}}
+\index{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D} C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T = \{ .hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x93\}}\label{packets_8c_a001c6aae152f0f58751b55ef30b9f3b5}
+
+
+Definition at line 13 of file packets.\+c.
+
+\hypertarget{packets_8c_a50aa732c81162fe89378a59ea49ae658}{}\index{packets.\+c@{packets.\+c}!C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}}
+\index{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}!packets.\+c@{packets.\+c}}
+\subsubsection[{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y} C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S = \{.packet\+Len = 6, .type = 0x03, .\+cmd = 0x93, .\+ret = 0x08\}}\label{packets_8c_a50aa732c81162fe89378a59ea49ae658}
+
+
+Definition at line 16 of file packets.\+c.
+
+\hypertarget{packets_8c_af9dc585e5fb5caacf92652490a69c370}{}\index{packets.\+c@{packets.\+c}!C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}}
+\index{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T = \{.hid\+Layer =0x00, .\+packet\+Len =7, .\+reply\+Type = 0x01, .\+cmd = 0x9\+A\}}\label{packets_8c_af9dc585e5fb5caacf92652490a69c370}
+
+
+Definition at line 28 of file packets.\+c.
+
+\hypertarget{packets_8c_a5bafb2c19e3680b581d83885a8ca9e30}{}\index{packets.\+c@{packets.\+c}!C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}}
+\index{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D} C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T = \{ .hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x95\}}\label{packets_8c_a5bafb2c19e3680b581d83885a8ca9e30}
+
+
+Definition at line 22 of file packets.\+c.
+
+\hypertarget{packets_8c_ab1bc0391422d7ecb2027d1fba985bc16}{}\index{packets.\+c@{packets.\+c}!C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T@{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T}}
+\index{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T@{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R} C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x9\+B \}}\label{packets_8c_ab1bc0391422d7ecb2027d1fba985bc16}
+
+
+Definition at line 34 of file packets.\+c.
+
+\hypertarget{packets_8c_a504c49842231bcde5d16b62eb057dddc}{}\index{packets.\+c@{packets.\+c}!D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}}
+\index{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E} D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x9\+C \}}\label{packets_8c_a504c49842231bcde5d16b62eb057dddc}
+
+
+Definition at line 37 of file packets.\+c.
+
+\hypertarget{packets_8c_abea37b01508cc72e924c64fb8f7507d4}{}\index{packets.\+c@{packets.\+c}!E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T@{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T}}
+\index{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T@{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E} E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x00, .\+cmd = 0x\+A0\}}\label{packets_8c_abea37b01508cc72e924c64fb8f7507d4}
+
+
+Definition at line 43 of file packets.\+c.
+
+\hypertarget{packets_8c_ae348866057beb74f99b60ce709943cfe}{}\index{packets.\+c@{packets.\+c}!E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}}
+\index{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E} E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x00, .\+alloc = 0x0800\}}\label{packets_8c_ae348866057beb74f99b60ce709943cfe}
+
+
+Definition at line 46 of file packets.\+c.
+
+\hypertarget{packets_8c_ab3823273ec98b105f3dc6313169518b2}{}\index{packets.\+c@{packets.\+c}!E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S@{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}}
+\index{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S@{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}!packets.\+c@{packets.\+c}}
+\subsubsection[{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf V\+M\+\_\+\+R\+E\+P\+L\+Y} E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S = \{.packet\+Len = 3, .reply\+Type = 0x02\}}\label{packets_8c_ab3823273ec98b105f3dc6313169518b2}
+
+
+Definition at line 49 of file packets.\+c.
+
+\hypertarget{packets_8c_a598dc2599231eda5a07b376409bcf034}{}\index{packets.\+c@{packets.\+c}!L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T@{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}}
+\index{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T@{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}!packets.\+c@{packets.\+c}}
+\subsubsection[{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T = \{.hid\+Layer = 0x00, .\+reply\+Type = 0x01, .\+cmd = 0x99 \}}\label{packets_8c_a598dc2599231eda5a07b376409bcf034}
+
+
+Definition at line 25 of file packets.\+c.
+

@@ -1,0 +1,381 @@
+\hypertarget{systemcmd_8h}{}\section{src/systemcmd.h File Reference}
+\label{systemcmd_8h}\index{src/systemcmd.\+h@{src/systemcmd.\+h}}
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+Include dependency graph for systemcmd.\+h\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=198pt]{systemcmd_8h__incl}
+\end{center}
+\end{figure}
+This graph shows which files directly or indirectly include this file\+:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{systemcmd_8h__dep__incl}
+\end{center}
+\end{figure}
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \hyperlink{struct_s_y_s_t_e_m___c_m_d}{S\+Y\+S\+T\+E\+M\+\_\+\+C\+M\+D}
+\item 
+struct \hyperlink{struct_s_y_s_t_e_m___r_e_p_l_y}{S\+Y\+S\+T\+E\+M\+\_\+\+R\+E\+P\+L\+Y}
+\item 
+struct \hyperlink{struct_b_e_g_i_n___d_o_w_n_l_o_a_d}{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D}
+\begin{DoxyCompactList}\small\item\em upload to E\+V3 \end{DoxyCompactList}\item 
+struct \hyperlink{struct_b_e_g_i_n___d_o_w_n_l_o_a_d___r_e_p_l_y}{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y}
+\item 
+struct \hyperlink{struct_c_o_n_t_i_n_u_e___d_o_w_n_l_o_a_d}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D}
+\item 
+struct \hyperlink{struct_b_e_g_i_n___u_p_l_o_a_d}{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D}
+\item 
+struct \hyperlink{struct_b_e_g_i_n___u_p_l_o_a_d___r_e_p_l_y}{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y}
+\item 
+struct \hyperlink{struct_c_o_n_t_i_n_u_e___u_p_l_o_a_d}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D}
+\item 
+struct \hyperlink{struct_c_o_n_t_i_n_u_e___u_p_l_o_a_d___r_e_p_l_y}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y}
+\item 
+struct \hyperlink{struct_l_i_s_t___f_i_l_e_s}{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S}
+\begin{DoxyCompactList}\small\item\em List files on E\+V3. \end{DoxyCompactList}\item 
+struct \hyperlink{struct_l_i_s_t___f_i_l_e_s___r_e_p_l_y}{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+R\+E\+P\+L\+Y}
+\item 
+struct \hyperlink{struct_c_o_n_t_i_n_u_e___l_i_s_t___f_i_l_e_s}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S}
+\item 
+struct \hyperlink{struct_c_o_n_t_i_n_u_e___l_i_s_t___f_i_l_e_s___r_e_p_l_y}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+R\+E\+P\+L\+Y}
+\begin{DoxyCompactList}\small\item\em create directory \end{DoxyCompactList}\item 
+struct \hyperlink{struct_c_r_e_a_t_e___d_i_r}{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R}
+\item 
+struct \hyperlink{struct_d_e_l_e_t_e___f_i_l_e}{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E}
+\item 
+struct \hyperlink{struct_b_l_u_e_t_o_o_t_h_p_i_n___r_e_p_l_y}{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+R\+E\+P\+L\+Y}
+\item 
+struct \hyperlink{struct_v_m___c_m_d}{V\+M\+\_\+\+C\+M\+D}
+\item 
+struct \hyperlink{struct_v_m___r_e_p_l_y}{V\+M\+\_\+\+R\+E\+P\+L\+Y}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{systemcmd_8h_af25f136b6d8507a42ec1843623892054}{H\+I\+D\+\_\+\+L\+A\+Y\+E\+R}~\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8} hid\+Layer;
+\item 
+\#define \hyperlink{systemcmd_8h_a948b7811b250da5bc1297c8d0c4c698b}{E\+V3\+\_\+\+P\+A\+C\+K\+E\+T\+\_\+\+F\+I\+E\+L\+D\+S}
+\item 
+\#define \hyperlink{systemcmd_8h_a0c26a010ef0da2962a751796943824c9}{E\+V3\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S}
+\item 
+\#define \hyperlink{systemcmd_8h_a382c165d520d462ac8f0c88e2a1970cb}{E\+V3\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+F\+I\+E\+L\+D\+S}
+\item 
+\#define \hyperlink{systemcmd_8h_abe208177340b58cb5096daabe07922d1}{P\+R\+E\+F\+I\+X\+\_\+\+S\+I\+Z\+E}~3
+\item 
+\#define \hyperlink{systemcmd_8h_a4c98eb40db8c22149f549465d1186e0d}{E\+V3\+\_\+\+V\+M\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S}
+\begin{DoxyCompactList}\small\item\em V\+M stuff. \end{DoxyCompactList}\item 
+\#define \hyperlink{systemcmd_8h_afb5e6e4185a678583d67d656cc6d8733}{packet\+\_\+alloc}(type,  extra)
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef \hyperlink{struct_b_e_g_i_n___d_o_w_n_l_o_a_d___r_e_p_l_y}{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y} \hyperlink{systemcmd_8h_a5c3eeff36f033cce69ffb89725c3da42}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y}
+\item 
+typedef \hyperlink{struct_l_i_s_t___f_i_l_e_s}{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} \hyperlink{systemcmd_8h_a6ceb579e59ce635ca6dca88e851a6aab}{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E}
+\item 
+typedef \hyperlink{struct_s_y_s_t_e_m___r_e_p_l_y}{S\+Y\+S\+T\+E\+M\+\_\+\+R\+E\+P\+L\+Y} \hyperlink{systemcmd_8h_aed8565e26f6ab57228dc06682c913d94}{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+R\+E\+P\+L\+Y}
+\item 
+typedef \hyperlink{struct_s_y_s_t_e_m___r_e_p_l_y}{S\+Y\+S\+T\+E\+M\+\_\+\+R\+E\+P\+L\+Y} \hyperlink{systemcmd_8h_af5d4ae54434544dfbc79606c251b966a}{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y}
+\item 
+typedef \hyperlink{struct_s_y_s_t_e_m___c_m_d}{S\+Y\+S\+T\+E\+M\+\_\+\+C\+M\+D} \hyperlink{systemcmd_8h_ac3a1ac8c2841ebbffc2c5b6aa98a167f}{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N}
+\begin{DoxyCompactList}\small\item\em set bluetooth pin \end{DoxyCompactList}\item 
+typedef \hyperlink{struct_s_y_s_t_e_m___c_m_d}{S\+Y\+S\+T\+E\+M\+\_\+\+C\+M\+D} \hyperlink{systemcmd_8h_a4f97cca46444f0b0f8d3e0be20466a56}{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E}
+\begin{DoxyCompactList}\small\item\em Force brick into Firmware update mode. \end{DoxyCompactList}\item 
+typedef \hyperlink{struct_v_m___c_m_d}{V\+M\+\_\+\+C\+M\+D} \hyperlink{systemcmd_8h_af5dec87ff7ff77f0f99b25ada3c9cf67}{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E}
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const \hyperlink{struct_b_e_g_i_n___d_o_w_n_l_o_a_d}{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D} \hyperlink{systemcmd_8h_a1a8e47c8020b4f9b9bdedad3e65bb076}{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{struct_c_o_n_t_i_n_u_e___d_o_w_n_l_o_a_d}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D} \hyperlink{systemcmd_8h_a001c6aae152f0f58751b55ef30b9f3b5}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{systemcmd_8h_a5c3eeff36f033cce69ffb89725c3da42}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y} \hyperlink{systemcmd_8h_a50aa732c81162fe89378a59ea49ae658}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}
+\item 
+const \hyperlink{struct_c_o_n_t_i_n_u_e___u_p_l_o_a_d}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D} \hyperlink{systemcmd_8h_a5bafb2c19e3680b581d83885a8ca9e30}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{struct_b_e_g_i_n___u_p_l_o_a_d}{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D} \hyperlink{systemcmd_8h_acc3a31580cb57d0ae2b4aedeca33ca06}{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{struct_l_i_s_t___f_i_l_e_s}{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} \hyperlink{systemcmd_8h_a598dc2599231eda5a07b376409bcf034}{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{systemcmd_8h_a6ceb579e59ce635ca6dca88e851a6aab}{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E} \hyperlink{systemcmd_8h_a0fedab4058d7adf4fe5cde7d3613efab}{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{struct_c_o_n_t_i_n_u_e___l_i_s_t___f_i_l_e_s}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} \hyperlink{systemcmd_8h_af9dc585e5fb5caacf92652490a69c370}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{struct_c_r_e_a_t_e___d_i_r}{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R} \hyperlink{systemcmd_8h_ab1bc0391422d7ecb2027d1fba985bc16}{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{struct_d_e_l_e_t_e___f_i_l_e}{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E} \hyperlink{systemcmd_8h_a504c49842231bcde5d16b62eb057dddc}{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{systemcmd_8h_ac3a1ac8c2841ebbffc2c5b6aa98a167f}{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N} \hyperlink{systemcmd_8h_aca1d211b0e7261ae3c50d644eb91112b}{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{systemcmd_8h_a4f97cca46444f0b0f8d3e0be20466a56}{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E} \hyperlink{systemcmd_8h_abea37b01508cc72e924c64fb8f7507d4}{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{systemcmd_8h_af5dec87ff7ff77f0f99b25ada3c9cf67}{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E} \hyperlink{systemcmd_8h_ae348866057beb74f99b60ce709943cfe}{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}
+\item 
+const \hyperlink{struct_v_m___r_e_p_l_y}{V\+M\+\_\+\+R\+E\+P\+L\+Y} \hyperlink{systemcmd_8h_ab3823273ec98b105f3dc6313169518b2}{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{systemcmd_8h_a0c26a010ef0da2962a751796943824c9}{}\index{systemcmd.\+h@{systemcmd.\+h}!E\+V3\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S@{E\+V3\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S}}
+\index{E\+V3\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S@{E\+V3\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{E\+V3\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+V3\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S}\label{systemcmd_8h_a0c26a010ef0da2962a751796943824c9}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{HID\_LAYER \(\backslash\)}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{    EV3\_PACKET\_FIELDS \(\backslash\)}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{    u8} replyType;\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{\(\backslash\)}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{    u8} cmd;
+\end{DoxyCode}
+
+
+Definition at line 13 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_a948b7811b250da5bc1297c8d0c4c698b}{}\index{systemcmd.\+h@{systemcmd.\+h}!E\+V3\+\_\+\+P\+A\+C\+K\+E\+T\+\_\+\+F\+I\+E\+L\+D\+S@{E\+V3\+\_\+\+P\+A\+C\+K\+E\+T\+\_\+\+F\+I\+E\+L\+D\+S}}
+\index{E\+V3\+\_\+\+P\+A\+C\+K\+E\+T\+\_\+\+F\+I\+E\+L\+D\+S@{E\+V3\+\_\+\+P\+A\+C\+K\+E\+T\+\_\+\+F\+I\+E\+L\+D\+S}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{E\+V3\+\_\+\+P\+A\+C\+K\+E\+T\+\_\+\+F\+I\+E\+L\+D\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+V3\+\_\+\+P\+A\+C\+K\+E\+T\+\_\+\+F\+I\+E\+L\+D\+S}\label{systemcmd_8h_a948b7811b250da5bc1297c8d0c4c698b}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\hyperlink{defs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16} packetLen;\hyperlink{defs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{\(\backslash\)}
+\hyperlink{defs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{    u16} msgCount;
+\end{DoxyCode}
+
+
+Definition at line 9 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_a382c165d520d462ac8f0c88e2a1970cb}{}\index{systemcmd.\+h@{systemcmd.\+h}!E\+V3\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+F\+I\+E\+L\+D\+S@{E\+V3\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+F\+I\+E\+L\+D\+S}}
+\index{E\+V3\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+F\+I\+E\+L\+D\+S@{E\+V3\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+F\+I\+E\+L\+D\+S}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{E\+V3\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+F\+I\+E\+L\+D\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+V3\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+F\+I\+E\+L\+D\+S}\label{systemcmd_8h_a382c165d520d462ac8f0c88e2a1970cb}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{EV3\_PACKET\_FIELDS \(\backslash\)}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{    u8} type; \hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{\(\backslash\)}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{    u8} cmd; \hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{\(\backslash\)}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{    u8} ret;
+\end{DoxyCode}
+
+
+Definition at line 19 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_a4c98eb40db8c22149f549465d1186e0d}{}\index{systemcmd.\+h@{systemcmd.\+h}!E\+V3\+\_\+\+V\+M\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S@{E\+V3\+\_\+\+V\+M\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S}}
+\index{E\+V3\+\_\+\+V\+M\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S@{E\+V3\+\_\+\+V\+M\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{E\+V3\+\_\+\+V\+M\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+V3\+\_\+\+V\+M\+\_\+\+C\+O\+M\+M\+A\+N\+D\+\_\+\+F\+I\+E\+L\+D\+S}\label{systemcmd_8h_a4c98eb40db8c22149f549465d1186e0d}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{HID\_LAYER \(\backslash\)}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{    EV3\_PACKET\_FIELDS \(\backslash\)}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{    u8} replyType; \hyperlink{defs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{\(\backslash\)}
+\hyperlink{defs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{    u16} alloc;
+\end{DoxyCode}
+
+
+V\+M stuff. 
+
+
+
+Definition at line 205 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_af25f136b6d8507a42ec1843623892054}{}\index{systemcmd.\+h@{systemcmd.\+h}!H\+I\+D\+\_\+\+L\+A\+Y\+E\+R@{H\+I\+D\+\_\+\+L\+A\+Y\+E\+R}}
+\index{H\+I\+D\+\_\+\+L\+A\+Y\+E\+R@{H\+I\+D\+\_\+\+L\+A\+Y\+E\+R}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{H\+I\+D\+\_\+\+L\+A\+Y\+E\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define H\+I\+D\+\_\+\+L\+A\+Y\+E\+R~{\bf u8} hid\+Layer;}\label{systemcmd_8h_af25f136b6d8507a42ec1843623892054}
+
+
+Definition at line 6 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_afb5e6e4185a678583d67d656cc6d8733}{}\index{systemcmd.\+h@{systemcmd.\+h}!packet\+\_\+alloc@{packet\+\_\+alloc}}
+\index{packet\+\_\+alloc@{packet\+\_\+alloc}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{packet\+\_\+alloc}]{\setlength{\rightskip}{0pt plus 5cm}\#define packet\+\_\+alloc(
+\begin{DoxyParamCaption}
+\item[{}]{type, }
+\item[{}]{extra}
+\end{DoxyParamCaption}
+)}\label{systemcmd_8h_afb5e6e4185a678583d67d656cc6d8733}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+(\{                          \(\backslash\)
+    void *ptr = NULL;                                 \(\backslash\)
+    if ((\textcolor{keyword}{sizeof}(type) + extra < (\hyperlink{defs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16})-1)              \(\backslash\)
+    && (ptr = malloc(\textcolor{keyword}{sizeof}(type) + extra))) \{          \(\backslash\)
+    memcpy(ptr, &type##\_INIT, \textcolor{keyword}{sizeof}(type));                    \(\backslash\)
+    ((\hyperlink{struct_s_y_s_t_e_m___c_m_d}{SYSTEM\_CMD} *)ptr)->packetLen = (\hyperlink{defs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16})(\textcolor{keyword}{sizeof}(type) + extra - 
+      \hyperlink{systemcmd_8h_abe208177340b58cb5096daabe07922d1}{PREFIX\_SIZE});                                          \(\backslash\)
+  \}                                                   \(\backslash\)
+    ptr;\})
+\end{DoxyCode}
+
+
+Definition at line 252 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_abe208177340b58cb5096daabe07922d1}{}\index{systemcmd.\+h@{systemcmd.\+h}!P\+R\+E\+F\+I\+X\+\_\+\+S\+I\+Z\+E@{P\+R\+E\+F\+I\+X\+\_\+\+S\+I\+Z\+E}}
+\index{P\+R\+E\+F\+I\+X\+\_\+\+S\+I\+Z\+E@{P\+R\+E\+F\+I\+X\+\_\+\+S\+I\+Z\+E}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{P\+R\+E\+F\+I\+X\+\_\+\+S\+I\+Z\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\+R\+E\+F\+I\+X\+\_\+\+S\+I\+Z\+E~3}\label{systemcmd_8h_abe208177340b58cb5096daabe07922d1}
+
+
+Definition at line 25 of file systemcmd.\+h.
+
+
+
+\subsection{Typedef Documentation}
+\hypertarget{systemcmd_8h_a6ceb579e59ce635ca6dca88e851a6aab}{}\index{systemcmd.\+h@{systemcmd.\+h}!B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E@{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E}}
+\index{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E@{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} {\bf B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E}}\label{systemcmd_8h_a6ceb579e59ce635ca6dca88e851a6aab}
+
+
+Definition at line 122 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_ac3a1ac8c2841ebbffc2c5b6aa98a167f}{}\index{systemcmd.\+h@{systemcmd.\+h}!B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N@{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N}}
+\index{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N@{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf S\+Y\+S\+T\+E\+M\+\_\+\+C\+M\+D} {\bf B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N}}\label{systemcmd_8h_ac3a1ac8c2841ebbffc2c5b6aa98a167f}
+
+
+set bluetooth pin 
+
+
+
+Definition at line 178 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_a5c3eeff36f033cce69ffb89725c3da42}{}\index{systemcmd.\+h@{systemcmd.\+h}!C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y}}
+\index{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y} {\bf C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y}}\label{systemcmd_8h_a5c3eeff36f033cce69ffb89725c3da42}
+
+
+Definition at line 70 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_aed8565e26f6ab57228dc06682c913d94}{}\index{systemcmd.\+h@{systemcmd.\+h}!C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+R\+E\+P\+L\+Y@{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+R\+E\+P\+L\+Y}}
+\index{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+R\+E\+P\+L\+Y@{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+R\+E\+P\+L\+Y}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+R\+E\+P\+L\+Y}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf S\+Y\+S\+T\+E\+M\+\_\+\+R\+E\+P\+L\+Y} {\bf C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+R\+E\+P\+L\+Y}}\label{systemcmd_8h_aed8565e26f6ab57228dc06682c913d94}
+
+
+Definition at line 162 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_af5d4ae54434544dfbc79606c251b966a}{}\index{systemcmd.\+h@{systemcmd.\+h}!D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y@{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y}}
+\index{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y@{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf S\+Y\+S\+T\+E\+M\+\_\+\+R\+E\+P\+L\+Y} {\bf D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y}}\label{systemcmd_8h_af5d4ae54434544dfbc79606c251b966a}
+
+
+Definition at line 174 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_a4f97cca46444f0b0f8d3e0be20466a56}{}\index{systemcmd.\+h@{systemcmd.\+h}!E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E@{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E}}
+\index{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E@{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf S\+Y\+S\+T\+E\+M\+\_\+\+C\+M\+D} {\bf E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E}}\label{systemcmd_8h_a4f97cca46444f0b0f8d3e0be20466a56}
+
+
+Force brick into Firmware update mode. 
+
+
+
+Definition at line 199 of file systemcmd.\+h.
+
+\hypertarget{systemcmd_8h_af5dec87ff7ff77f0f99b25ada3c9cf67}{}\index{systemcmd.\+h@{systemcmd.\+h}!E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E@{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E}}
+\index{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E@{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E}]{\setlength{\rightskip}{0pt plus 5cm}typedef {\bf V\+M\+\_\+\+C\+M\+D} {\bf E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E}}\label{systemcmd_8h_af5dec87ff7ff77f0f99b25ada3c9cf67}
+
+
+Definition at line 218 of file systemcmd.\+h.
+
+
+
+\subsection{Variable Documentation}
+\hypertarget{systemcmd_8h_a1a8e47c8020b4f9b9bdedad3e65bb076}{}\index{systemcmd.\+h@{systemcmd.\+h}!B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}}
+\index{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D} B\+E\+G\+I\+N\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_a1a8e47c8020b4f9b9bdedad3e65bb076}
+
+
+Definition at line 4 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_a0fedab4058d7adf4fe5cde7d3613efab}{}\index{systemcmd.\+h@{systemcmd.\+h}!B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}}
+\index{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E} B\+E\+G\+I\+N\+\_\+\+G\+E\+T\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_a0fedab4058d7adf4fe5cde7d3613efab}
+
+
+Definition at line 25 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_acc3a31580cb57d0ae2b4aedeca33ca06}{}\index{systemcmd.\+h@{systemcmd.\+h}!B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}}
+\index{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D} B\+E\+G\+I\+N\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_acc3a31580cb57d0ae2b4aedeca33ca06}
+
+
+Definition at line 13 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_aca1d211b0e7261ae3c50d644eb91112b}{}\index{systemcmd.\+h@{systemcmd.\+h}!B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T@{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T}}
+\index{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T@{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N} B\+L\+U\+E\+T\+O\+O\+T\+H\+P\+I\+N\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_aca1d211b0e7261ae3c50d644eb91112b}
+
+
+Definition at line 34 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_a001c6aae152f0f58751b55ef30b9f3b5}{}\index{systemcmd.\+h@{systemcmd.\+h}!C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}}
+\index{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D} C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_a001c6aae152f0f58751b55ef30b9f3b5}
+
+
+Definition at line 7 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_a50aa732c81162fe89378a59ea49ae658}{}\index{systemcmd.\+h@{systemcmd.\+h}!C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}}
+\index{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y} C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+D\+O\+W\+N\+L\+O\+A\+D\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}\label{systemcmd_8h_a50aa732c81162fe89378a59ea49ae658}
+
+
+Definition at line 10 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_af9dc585e5fb5caacf92652490a69c370}{}\index{systemcmd.\+h@{systemcmd.\+h}!C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}}
+\index{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_af9dc585e5fb5caacf92652490a69c370}
+
+
+Definition at line 22 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_a5bafb2c19e3680b581d83885a8ca9e30}{}\index{systemcmd.\+h@{systemcmd.\+h}!C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}}
+\index{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T@{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D} C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+U\+P\+L\+O\+A\+D\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_a5bafb2c19e3680b581d83885a8ca9e30}
+
+
+Definition at line 16 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_ab1bc0391422d7ecb2027d1fba985bc16}{}\index{systemcmd.\+h@{systemcmd.\+h}!C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T@{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T}}
+\index{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T@{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R} C\+R\+E\+A\+T\+E\+\_\+\+D\+I\+R\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_ab1bc0391422d7ecb2027d1fba985bc16}
+
+
+Definition at line 28 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_a504c49842231bcde5d16b62eb057dddc}{}\index{systemcmd.\+h@{systemcmd.\+h}!D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}}
+\index{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E} D\+E\+L\+E\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_a504c49842231bcde5d16b62eb057dddc}
+
+
+Definition at line 31 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_abea37b01508cc72e924c64fb8f7507d4}{}\index{systemcmd.\+h@{systemcmd.\+h}!E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T@{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T}}
+\index{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T@{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E} E\+N\+T\+E\+R\+F\+W\+U\+P\+D\+A\+T\+E\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_abea37b01508cc72e924c64fb8f7507d4}
+
+
+Definition at line 37 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_ae348866057beb74f99b60ce709943cfe}{}\index{systemcmd.\+h@{systemcmd.\+h}!E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}}
+\index{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T@{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E} E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_ae348866057beb74f99b60ce709943cfe}
+
+
+Definition at line 40 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_ab3823273ec98b105f3dc6313169518b2}{}\index{systemcmd.\+h@{systemcmd.\+h}!E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S@{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}}
+\index{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S@{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf V\+M\+\_\+\+R\+E\+P\+L\+Y} E\+X\+E\+C\+U\+T\+E\+\_\+\+F\+I\+L\+E\+\_\+\+R\+E\+P\+L\+Y\+\_\+\+S\+U\+C\+C\+E\+S\+S}\label{systemcmd_8h_ab3823273ec98b105f3dc6313169518b2}
+
+
+Definition at line 43 of file cmd\+\_\+defaults.\+c.
+
+\hypertarget{systemcmd_8h_a598dc2599231eda5a07b376409bcf034}{}\index{systemcmd.\+h@{systemcmd.\+h}!L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T@{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}}
+\index{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T@{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}!systemcmd.\+h@{systemcmd.\+h}}
+\subsubsection[{L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}]{\setlength{\rightskip}{0pt plus 5cm}const {\bf L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S\+\_\+\+I\+N\+I\+T}\label{systemcmd_8h_a598dc2599231eda5a07b376409bcf034}
+
+
+Definition at line 19 of file cmd\+\_\+defaults.\+c.
+

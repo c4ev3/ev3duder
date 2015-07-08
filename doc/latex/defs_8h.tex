@@ -1,0 +1,192 @@
+\hypertarget{defs_8h}{}\section{src/defs.h File Reference}
+\label{defs_8h}\index{src/defs.\+h@{src/defs.\+h}}
+{\ttfamily \#include $<$stdint.\+h$>$}\\*
+{\ttfamily \#include $<$stddef.\+h$>$}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{defs_8h_a70c57aae3eb654e205459b4362c8089a}{A\+R\+R\+A\+Y\+\_\+\+S\+I\+Z\+E}(array)~(sizeof(array) / sizeof(array)\mbox{[}0\mbox{]})
+\item 
+\#define \hyperlink{defs_8h_ab6acaec854169756098dfd26138a1a0e}{die}(msg)
+\item 
+\#define \hyperlink{defs_8h_a2d7756fb1bdd62997fc68a5cd227e414}{mempcpy}(dst,  src,  len)~((char$\ast$)memcpy((dst), (src), (len)) + (len))
+\begin{DoxyCompactList}\small\item\em returns dst+len instead of len for easiert chaining \end{DoxyCompactList}\item 
+\#define \hyperlink{defs_8h_ac3202fc8147202e24a01ac6c0ae205a7}{print\+\_\+bytes}(buf,  len)
+\item 
+\#define \hyperlink{defs_8h_ad569bebb6b669517e456f1ae29f88336}{print\+\_\+chars}(buf,  len)
+\item 
+\#define \hyperlink{defs_8h_a45ba202b05caf39795aeca91b0ae547e}{T\+I\+M\+E\+O\+U\+T}~2000 /$\ast$ in milliseconds $\ast$/
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef uint8\+\_\+t \hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}
+\item 
+typedef uint16\+\_\+t \hyperlink{defs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{u16}
+\item 
+typedef uint32\+\_\+t \hyperlink{defs_8h_afaa62991928fb9fb18ff0db62a040aba}{u32}
+\item 
+typedef uint64\+\_\+t \hyperlink{defs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{u64}
+\item 
+typedef int8\+\_\+t \hyperlink{defs_8h_ae3702327b5f47e83b431e22b33da7b58}{i8}
+\item 
+typedef int16\+\_\+t \hyperlink{defs_8h_ad309dbcaeea13aa602d686964156ea0b}{i16}
+\item 
+typedef int32\+\_\+t \hyperlink{defs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{i32}
+\item 
+typedef int64\+\_\+t \hyperlink{defs_8h_a85cb35fbe5bf2961d7ad5f26814a91a2}{i64}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{defs_8h_a70c57aae3eb654e205459b4362c8089a}{}\index{defs.\+h@{defs.\+h}!A\+R\+R\+A\+Y\+\_\+\+S\+I\+Z\+E@{A\+R\+R\+A\+Y\+\_\+\+S\+I\+Z\+E}}
+\index{A\+R\+R\+A\+Y\+\_\+\+S\+I\+Z\+E@{A\+R\+R\+A\+Y\+\_\+\+S\+I\+Z\+E}!defs.\+h@{defs.\+h}}
+\subsubsection[{A\+R\+R\+A\+Y\+\_\+\+S\+I\+Z\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\+R\+R\+A\+Y\+\_\+\+S\+I\+Z\+E(
+\begin{DoxyParamCaption}
+\item[{}]{array}
+\end{DoxyParamCaption}
+)~(sizeof(array) / sizeof(array)\mbox{[}0\mbox{]})}\label{defs_8h_a70c57aae3eb654e205459b4362c8089a}
+
+
+Definition at line 18 of file defs.\+h.
+
+\hypertarget{defs_8h_ab6acaec854169756098dfd26138a1a0e}{}\index{defs.\+h@{defs.\+h}!die@{die}}
+\index{die@{die}!defs.\+h@{defs.\+h}}
+\subsubsection[{die}]{\setlength{\rightskip}{0pt plus 5cm}\#define die(
+\begin{DoxyParamCaption}
+\item[{}]{msg}
+\end{DoxyParamCaption}
+)}\label{defs_8h_ab6acaec854169756098dfd26138a1a0e}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \{\(\backslash\)
+        fprintf(stderr, \textcolor{stringliteral}{"[%s:%d]: %ls (%s)"}, \_\_func\_\_, \_\_LINE\_\_, hid\_error(
+      \hyperlink{ev3__io_8h_aa0fee4a3e0cbfef079dcc441aaf8a8bf}{handle}), msg);\(\backslash\)
+        exit(\_\_LINE\_\_);\(\backslash\)
+    \} \textcolor{keywordflow}{while} (0)
+\end{DoxyCode}
+
+
+Definition at line 20 of file defs.\+h.
+
+\hypertarget{defs_8h_a2d7756fb1bdd62997fc68a5cd227e414}{}\index{defs.\+h@{defs.\+h}!mempcpy@{mempcpy}}
+\index{mempcpy@{mempcpy}!defs.\+h@{defs.\+h}}
+\subsubsection[{mempcpy}]{\setlength{\rightskip}{0pt plus 5cm}\#define mempcpy(
+\begin{DoxyParamCaption}
+\item[{}]{dst, }
+\item[{}]{src, }
+\item[{}]{len}
+\end{DoxyParamCaption}
+)~((char$\ast$)memcpy((dst), (src), (len)) + (len))}\label{defs_8h_a2d7756fb1bdd62997fc68a5cd227e414}
+
+
+returns dst+len instead of len for easiert chaining 
+
+
+
+Definition at line 28 of file defs.\+h.
+
+\hypertarget{defs_8h_ac3202fc8147202e24a01ac6c0ae205a7}{}\index{defs.\+h@{defs.\+h}!print\+\_\+bytes@{print\+\_\+bytes}}
+\index{print\+\_\+bytes@{print\+\_\+bytes}!defs.\+h@{defs.\+h}}
+\subsubsection[{print\+\_\+bytes}]{\setlength{\rightskip}{0pt plus 5cm}\#define print\+\_\+bytes(
+\begin{DoxyParamCaption}
+\item[{}]{buf, }
+\item[{}]{len}
+\end{DoxyParamCaption}
+)}\label{defs_8h_ac3202fc8147202e24a01ac6c0ae205a7}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \{\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{\(\backslash\)}
+\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{        u8} *ptr = (\hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8}*)buf;\(\backslash\)
+        for (\textcolor{keywordtype}{int} i = 0; i != len; i++, ptr++) fprintf(stderr, \textcolor{stringliteral}{"%02x "}, *ptr);\(\backslash\)
+    \} \textcolor{keywordflow}{while} (0*putc(\textcolor{charliteral}{'\(\backslash\)n'}, stderr))
+\end{DoxyCode}
+
+
+Definition at line 31 of file defs.\+h.
+
+\hypertarget{defs_8h_ad569bebb6b669517e456f1ae29f88336}{}\index{defs.\+h@{defs.\+h}!print\+\_\+chars@{print\+\_\+chars}}
+\index{print\+\_\+chars@{print\+\_\+chars}!defs.\+h@{defs.\+h}}
+\subsubsection[{print\+\_\+chars}]{\setlength{\rightskip}{0pt plus 5cm}\#define print\+\_\+chars(
+\begin{DoxyParamCaption}
+\item[{}]{buf, }
+\item[{}]{len}
+\end{DoxyParamCaption}
+)}\label{defs_8h_ad569bebb6b669517e456f1ae29f88336}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+\textcolor{keywordflow}{do} \{\(\backslash\)
+        char *ptr = buf;\(\backslash\)
+        for (\textcolor{keywordtype}{int} i = 0; i != len; i++, ptr++) fprintf(stderr, \textcolor{stringliteral}{"%c "}, *ptr);\(\backslash\)
+    \} \textcolor{keywordflow}{while} (0*putc(\textcolor{charliteral}{'\(\backslash\)n'}, stderr))
+\end{DoxyCode}
+
+
+Definition at line 37 of file defs.\+h.
+
+\hypertarget{defs_8h_a45ba202b05caf39795aeca91b0ae547e}{}\index{defs.\+h@{defs.\+h}!T\+I\+M\+E\+O\+U\+T@{T\+I\+M\+E\+O\+U\+T}}
+\index{T\+I\+M\+E\+O\+U\+T@{T\+I\+M\+E\+O\+U\+T}!defs.\+h@{defs.\+h}}
+\subsubsection[{T\+I\+M\+E\+O\+U\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define T\+I\+M\+E\+O\+U\+T~2000 /$\ast$ in milliseconds $\ast$/}\label{defs_8h_a45ba202b05caf39795aeca91b0ae547e}
+
+
+Definition at line 43 of file defs.\+h.
+
+
+
+\subsection{Typedef Documentation}
+\hypertarget{defs_8h_ad309dbcaeea13aa602d686964156ea0b}{}\index{defs.\+h@{defs.\+h}!i16@{i16}}
+\index{i16@{i16}!defs.\+h@{defs.\+h}}
+\subsubsection[{i16}]{\setlength{\rightskip}{0pt plus 5cm}typedef int16\+\_\+t {\bf i16}}\label{defs_8h_ad309dbcaeea13aa602d686964156ea0b}
+
+
+Definition at line 14 of file defs.\+h.
+
+\hypertarget{defs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}{}\index{defs.\+h@{defs.\+h}!i32@{i32}}
+\index{i32@{i32}!defs.\+h@{defs.\+h}}
+\subsubsection[{i32}]{\setlength{\rightskip}{0pt plus 5cm}typedef int32\+\_\+t {\bf i32}}\label{defs_8h_a48d6cd8e4135fb2ff7e7f2dac84089ec}
+
+
+Definition at line 15 of file defs.\+h.
+
+\hypertarget{defs_8h_a85cb35fbe5bf2961d7ad5f26814a91a2}{}\index{defs.\+h@{defs.\+h}!i64@{i64}}
+\index{i64@{i64}!defs.\+h@{defs.\+h}}
+\subsubsection[{i64}]{\setlength{\rightskip}{0pt plus 5cm}typedef int64\+\_\+t {\bf i64}}\label{defs_8h_a85cb35fbe5bf2961d7ad5f26814a91a2}
+
+
+Definition at line 16 of file defs.\+h.
+
+\hypertarget{defs_8h_ae3702327b5f47e83b431e22b33da7b58}{}\index{defs.\+h@{defs.\+h}!i8@{i8}}
+\index{i8@{i8}!defs.\+h@{defs.\+h}}
+\subsubsection[{i8}]{\setlength{\rightskip}{0pt plus 5cm}typedef int8\+\_\+t {\bf i8}}\label{defs_8h_ae3702327b5f47e83b431e22b33da7b58}
+
+
+Definition at line 13 of file defs.\+h.
+
+\hypertarget{defs_8h_ace9d960e74685e2cd84b36132dbbf8aa}{}\index{defs.\+h@{defs.\+h}!u16@{u16}}
+\index{u16@{u16}!defs.\+h@{defs.\+h}}
+\subsubsection[{u16}]{\setlength{\rightskip}{0pt plus 5cm}typedef uint16\+\_\+t {\bf u16}}\label{defs_8h_ace9d960e74685e2cd84b36132dbbf8aa}
+
+
+Definition at line 9 of file defs.\+h.
+
+\hypertarget{defs_8h_afaa62991928fb9fb18ff0db62a040aba}{}\index{defs.\+h@{defs.\+h}!u32@{u32}}
+\index{u32@{u32}!defs.\+h@{defs.\+h}}
+\subsubsection[{u32}]{\setlength{\rightskip}{0pt plus 5cm}typedef uint32\+\_\+t {\bf u32}}\label{defs_8h_afaa62991928fb9fb18ff0db62a040aba}
+
+
+Definition at line 10 of file defs.\+h.
+
+\hypertarget{defs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}{}\index{defs.\+h@{defs.\+h}!u64@{u64}}
+\index{u64@{u64}!defs.\+h@{defs.\+h}}
+\subsubsection[{u64}]{\setlength{\rightskip}{0pt plus 5cm}typedef uint64\+\_\+t {\bf u64}}\label{defs_8h_a3f7e2bcbb0b4c338f3c4f6c937cd4234}
+
+
+Definition at line 11 of file defs.\+h.
+
+\hypertarget{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{}\index{defs.\+h@{defs.\+h}!u8@{u8}}
+\index{u8@{u8}!defs.\+h@{defs.\+h}}
+\subsubsection[{u8}]{\setlength{\rightskip}{0pt plus 5cm}typedef uint8\+\_\+t {\bf u8}}\label{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}
+
+
+Definition at line 8 of file defs.\+h.
+

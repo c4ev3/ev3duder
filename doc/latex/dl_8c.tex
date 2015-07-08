@@ -1,0 +1,77 @@
+\hypertarget{dl_8c}{}\section{src/dl.c File Reference}
+\label{dl_8c}\index{src/dl.\+c@{src/dl.\+c}}
+
+
+untested  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}ev3\+\_\+io.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packets.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}funcs.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{dl_8c_aea3cfda4f3a9f978ec759f206cf186fe}{C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E}~1000
+\begin{DoxyCompactList}\small\item\em Transmission is done in units smaller or equal to C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{dl_8c_ad364f2729481e25215bedbe7904dee6e}{dl} (const char $\ast$path, F\+I\+L\+E $\ast$fp)
+\begin{DoxyCompactList}\small\item\em download remote source {\ttfamily rem} to local file {\ttfamily loc} \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+untested 
+
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{dl_8c_aea3cfda4f3a9f978ec759f206cf186fe}{}\index{dl.\+c@{dl.\+c}!C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E@{C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E}}
+\index{C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E@{C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E}!dl.\+c@{dl.\+c}}
+\subsubsection[{C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E~1000}\label{dl_8c_aea3cfda4f3a9f978ec759f206cf186fe}
+
+
+Transmission is done in units smaller or equal to C\+H\+U\+N\+K\+\_\+\+S\+I\+Z\+E. 
+
+
+
+Definition at line 17 of file dl.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{dl_8c_ad364f2729481e25215bedbe7904dee6e}{}\index{dl.\+c@{dl.\+c}!dl@{dl}}
+\index{dl@{dl}!dl.\+c@{dl.\+c}}
+\subsubsection[{dl}]{\setlength{\rightskip}{0pt plus 5cm}int dl (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path, }
+\item[{F\+I\+L\+E $\ast$}]{fp}
+\end{DoxyParamCaption}
+)}\label{dl_8c_ad364f2729481e25215bedbe7904dee6e}
+
+
+download remote source {\ttfamily rem} to local file {\ttfamily loc} 
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & path on the ev3 \\
+\hline
+{\em fp} & F\+I\+L\+E$\ast$ to write data to \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000013}{Bug}]doesn\textquotesingle{}t work, needs more debugging (over Wi\+Fi maybe) \end{DoxyRefDesc}
+
+
+Definition at line 24 of file dl.\+c.
+

@@ -1,0 +1,235 @@
+\hypertarget{main_8c}{}\section{src/main.c File Reference}
+\label{main_8c}\index{src/main.\+c@{src/main.\+c}}
+
+
+Argument parsing, device opening and file creation/openning.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$stdbool.\+h$>$}\\*
+{\ttfamily \#include $<$wchar.\+h$>$}\\*
+{\ttfamily \#include $<$hidapi.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}btserial.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}ev3\+\_\+io.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packets.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}funcs.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{main_8c_a34b04bd23b07b485921a728ad0805ac4}{M\+A\+I\+N}
+\begin{DoxyCompactList}\small\item\em For avoiding the need to separately define and declare stuff. \end{DoxyCompactList}\item 
+\#define \hyperlink{main_8c_a3153a272f18d0f805028fce7e4337b53}{assert}(cond)~do\{ if (!(cond)) if (\hyperlink{ev3__io_8h_aa0fee4a3e0cbfef079dcc441aaf8a8bf}{handle}) \{\hyperlink{ev3__io_8h_ad07a47b97f401ce191e2eeed3c3b74c6}{ev3\+\_\+close}(\hyperlink{ev3__io_8h_aa0fee4a3e0cbfef079dcc441aaf8a8bf}{handle});exit(\hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103ab508ce0ebdf3ca735208b00a80a45c91}{E\+R\+R\+\_\+\+A\+R\+G});\}\}while(0)
+\item 
+\#define \hyperlink{main_8c_afec97479c93b93cce5e98e82d701709a}{Vendor\+I\+D}~0x694 /$\ast$ L\+E\+G\+O G\+R\+O\+U\+P $\ast$/
+\item 
+\#define \hyperlink{main_8c_a9a3ffb8dc6a4244138bc2ad21c2d5165}{Product\+I\+D}~0x005 /$\ast$ E\+V3 $\ast$/
+\item 
+\#define \hyperlink{main_8c_a982a5174783aeb5994335e56f23edc3e}{F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G}(A\+R\+G)
+\item 
+\#define \hyperlink{main_8c_a90e3b674dd05d39f90c713a6e22e2bfa}{M\+K\+\_\+\+E\+N\+U\+M}(x)~A\+R\+G\+\_\+\#\#x,
+\item 
+\#define \hyperlink{main_8c_a1978892d759d63abe3802d326bc20182}{M\+K\+\_\+\+S\+T\+R}(x)~\#x,
+\item 
+\#define \hyperlink{main_8c_a4e1935e9736855aa8ae7957341e85a1e}{S\+A\+N\+I\+T\+I\+Z\+E}
+\end{DoxyCompactItemize}
+\subsection*{Enumerations}
+\begin{DoxyCompactItemize}
+\item 
+enum \hyperlink{main_8c_a30e837d211f0030e72fa8d317be59d56}{A\+R\+G\+S} \{ \hyperlink{main_8c_a30e837d211f0030e72fa8d317be59d56a51c8a93f3f01bf6e868ba891bd2f6ab6}{F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G} =(M\+K\+\_\+\+E\+N\+U\+M)
+ \}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{main_8c_a0ddf1224851353fc92bfbff6f499fa97}{main} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+const char $\ast$const \hyperlink{main_8c_a4163e631c07a727a1c1f58da27ad3659}{params}
+\item 
+const char $\ast$const \hyperlink{main_8c_adc8818c9d526bee9c483f415ab175f2f}{params\+\_\+desc}
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Argument parsing, device opening and file creation/openning. 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 2.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{main_8c_a3153a272f18d0f805028fce7e4337b53}{}\index{main.\+c@{main.\+c}!assert@{assert}}
+\index{assert@{assert}!main.\+c@{main.\+c}}
+\subsubsection[{assert}]{\setlength{\rightskip}{0pt plus 5cm}\#define assert(
+\begin{DoxyParamCaption}
+\item[{}]{cond}
+\end{DoxyParamCaption}
+)~do\{ if (!(cond)) if ({\bf handle}) \{{\bf ev3\+\_\+close}({\bf handle});exit({\bf E\+R\+R\+\_\+\+A\+R\+G});\}\}while(0)}\label{main_8c_a3153a272f18d0f805028fce7e4337b53}
+
+
+Definition at line 17 of file main.\+c.
+
+\hypertarget{main_8c_a982a5174783aeb5994335e56f23edc3e}{}\index{main.\+c@{main.\+c}!F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G@{F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G}}
+\index{F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G@{F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G}!main.\+c@{main.\+c}}
+\subsubsection[{F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G(
+\begin{DoxyParamCaption}
+\item[{}]{A\+R\+G}
+\end{DoxyParamCaption}
+)}\label{main_8c_a982a5174783aeb5994335e56f23edc3e}
+{\bfseries Value\+:}
+\begin{DoxyCode}
+ARG(\hyperlink{funcs_8h_a1f3479a5eb21a215c63cfcd8876e3486}{test})            \(\backslash\)
+ARG(\hyperlink{funcs_8h_abdbaa8f93fc1cbe7216ee0effc5161b7}{up})              \(\backslash\)
+ARG(\hyperlink{dl_8c_ad364f2729481e25215bedbe7904dee6e}{dl})              \(\backslash\)
+ARG(\hyperlink{funcs_8h_aaf8a793cb1b3378427235a78f684a520}{run})             \(\backslash\)
+ARG(\hyperlink{funcs_8h_a8dbb05627f3f753825fba2e1226450a7}{ls})              \(\backslash\)
+ARG(\hyperlink{funcs_8h_ae815743b20ac09451a0c027c8ad6b57e}{rm})              \(\backslash\)
+ARG(\hyperlink{funcs_8h_a433be27a0f3e031bf4b8aca1c53284cb}{mkdir})           \(\backslash\)
+ARG(\hyperlink{funcs_8h_a575ddc806cdf31e8ac769e9dc21f6e57}{mkrbf})           \(\backslash\)
+ARG(exec)            \(\backslash\)
+ARG(end)
+\end{DoxyCode}
+
+
+Definition at line 53 of file main.\+c.
+
+\hypertarget{main_8c_a34b04bd23b07b485921a728ad0805ac4}{}\index{main.\+c@{main.\+c}!M\+A\+I\+N@{M\+A\+I\+N}}
+\index{M\+A\+I\+N@{M\+A\+I\+N}!main.\+c@{main.\+c}}
+\subsubsection[{M\+A\+I\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+A\+I\+N}\label{main_8c_a34b04bd23b07b485921a728ad0805ac4}
+
+
+For avoiding the need to separately define and declare stuff. 
+
+
+
+Definition at line 8 of file main.\+c.
+
+\hypertarget{main_8c_a90e3b674dd05d39f90c713a6e22e2bfa}{}\index{main.\+c@{main.\+c}!M\+K\+\_\+\+E\+N\+U\+M@{M\+K\+\_\+\+E\+N\+U\+M}}
+\index{M\+K\+\_\+\+E\+N\+U\+M@{M\+K\+\_\+\+E\+N\+U\+M}!main.\+c@{main.\+c}}
+\subsubsection[{M\+K\+\_\+\+E\+N\+U\+M}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+K\+\_\+\+E\+N\+U\+M(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~A\+R\+G\+\_\+\#\#x,}\label{main_8c_a90e3b674dd05d39f90c713a6e22e2bfa}
+
+
+Definition at line 65 of file main.\+c.
+
+\hypertarget{main_8c_a1978892d759d63abe3802d326bc20182}{}\index{main.\+c@{main.\+c}!M\+K\+\_\+\+S\+T\+R@{M\+K\+\_\+\+S\+T\+R}}
+\index{M\+K\+\_\+\+S\+T\+R@{M\+K\+\_\+\+S\+T\+R}!main.\+c@{main.\+c}}
+\subsubsection[{M\+K\+\_\+\+S\+T\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+K\+\_\+\+S\+T\+R(
+\begin{DoxyParamCaption}
+\item[{}]{x}
+\end{DoxyParamCaption}
+)~\#x,}\label{main_8c_a1978892d759d63abe3802d326bc20182}
+
+
+Definition at line 66 of file main.\+c.
+
+\hypertarget{main_8c_a9a3ffb8dc6a4244138bc2ad21c2d5165}{}\index{main.\+c@{main.\+c}!Product\+I\+D@{Product\+I\+D}}
+\index{Product\+I\+D@{Product\+I\+D}!main.\+c@{main.\+c}}
+\subsubsection[{Product\+I\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define Product\+I\+D~0x005 /$\ast$ E\+V3 $\ast$/}\label{main_8c_a9a3ffb8dc6a4244138bc2ad21c2d5165}
+
+
+Definition at line 29 of file main.\+c.
+
+\hypertarget{main_8c_a4e1935e9736855aa8ae7957341e85a1e}{}\index{main.\+c@{main.\+c}!S\+A\+N\+I\+T\+I\+Z\+E@{S\+A\+N\+I\+T\+I\+Z\+E}}
+\index{S\+A\+N\+I\+T\+I\+Z\+E@{S\+A\+N\+I\+T\+I\+Z\+E}!main.\+c@{main.\+c}}
+\subsubsection[{S\+A\+N\+I\+T\+I\+Z\+E}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+A\+N\+I\+T\+I\+Z\+E}\label{main_8c_a4e1935e9736855aa8ae7957341e85a1e}
+
+
+Definition at line 75 of file main.\+c.
+
+\hypertarget{main_8c_afec97479c93b93cce5e98e82d701709a}{}\index{main.\+c@{main.\+c}!Vendor\+I\+D@{Vendor\+I\+D}}
+\index{Vendor\+I\+D@{Vendor\+I\+D}!main.\+c@{main.\+c}}
+\subsubsection[{Vendor\+I\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define Vendor\+I\+D~0x694 /$\ast$ L\+E\+G\+O G\+R\+O\+U\+P $\ast$/}\label{main_8c_afec97479c93b93cce5e98e82d701709a}
+
+
+Definition at line 28 of file main.\+c.
+
+
+
+\subsection{Enumeration Type Documentation}
+\hypertarget{main_8c_a30e837d211f0030e72fa8d317be59d56}{}\index{main.\+c@{main.\+c}!A\+R\+G\+S@{A\+R\+G\+S}}
+\index{A\+R\+G\+S@{A\+R\+G\+S}!main.\+c@{main.\+c}}
+\subsubsection[{A\+R\+G\+S}]{\setlength{\rightskip}{0pt plus 5cm}enum {\bf A\+R\+G\+S}}\label{main_8c_a30e837d211f0030e72fa8d317be59d56}
+\begin{Desc}
+\item[Enumerator]\par
+\begin{description}
+\index{F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G@{F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G}!main.\+c@{main.\+c}}\index{main.\+c@{main.\+c}!F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G@{F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G}}\item[{\em 
+\hypertarget{main_8c_a30e837d211f0030e72fa8d317be59d56a51c8a93f3f01bf6e868ba891bd2f6ab6}{}F\+O\+R\+E\+A\+C\+H\+\_\+\+A\+R\+G\label{main_8c_a30e837d211f0030e72fa8d317be59d56a51c8a93f3f01bf6e868ba891bd2f6ab6}
+}]\end{description}
+\end{Desc}
+
+
+Definition at line 67 of file main.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{main_8c_a0ddf1224851353fc92bfbff6f499fa97}{}\index{main.\+c@{main.\+c}!main@{main}}
+\index{main@{main}!main.\+c@{main.\+c}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]}}
+\end{DoxyParamCaption}
+)}\label{main_8c_a0ddf1224851353fc92bfbff6f499fa97}
+
+
+Definition at line 79 of file main.\+c.
+
+
+
+\subsection{Variable Documentation}
+\hypertarget{main_8c_a4163e631c07a727a1c1f58da27ad3659}{}\index{main.\+c@{main.\+c}!params@{params}}
+\index{params@{params}!main.\+c@{main.\+c}}
+\subsubsection[{params}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ const params}\label{main_8c_a4163e631c07a727a1c1f58da27ad3659}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= 
+            \textcolor{stringliteral}{"USAGE: ev3duder "} \textcolor{stringliteral}{"[ up loc rem | dl rem loc | rm rem | ls [rem] | test |\(\backslash\)n"}
+            \textcolor{stringliteral}{"                "} \textcolor{stringliteral}{"  mkdir rem | mkrbf rem loc | run rem | exec cmd ]\(\backslash\)n"}
+            \textcolor{stringliteral}{"                  "} \textcolor{stringliteral}{"\(\backslash\)n"}
+            \textcolor{stringliteral}{"       "}
+            \textcolor{stringliteral}{"rem = remote (EV3) path, loc = local path, dev = device identifier"}    \textcolor{stringliteral}{"\(\backslash\)n"}
+\end{DoxyCode}
+
+
+Definition at line 31 of file main.\+c.
+
+\hypertarget{main_8c_adc8818c9d526bee9c483f415ab175f2f}{}\index{main.\+c@{main.\+c}!params\+\_\+desc@{params\+\_\+desc}}
+\index{params\+\_\+desc@{params\+\_\+desc}!main.\+c@{main.\+c}}
+\subsubsection[{params\+\_\+desc}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ const params\+\_\+desc}\label{main_8c_adc8818c9d526bee9c483f415ab175f2f}
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+= 
+            \textcolor{stringliteral}{" up\(\backslash\)t"}     \textcolor{stringliteral}{"upload local file to remote ev3 brick\(\backslash\)n"}
+            \textcolor{stringliteral}{" dl\(\backslash\)t"}     \textcolor{stringliteral}{"should be downloading\(\backslash\)n"} 
+            \textcolor{stringliteral}{" rm\(\backslash\)t"}     \textcolor{stringliteral}{"remove file on ev3 brick\(\backslash\)n"}
+            \textcolor{stringliteral}{" ls\(\backslash\)t"}     \textcolor{stringliteral}{"list files. Standard value is '/'\(\backslash\)n"}
+            \textcolor{stringliteral}{" test\(\backslash\)t"}   \textcolor{stringliteral}{"attempt a beep and print information about the connection\(\backslash\)n"}
+            \textcolor{stringliteral}{" mkdir\(\backslash\)t"}  \textcolor{stringliteral}{"create directory. Relative to path of VM.\(\backslash\)n"}
+            \textcolor{stringliteral}{" mkrbf\(\backslash\)t"}  \textcolor{stringliteral}{"creates rbf (menu entry) file locally. Sensible upload paths are:\(\backslash\)n"}
+            \textcolor{stringliteral}{"\(\backslash\)t"}        \textcolor{stringliteral}{"\(\backslash\)t../prjs/BrkProg\_SAVE/ Internal memory\(\backslash\)n"}
+            \textcolor{stringliteral}{"\(\backslash\)t"}        \textcolor{stringliteral}{"\(\backslash\)t../prjs/BrkProg\_DL/ Internal memory\(\backslash\)n"}
+            \textcolor{stringliteral}{"\(\backslash\)t"}        \textcolor{stringliteral}{"\(\backslash\)t./apps/ Internal memory - Applicatios (3rd tab)\(\backslash\)n"}
+            \textcolor{stringliteral}{"\(\backslash\)t"}        \textcolor{stringliteral}{"\(\backslash\)t/media/card/myapps/ Memory card\(\backslash\)n"}
+            \textcolor{stringliteral}{"\(\backslash\)t"}        \textcolor{stringliteral}{"\(\backslash\)t/media/usb/myappps/ USB stick\(\backslash\)n"}
+            \textcolor{stringliteral}{"run\(\backslash\)t"}     \textcolor{stringliteral}{"instruct the VM to run a rbf file\(\backslash\)n"}
+            \textcolor{stringliteral}{"exec\(\backslash\)t"}    \textcolor{stringliteral}{"pass cmd to root shell. Handle with caution\(\backslash\)n"}
+\end{DoxyCode}
+
+
+Definition at line 37 of file main.\+c.
+

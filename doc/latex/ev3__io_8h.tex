@@ -1,0 +1,73 @@
+\hypertarget{ev3__io_8h}{}\section{src/ev3\+\_\+io.h File Reference}
+\label{ev3__io_8h}\index{src/ev3\+\_\+io.\+h@{src/ev3\+\_\+io.\+h}}
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{ev3__io_8h_a77366c1bd428629dc898e188bfd182a3}{E\+X\+T\+E\+R\+N}~extern
+\begin{DoxyCompactList}\small\item\em For avoiding the need to separately define and declare stuff. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{ev3__io_8h_a77366c1bd428629dc898e188bfd182a3}{E\+X\+T\+E\+R\+N} int($\ast$ \hyperlink{ev3__io_8h_a58ad5210172a44c4bef303cf3f04d9e8}{ev3\+\_\+write} )(void $\ast$, const \hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8} $\ast$, size\+\_\+t)
+\item 
+\hyperlink{ev3__io_8h_a77366c1bd428629dc898e188bfd182a3}{E\+X\+T\+E\+R\+N} int($\ast$ \hyperlink{ev3__io_8h_aa1ff8cf4d134e8fe8053f8acce20e86c}{ev3\+\_\+read\+\_\+timeout} )(void $\ast$, \hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8} $\ast$, size\+\_\+t, int milliseconds)
+\item 
+\hyperlink{ev3__io_8h_a77366c1bd428629dc898e188bfd182a3}{E\+X\+T\+E\+R\+N} const wchar\+\_\+t $\ast$($\ast$ \hyperlink{ev3__io_8h_a775313f5a1dc963efbdada39146455da}{ev3\+\_\+error} )(void $\ast$)
+\item 
+\hyperlink{ev3__io_8h_a77366c1bd428629dc898e188bfd182a3}{E\+X\+T\+E\+R\+N} void($\ast$ \hyperlink{ev3__io_8h_ad07a47b97f401ce191e2eeed3c3b74c6}{ev3\+\_\+close} )(void $\ast$)
+\item 
+\hyperlink{ev3__io_8h_a77366c1bd428629dc898e188bfd182a3}{E\+X\+T\+E\+R\+N} void $\ast$ \hyperlink{ev3__io_8h_aa0fee4a3e0cbfef079dcc441aaf8a8bf}{handle}
+\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{ev3__io_8h_a77366c1bd428629dc898e188bfd182a3}{}\index{ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}!E\+X\+T\+E\+R\+N@{E\+X\+T\+E\+R\+N}}
+\index{E\+X\+T\+E\+R\+N@{E\+X\+T\+E\+R\+N}!ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}}
+\subsubsection[{E\+X\+T\+E\+R\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define E\+X\+T\+E\+R\+N~extern}\label{ev3__io_8h_a77366c1bd428629dc898e188bfd182a3}
+
+
+For avoiding the need to separately define and declare stuff. 
+
+
+
+Definition at line 8 of file ev3\+\_\+io.\+h.
+
+
+
+\subsection{Variable Documentation}
+\hypertarget{ev3__io_8h_ad07a47b97f401ce191e2eeed3c3b74c6}{}\index{ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}!ev3\+\_\+close@{ev3\+\_\+close}}
+\index{ev3\+\_\+close@{ev3\+\_\+close}!ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}}
+\subsubsection[{ev3\+\_\+close}]{\setlength{\rightskip}{0pt plus 5cm}{\bf E\+X\+T\+E\+R\+N} void($\ast$ ev3\+\_\+close) (void $\ast$)}\label{ev3__io_8h_ad07a47b97f401ce191e2eeed3c3b74c6}
+
+
+Definition at line 16 of file ev3\+\_\+io.\+h.
+
+\hypertarget{ev3__io_8h_a775313f5a1dc963efbdada39146455da}{}\index{ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}!ev3\+\_\+error@{ev3\+\_\+error}}
+\index{ev3\+\_\+error@{ev3\+\_\+error}!ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}}
+\subsubsection[{ev3\+\_\+error}]{\setlength{\rightskip}{0pt plus 5cm}{\bf E\+X\+T\+E\+R\+N} const wchar\+\_\+t$\ast$($\ast$ ev3\+\_\+error) (void $\ast$)}\label{ev3__io_8h_a775313f5a1dc963efbdada39146455da}
+
+
+Definition at line 15 of file ev3\+\_\+io.\+h.
+
+\hypertarget{ev3__io_8h_aa1ff8cf4d134e8fe8053f8acce20e86c}{}\index{ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}!ev3\+\_\+read\+\_\+timeout@{ev3\+\_\+read\+\_\+timeout}}
+\index{ev3\+\_\+read\+\_\+timeout@{ev3\+\_\+read\+\_\+timeout}!ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}}
+\subsubsection[{ev3\+\_\+read\+\_\+timeout}]{\setlength{\rightskip}{0pt plus 5cm}{\bf E\+X\+T\+E\+R\+N} int($\ast$ ev3\+\_\+read\+\_\+timeout) (void $\ast$, {\bf u8} $\ast$, size\+\_\+t, int milliseconds)}\label{ev3__io_8h_aa1ff8cf4d134e8fe8053f8acce20e86c}
+
+
+Definition at line 14 of file ev3\+\_\+io.\+h.
+
+\hypertarget{ev3__io_8h_a58ad5210172a44c4bef303cf3f04d9e8}{}\index{ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}!ev3\+\_\+write@{ev3\+\_\+write}}
+\index{ev3\+\_\+write@{ev3\+\_\+write}!ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}}
+\subsubsection[{ev3\+\_\+write}]{\setlength{\rightskip}{0pt plus 5cm}{\bf E\+X\+T\+E\+R\+N} int($\ast$ ev3\+\_\+write) (void $\ast$, const {\bf u8} $\ast$, size\+\_\+t)}\label{ev3__io_8h_a58ad5210172a44c4bef303cf3f04d9e8}
+
+
+Definition at line 13 of file ev3\+\_\+io.\+h.
+
+\hypertarget{ev3__io_8h_aa0fee4a3e0cbfef079dcc441aaf8a8bf}{}\index{ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}!handle@{handle}}
+\index{handle@{handle}!ev3\+\_\+io.\+h@{ev3\+\_\+io.\+h}}
+\subsubsection[{handle}]{\setlength{\rightskip}{0pt plus 5cm}{\bf E\+X\+T\+E\+R\+N} void$\ast$ handle}\label{ev3__io_8h_aa0fee4a3e0cbfef079dcc441aaf8a8bf}
+
+
+Definition at line 17 of file ev3\+\_\+io.\+h.
+

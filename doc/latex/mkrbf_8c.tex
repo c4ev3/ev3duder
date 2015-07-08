@@ -1,0 +1,65 @@
+\hypertarget{mkrbf_8c}{}\section{src/mkrbf.c File Reference}
+\label{mkrbf_8c}\index{src/mkrbf.\+c@{src/mkrbf.\+c}}
+
+
+creates a directory structure on the ev3  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}funcs.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+size\+\_\+t \hyperlink{mkrbf_8c_a575ddc806cdf31e8ac769e9dc21f6e57}{mkrbf} (char $\ast$$\ast$buf, const char $\ast$cmd)
+\begin{DoxyCompactList}\small\item\em Offline functionality. Generates bytecode for executing a binary executable. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+creates a directory structure on the ev3 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 2.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Function Documentation}
+\hypertarget{mkrbf_8c_a575ddc806cdf31e8ac769e9dc21f6e57}{}\index{mkrbf.\+c@{mkrbf.\+c}!mkrbf@{mkrbf}}
+\index{mkrbf@{mkrbf}!mkrbf.\+c@{mkrbf.\+c}}
+\subsubsection[{mkrbf}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t mkrbf (
+\begin{DoxyParamCaption}
+\item[{char $\ast$$\ast$}]{buf, }
+\item[{const char $\ast$}]{cmd}
+\end{DoxyParamCaption}
+)}\label{mkrbf_8c_a575ddc806cdf31e8ac769e9dc21f6e57}
+
+
+Offline functionality. Generates bytecode for executing a binary executable. 
+
+fill {\ttfamily $\ast$buf} with a rbf file executing {\ttfamily cmd} 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em buf} & buffer with the bytecode \\
+\hline
+\mbox{\tt in}  & {\em cmd} & the command to be executed\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em bytes\+\_\+written} & buffer size \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyWarning}{Warning}
+Command is passed unsanitized to root shell. Handle with care 
+\end{DoxyWarning}
+
+
+Definition at line 29 of file mkrbf.\+c.
+

@@ -1,0 +1,293 @@
+\hypertarget{funcs_8h}{}\section{src/funcs.h File Reference}
+\label{funcs_8h}\index{src/funcs.\+h@{src/funcs.\+h}}
+
+
+contains declarations for ev3 commands  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stddef.\+h$>$}\\*
+\subsection*{Functions}
+\begin{Indent}{\bf General Usage}\par
+{\em 
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em loc} & Local F\+I\+L\+E$\ast$s \\
+\hline
+\mbox{\tt in}  & {\em rem} & Remote E\+V3 U\+T\+F-\/8 encoded path strings\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+}\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{funcs_8h_abdbaa8f93fc1cbe7216ee0effc5161b7}{up} (F\+I\+L\+E $\ast$loc, const char $\ast$rem)
+\begin{DoxyCompactList}\small\item\em upload local file {\ttfamily loc} to remote destination {\ttfamily rem} \end{DoxyCompactList}\item 
+int \hyperlink{funcs_8h_ab02211821f09890bd234140b841d173b}{dl} (const char $\ast$rem, F\+I\+L\+E $\ast$loc)
+\begin{DoxyCompactList}\small\item\em download remote source {\ttfamily rem} to local file {\ttfamily loc} \end{DoxyCompactList}\item 
+int \hyperlink{funcs_8h_a1f3479a5eb21a215c63cfcd8876e3486}{test} (void)
+\begin{DoxyCompactList}\small\item\em print H\+I\+D information, beep and exit \end{DoxyCompactList}\item 
+int \hyperlink{funcs_8h_aaf8a793cb1b3378427235a78f684a520}{run} (const char $\ast$rem)
+\begin{DoxyCompactList}\small\item\em run remote .rbf file {\ttfamily rem} via V\+M \end{DoxyCompactList}\item 
+int \hyperlink{funcs_8h_a8dbb05627f3f753825fba2e1226450a7}{ls} (const char $\ast$rem)
+\begin{DoxyCompactList}\small\item\em list contents of remote directory {\ttfamily rem} \end{DoxyCompactList}\item 
+int \hyperlink{funcs_8h_ae815743b20ac09451a0c027c8ad6b57e}{rm} (const char $\ast$rem)
+\begin{DoxyCompactList}\small\item\em remove remote file or directory {\ttfamily rem} \end{DoxyCompactList}\item 
+int \hyperlink{funcs_8h_a433be27a0f3e031bf4b8aca1c53284cb}{mkdir} (const char $\ast$rem)
+\begin{DoxyCompactList}\small\item\em create directory {\ttfamily rem} on remote system \end{DoxyCompactList}\item 
+size\+\_\+t \hyperlink{funcs_8h_a575ddc806cdf31e8ac769e9dc21f6e57}{mkrbf} (char $\ast$$\ast$buf, const char $\ast$cmd)
+\begin{DoxyCompactList}\small\item\em fill {\ttfamily $\ast$buf} with a rbf file executing {\ttfamily cmd} \end{DoxyCompactList}\end{DoxyCompactItemize}
+\end{Indent}
+
+
+\subsection{Detailed Description}
+contains declarations for ev3 commands 
+
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 2.\+0 All commands take F\+I\+L\+E$\ast$ loc arguments for loc files and U\+T\+F-\/8 encoded rem file names, if any. On P\+O\+S\+I\+X, this needs no changes. On Windows, for multibyte input U\+C\+S-\/2 to U\+T\+F-\/8 conversion would need to be handled by caller 
+\end{DoxyCopyright}
+\begin{DoxySeeAlso}{See also}
+branch win32-\/unicode for a possible way to implement {\ttfamily \hyperlink{main_8c_a0ddf1224851353fc92bfbff6f499fa97}{main}}. All calls to these functions should be in \hyperlink{main_8c}{main.\+c} 
+\end{DoxySeeAlso}
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyWarning}{Warning}
+unless otherwise stated, passing {\ttfamily N\+U\+L\+L} to a function is undefined behavior. 
+\end{DoxyWarning}
+
+
+\subsection{Function Documentation}
+\hypertarget{funcs_8h_ab02211821f09890bd234140b841d173b}{}\index{funcs.\+h@{funcs.\+h}!dl@{dl}}
+\index{dl@{dl}!funcs.\+h@{funcs.\+h}}
+\subsubsection[{dl}]{\setlength{\rightskip}{0pt plus 5cm}int dl (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path, }
+\item[{F\+I\+L\+E $\ast$}]{fp}
+\end{DoxyParamCaption}
+)}\label{funcs_8h_ab02211821f09890bd234140b841d173b}
+
+
+download remote source {\ttfamily rem} to local file {\ttfamily loc} 
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & path on the ev3 \\
+\hline
+{\em fp} & F\+I\+L\+E$\ast$ to write data to \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000013}{Bug}]doesn\textquotesingle{}t work, needs more debugging (over Wi\+Fi maybe) \end{DoxyRefDesc}
+
+
+download remote source {\ttfamily rem} to local file {\ttfamily loc} 
+
+Definition at line 24 of file dl.\+c.
+
+\hypertarget{funcs_8h_a8dbb05627f3f753825fba2e1226450a7}{}\index{funcs.\+h@{funcs.\+h}!ls@{ls}}
+\index{ls@{ls}!funcs.\+h@{funcs.\+h}}
+\subsubsection[{ls}]{\setlength{\rightskip}{0pt plus 5cm}int ls (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{rem}
+\end{DoxyParamCaption}
+)}\label{funcs_8h_a8dbb05627f3f753825fba2e1226450a7}
+
+
+list contents of remote directory {\ttfamily rem} 
+
+
+
+Definition at line 35 of file ls.\+c.
+
+\hypertarget{funcs_8h_a433be27a0f3e031bf4b8aca1c53284cb}{}\index{funcs.\+h@{funcs.\+h}!mkdir@{mkdir}}
+\index{mkdir@{mkdir}!funcs.\+h@{funcs.\+h}}
+\subsubsection[{mkdir}]{\setlength{\rightskip}{0pt plus 5cm}int mkdir (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path}
+\end{DoxyParamCaption}
+)}\label{funcs_8h_a433be27a0f3e031bf4b8aca1c53284cb}
+
+
+create directory {\ttfamily rem} on remote system 
+
+create directory {\ttfamily rem} on remote system
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em path} & directory structure\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxySeeAlso}{See also}
+your man pages for {\ttfamily \hyperlink{funcs_8h_a433be27a0f3e031bf4b8aca1c53284cb}{mkdir}} 
+\end{DoxySeeAlso}
+\begin{DoxyNote}{Note}
+The V\+M will choke to death when you excede the A\+S\+C\+I\+I subset of U\+T\+F-\/8 Do N\+O\+T use any non A\+S\+C\+I\+I letters if you want the L\+E\+G\+O menu to stay responsible. In case of fudging up, {\ttfamily ev3duder} \hyperlink{funcs_8h_ae815743b20ac09451a0c027c8ad6b57e}{rm()} can delete directories too 
+\end{DoxyNote}
+
+
+Definition at line 28 of file mkdir.\+c.
+
+\hypertarget{funcs_8h_a575ddc806cdf31e8ac769e9dc21f6e57}{}\index{funcs.\+h@{funcs.\+h}!mkrbf@{mkrbf}}
+\index{mkrbf@{mkrbf}!funcs.\+h@{funcs.\+h}}
+\subsubsection[{mkrbf}]{\setlength{\rightskip}{0pt plus 5cm}size\+\_\+t mkrbf (
+\begin{DoxyParamCaption}
+\item[{char $\ast$$\ast$}]{buf, }
+\item[{const char $\ast$}]{cmd}
+\end{DoxyParamCaption}
+)}\label{funcs_8h_a575ddc806cdf31e8ac769e9dc21f6e57}
+
+
+fill {\ttfamily $\ast$buf} with a rbf file executing {\ttfamily cmd} 
+
+fill {\ttfamily $\ast$buf} with a rbf file executing {\ttfamily cmd} 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em buf} & buffer with the bytecode \\
+\hline
+\mbox{\tt in}  & {\em cmd} & the command to be executed\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em bytes\+\_\+written} & buffer size \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyWarning}{Warning}
+Command is passed unsanitized to root shell. Handle with care 
+\end{DoxyWarning}
+
+
+Definition at line 29 of file mkrbf.\+c.
+
+\hypertarget{funcs_8h_ae815743b20ac09451a0c027c8ad6b57e}{}\index{funcs.\+h@{funcs.\+h}!rm@{rm}}
+\index{rm@{rm}!funcs.\+h@{funcs.\+h}}
+\subsubsection[{rm}]{\setlength{\rightskip}{0pt plus 5cm}int rm (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path}
+\end{DoxyParamCaption}
+)}\label{funcs_8h_ae815743b20ac09451a0c027c8ad6b57e}
+
+
+remove remote file or directory {\ttfamily rem} 
+
+remove remote file or directory {\ttfamily rem} 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em path} & path/file to remove\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyWarning}{Warning}
+removing system files will lock up the device/\+V\+M. don\textquotesingle{}t do it 
+\end{DoxyWarning}
+
+
+Definition at line 26 of file rm.\+c.
+
+\hypertarget{funcs_8h_aaf8a793cb1b3378427235a78f684a520}{}\index{funcs.\+h@{funcs.\+h}!run@{run}}
+\index{run@{run}!funcs.\+h@{funcs.\+h}}
+\subsubsection[{run}]{\setlength{\rightskip}{0pt plus 5cm}int run (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{exec}
+\end{DoxyParamCaption}
+)}\label{funcs_8h_aaf8a793cb1b3378427235a78f684a520}
+
+
+run remote .rbf file {\ttfamily rem} via V\+M 
+
+run remote .rbf file {\ttfamily rem} via V\+M
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em path} & path to file to execute\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxySeeAlso}{See also}
+\href{http://ev3.fantastic.computer/doxygen/buildinapps.html}{\tt http\+://ev3.\+fantastic.\+computer/doxygen/buildinapps.\+html} 
+
+\hyperlink{funcs_8h_a575ddc806cdf31e8ac769e9dc21f6e57}{mkrbf()} 
+\end{DoxySeeAlso}
+
+
+Definition at line 29 of file run.\+c.
+
+\hypertarget{funcs_8h_a1f3479a5eb21a215c63cfcd8876e3486}{}\index{funcs.\+h@{funcs.\+h}!test@{test}}
+\index{test@{test}!funcs.\+h@{funcs.\+h}}
+\subsubsection[{test}]{\setlength{\rightskip}{0pt plus 5cm}int test (
+\begin{DoxyParamCaption}
+\item[{void}]{}
+\end{DoxyParamCaption}
+)}\label{funcs_8h_a1f3479a5eb21a215c63cfcd8876e3486}
+
+
+print H\+I\+D information, beep and exit 
+
+print H\+I\+D information, beep and exit
+
+
+\begin{DoxyRetVals}{Return values}
+{\em err\+\_\+code} & An error code according to {\ttfamily enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R}} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000016}{Bug}]needs more detailed information for bluetooth/wlan should print C\+O\+M port, device name \end{DoxyRefDesc}
+
+
+Definition at line 35 of file test.\+c.
+
+\hypertarget{funcs_8h_abdbaa8f93fc1cbe7216ee0effc5161b7}{}\index{funcs.\+h@{funcs.\+h}!up@{up}}
+\index{up@{up}!funcs.\+h@{funcs.\+h}}
+\subsubsection[{up}]{\setlength{\rightskip}{0pt plus 5cm}int up (
+\begin{DoxyParamCaption}
+\item[{F\+I\+L\+E $\ast$}]{fp, }
+\item[{const char $\ast$}]{dst}
+\end{DoxyParamCaption}
+)}\label{funcs_8h_abdbaa8f93fc1cbe7216ee0effc5161b7}
+
+
+upload local file {\ttfamily loc} to remote destination {\ttfamily rem} 
+
+upload local file {\ttfamily loc} to remote destination {\ttfamily rem} 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fp} & Local F\+I\+L\+E$\ast$ to upload \\
+\hline
+\mbox{\tt in}  & {\em dst} & destination path to upload to (U\+T\+F-\/8 encoded) \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000017}{Bug}]might not handle files bigger than 2gb \+:-\/) \end{DoxyRefDesc}
+
+
+Definition at line 28 of file up.\+c.
+

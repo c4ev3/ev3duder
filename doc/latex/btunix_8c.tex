@@ -1,0 +1,202 @@
+\hypertarget{btunix_8c}{}\section{src/btunix.c File Reference}
+\label{btunix_8c}\index{src/btunix.\+c@{src/btunix.\+c}}
+
+
+Unix bluetooth I/\+O wrappers.  
+
+
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$termios.\+h$>$}\\*
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$fcntl.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+{\ttfamily \#include $<$signal.\+h$>$}\\*
+{\ttfamily \#include $<$setjmp.\+h$>$}\\*
+{\ttfamily \#include $<$sys/time.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{btunix_8c_a9ed5212b4acf61bb0f7b9b9078ba67ae}{B\+T}~\char`\"{}/dev/cu.\+E\+V3-\/Serial\+Port\char`\"{}
+\begin{DoxyCompactList}\small\item\em default serial port name on O\+S X \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void $\ast$ \hyperlink{btunix_8c_af506b835d8daf62d306f72deec5001ce}{bt\+\_\+open} (const char $\ast$file)
+\begin{DoxyCompactList}\small\item\em open(2)s serial port described by device. {\ttfamily N\+U\+L\+L} leads to default action \end{DoxyCompactList}\item 
+int \hyperlink{btunix_8c_acbb62c11a110c097a4a9be010af9c4e7}{bt\+\_\+write} (void $\ast$fd\+\_\+, const \hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8} $\ast$buf, size\+\_\+t count)
+\begin{DoxyCompactList}\small\item\em writes buf\mbox{[}1\mbox{]} till buf\mbox{[}count -\/ 2\mbox{]} to device \end{DoxyCompactList}\item 
+int \hyperlink{btunix_8c_a0100d3e3520a9b774896f6b2a2f589f5}{bt\+\_\+read} (void $\ast$fd\+\_\+, \hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8} $\ast$buf, size\+\_\+t count, int milliseconds)
+\begin{DoxyCompactList}\small\item\em writes buf\mbox{[}1\mbox{]} till buf\mbox{[}count -\/ 2\mbox{]} to device \end{DoxyCompactList}\item 
+void \hyperlink{btunix_8c_a66111b994dc31a22f27679a286c338e4}{bt\+\_\+close} (void $\ast$\hyperlink{ev3__io_8h_aa0fee4a3e0cbfef079dcc441aaf8a8bf}{handle})
+\begin{DoxyCompactList}\small\item\em Closes the file descriptor opened by \hyperlink{btunix_8c_af506b835d8daf62d306f72deec5001ce}{bt\+\_\+open()} \end{DoxyCompactList}\item 
+const wchar\+\_\+t $\ast$ \hyperlink{btunix_8c_a91cd0489b6e5dc0973109579ca9c7a55}{bt\+\_\+error} (void $\ast$fd\+\_\+)
+\begin{DoxyCompactList}\small\item\em Returns an error string describing the last error occured. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Unix bluetooth I/\+O wrappers. 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 2.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{btunix_8c_a9ed5212b4acf61bb0f7b9b9078ba67ae}{}\index{btunix.\+c@{btunix.\+c}!B\+T@{B\+T}}
+\index{B\+T@{B\+T}!btunix.\+c@{btunix.\+c}}
+\subsubsection[{B\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define B\+T~\char`\"{}/dev/cu.\+E\+V3-\/Serial\+Port\char`\"{}}\label{btunix_8c_a9ed5212b4acf61bb0f7b9b9078ba67ae}
+
+
+default serial port name on O\+S X 
+
+
+
+Definition at line 20 of file btunix.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{btunix_8c_a66111b994dc31a22f27679a286c338e4}{}\index{btunix.\+c@{btunix.\+c}!bt\+\_\+close@{bt\+\_\+close}}
+\index{bt\+\_\+close@{bt\+\_\+close}!btunix.\+c@{btunix.\+c}}
+\subsubsection[{bt\+\_\+close}]{\setlength{\rightskip}{0pt plus 5cm}void bt\+\_\+close (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{handle}
+\end{DoxyParamCaption}
+)}\label{btunix_8c_a66111b994dc31a22f27679a286c338e4}
+
+
+Closes the file descriptor opened by \hyperlink{btunix_8c_af506b835d8daf62d306f72deec5001ce}{bt\+\_\+open()} 
+
+Closes the resource opened by {\ttfamily bt\+\_\+open}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by \hyperlink{btserial_8h_ac512d6f6d4e25b81fbe386a04efcc330}{bt\+\_\+open()} \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 122 of file btunix.\+c.
+
+\hypertarget{btunix_8c_a91cd0489b6e5dc0973109579ca9c7a55}{}\index{btunix.\+c@{btunix.\+c}!bt\+\_\+error@{bt\+\_\+error}}
+\index{bt\+\_\+error@{bt\+\_\+error}!btunix.\+c@{btunix.\+c}}
+\subsubsection[{bt\+\_\+error}]{\setlength{\rightskip}{0pt plus 5cm}const wchar\+\_\+t$\ast$ bt\+\_\+error (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{fd\+\_\+}
+\end{DoxyParamCaption}
+)}\label{btunix_8c_a91cd0489b6e5dc0973109579ca9c7a55}
+
+
+Returns an error string describing the last error occured. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by \hyperlink{btunix_8c_af506b835d8daf62d306f72deec5001ce}{bt\+\_\+open()} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+message An error string 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000007}{Bug}]it\textquotesingle{}s useless. Could use {\ttfamily wprintf} and {\ttfamily strerror} \end{DoxyRefDesc}
+
+
+Definition at line 133 of file btunix.\+c.
+
+\hypertarget{btunix_8c_af506b835d8daf62d306f72deec5001ce}{}\index{btunix.\+c@{btunix.\+c}!bt\+\_\+open@{bt\+\_\+open}}
+\index{bt\+\_\+open@{bt\+\_\+open}!btunix.\+c@{btunix.\+c}}
+\subsubsection[{bt\+\_\+open}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ bt\+\_\+open (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{file}
+\end{DoxyParamCaption}
+)}\label{btunix_8c_af506b835d8daf62d306f72deec5001ce}
+
+
+open(2)s serial port described by device. {\ttfamily N\+U\+L\+L} leads to default action 
+
+open a bluetooth device described by device. {\ttfamily N\+U\+L\+L} leads to default action
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & path to Serial\+Port or {\ttfamily N\+U\+L\+L} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+\&fd pointer to file descriptor for use with bt\+\_\+\{read,write,close,error\} 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000004}{Bug}]default value should be enumerating. Not hardcoded like in {\ttfamily B\+T} \end{DoxyRefDesc}
+
+
+Definition at line 28 of file btunix.\+c.
+
+\hypertarget{btunix_8c_a0100d3e3520a9b774896f6b2a2f589f5}{}\index{btunix.\+c@{btunix.\+c}!bt\+\_\+read@{bt\+\_\+read}}
+\index{bt\+\_\+read@{bt\+\_\+read}!btunix.\+c@{btunix.\+c}}
+\subsubsection[{bt\+\_\+read}]{\setlength{\rightskip}{0pt plus 5cm}int bt\+\_\+read (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{fd\+\_\+, }
+\item[{{\bf u8} $\ast$}]{buf, }
+\item[{size\+\_\+t}]{count, }
+\item[{int}]{milliseconds}
+\end{DoxyParamCaption}
+)}\label{btunix_8c_a0100d3e3520a9b774896f6b2a2f589f5}
+
+
+writes buf\mbox{[}1\mbox{]} till buf\mbox{[}count -\/ 2\mbox{]} to device 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by \hyperlink{btunix_8c_af506b835d8daf62d306f72deec5001ce}{bt\+\_\+open()} \\
+\hline
+\mbox{\tt in}  & {\em buf} & buffer to write to \\
+\hline
+\mbox{\tt in}  & {\em count} & number of characters to be read \\
+\hline
+\mbox{\tt in}  & {\em milliseconds} & number of milliseconds to wait at maximum. -\/1 is indefinitely \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+status -\/1 on error. bytes read otherwise. 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000006}{Bug}]the milliseconds part needs to be tested more throughly \end{DoxyRefDesc}
+
+
+Definition at line 75 of file btunix.\+c.
+
+\hypertarget{btunix_8c_acbb62c11a110c097a4a9be010af9c4e7}{}\index{btunix.\+c@{btunix.\+c}!bt\+\_\+write@{bt\+\_\+write}}
+\index{bt\+\_\+write@{bt\+\_\+write}!btunix.\+c@{btunix.\+c}}
+\subsubsection[{bt\+\_\+write}]{\setlength{\rightskip}{0pt plus 5cm}int bt\+\_\+write (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{fd\+\_\+, }
+\item[{const {\bf u8} $\ast$}]{buf, }
+\item[{size\+\_\+t}]{count}
+\end{DoxyParamCaption}
+)}\label{btunix_8c_acbb62c11a110c097a4a9be010af9c4e7}
+
+
+writes buf\mbox{[}1\mbox{]} till buf\mbox{[}count -\/ 2\mbox{]} to device 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em handle} & handle returned by \hyperlink{btunix_8c_af506b835d8daf62d306f72deec5001ce}{bt\+\_\+open()} \\
+\hline
+\mbox{\tt in}  & {\em buf} & byte string to write, the first byte is omitted \\
+\hline
+\mbox{\tt in}  & {\em count} & number of characters to be written (including leading ignored byte) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+status -\/1 on error. bytes read otherwise. 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000005}{Bug}]the first byte is omitted for compatiblity with the leading report byte demanded by {\ttfamily hid\+\_\+write}. Wrapping H\+I\+D\+A\+P\+I could fix this. \end{DoxyRefDesc}
+
+
+Definition at line 44 of file btunix.\+c.
+

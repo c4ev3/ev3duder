@@ -48,12 +48,8 @@ Temporary Items
 *.a
 ev3duder
 #doxygen
-doc
 #vim
 *.swp
 *.swo
 *.pyc
 
-doc/
-html/
-latex/
