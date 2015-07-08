@@ -1,3 +1,7 @@
+/**
+ * @file cat.c
+ * @brief unimplemented
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,7 +9,7 @@
 #include "ev3_io.h"
 
 #include "defs.h"
-#include "systemcmd.h"
+#include "packets.h"
 #include "error.h"
 #include "funcs.h"
 

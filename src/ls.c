@@ -1,7 +1,7 @@
 /**
  * @file ls.c
  * @author Ahmad Fatoum
- * @license Copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
  * @brief Lists files on brick
  */
 #include <stdio.h>
@@ -11,7 +11,7 @@
 #include "ev3_io.h"
 
 #include "defs.h"
-#include "systemcmd.h"
+#include "packets.h"
 #include "error.h"
 #include "funcs.h"
 
@@ -22,10 +22,15 @@
  *
  * @retval error according to enum #ERR
  * @see http://topikachu.github.io/python-ev3/UIdesign.html
- * @bug Doesn't handle replies over 1000 byte in length.
- *      implementation of \p CONTINUTE_LIST_FILES would be required
- *		EDIT: CONTINUE_LIST_FILES isn't even implemented in "firmware".
+ * @warning Doesn't handle replies over 1014 byte in length.
+ *      implementation of \p CONTINUTE_LIST_FILES isn't tested
+ *		because CONTINUE_LIST_FILES isn't implemented in "firmware".
+ * @warning ls /proc will lock up the virtual machine. 
+ * So refrain from doing it or exposing it to the user
+ * The Eclipse Plugin handles /proc specially by making it non expandable
+ * in the file manager 
  */
+
 #define MAX_READ 1024
 int ls(const char *path)
 {
@@ -70,7 +75,7 @@ int ls(const char *path)
     }
     fwrite(listrep->list, 1, listrep->packetLen - 10, stdout); // No NUL Termination over Serial COM for whatever reason.
 	//
-// From the LEGO docs:  - LIST_FILES should work as long as list does not exceed 1014 bytes. CONTINUE_LISTFILES has NOT been implemented yet.
+// Excerpt from the lms2012O sources:  - LIST_FILES should work as long as list does not exceed 1014 bytes. CONTINUE_LISTFILES has NOT been implemented yet.
 #if !LEGO_FIXED_CONTINUE_LIST_FILES
 	
 #else

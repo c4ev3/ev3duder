@@ -1,6 +1,6 @@
 /**
  * @file   funcs.h
- * @license Copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
  * @brief  contains declarations for ev3 commands
  *
  * All commands take FILE* loc arguments for loc files
@@ -10,6 +10,7 @@
  * @see branch win32-unicode for a possible way to implement \p main.
  *      All calls to these functions should be in main.c
  * @author Ahmad Fatoum
+ * @warning unless otherwise stated, passing \p NULL to a function is undefined behavior.
  */
 #ifndef EV3DUDER_FUNCS_H
 #define EV3DUDER_FUNCS_H

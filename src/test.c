@@ -1,3 +1,10 @@
+/**
+ * @file test.c
+ * @author Ahmad Fatoum
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @brief test function - beeps and prints info
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,7 +13,7 @@
 #include "ev3_io.h"
 
 #include "defs.h"
-#include "systemcmd.h"
+#include "packets.h"
 #include "error.h"
 #include "funcs.h"
 
@@ -20,7 +27,7 @@ static const u8 tone[] = "\x0\x0F\x00\0\0\x80\x00\x00\x94\x01\x81\x02\x82\xE8\x0
 #define MAX_STR 256
 
 /**
- * \return err_code An error code according to \p enum ERR
+ * \retval err_code An error code according to `enum #ERR`
  * \brief cause a beep and print HID information if applicable
  * \bug needs more detailed information for bluetooth/wlan
  * 		should print COM port, device name

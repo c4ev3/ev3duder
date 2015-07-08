@@ -1,3 +1,10 @@
+/**
+ * @file rm.c
+ * @author Ahmad Fatoum
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @brief removes files and directories see rm(1)
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,10 +12,17 @@
 #include "ev3_io.h"
 
 #include "defs.h"
-#include "systemcmd.h"
+#include "packets.h"
 #include "error.h"
 #include "funcs.h"
 
+/**
+ * @brief removes files and directories at \p path. path is always relative to <em>/home/root/lms2012/prjs/sys/<em>
+ * @param [in] path path/file to remove
+ *
+ * @retval error according to enum #ERR
+ * @warning removing system files will lock up the device/VM. don't do it
+ */
 int rm(const char *path)
 {
     int res;

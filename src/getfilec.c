@@ -1,3 +1,7 @@
+/**
+ * @file dl.c
+ * @brief untested
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,11 +9,12 @@
 #include "ev3_io.h"
 
 #include "defs.h"
-#include "systemcmd.h"
+#include "packets.h"
 #include "error.h"
 #include "funcs.h"
 
 #define CHUNK_SIZE 1000 // EV3's HID driver doesn't do packets > 1024B
+//! same as dl(). doesn't work either
 int dl( const char *path, FILE *fp)
 {
     int res;

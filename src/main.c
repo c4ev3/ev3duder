@@ -1,7 +1,7 @@
 /**
  * @file main.c
  * @author Ahmad Fatoum
- * @license Copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
  * @brief Argument parsing, device opening and file creation/openning
  */
 //! For avoiding the need to separately define and declare stuff
@@ -13,7 +13,7 @@
 #include <wchar.h>
 
 #undef assert
-//TODO: add better error message
+//FIXME: add better error message
 #define assert(cond) do{ if (!(cond)) if (handle) {ev3_close(handle);exit(ERR_ARG);}}while(0)
 
 #include <hidapi.h>
@@ -21,7 +21,7 @@
 #include "ev3_io.h"
 
 #include "defs.h"
-#include "systemcmd.h"
+#include "packets.h"
 #include "error.h"
 #include "funcs.h"
 

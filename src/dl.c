@@ -1,3 +1,7 @@
+/**
+ * @file dl.c
+ * @brief untested
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,11 +9,18 @@
 #include "ev3_io.h"
 
 #include "defs.h"
-#include "systemcmd.h"
+#include "packets.h"
 #include "error.h"
 #include "funcs.h"
 
+//! Transmission is done in units smaller or equal to CHUNK_SIZE
 #define CHUNK_SIZE 1000 // EV3's HID driver doesn't do packets > 1024B
+/**
+ * \param path path on the ev3
+ * \param fp FILE* to write data to
+ * \retval error according to enum #ERR
+ * \bug doesn't work, needs more debugging (over WiFi maybe)
+ */
 int dl(const char *path, FILE *fp)
 {
     int res;

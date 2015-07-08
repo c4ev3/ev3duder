@@ -1,3 +1,9 @@
+/**
+ * @file mkdir.c
+ * @author Ahmad Fatoum
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @brief creates a directory structure on the ev3
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,10 +11,20 @@
 #include "ev3_io.h"
 
 #include "defs.h"
-#include "systemcmd.h"
+#include "packets.h"
 #include "error.h"
 #include "funcs.h"
 
+/**
+ * @brief creates directory structures relative to <em>/home/root/lms2012/prjs/sys/<em>
+ * @param [in] path directory structure
+ *
+ * @retval error according to enum #ERR
+ * @see your man pages for \p mkdir
+ * @note The VM will choke to death when you excede the ASCII subset of UTF-8
+ *		Do NOT use any non ASCII letters if you want the LEGO menu to stay responsible.
+ *		In case of fudging up, \p ev3duder rm() can delete directories too
+ */
 int mkdir(const char *path)
 {
     int res;

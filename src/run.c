@@ -1,17 +1,31 @@
+/**
+ * @file run.c
+ * @author Ahmad Fatoum
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @brief runs rbf file via VM facilities
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "defs.h"
-#include "systemcmd.h"
+#include "packets.h"
 #include "error.h"
 #include "funcs.h"
 #include "ev3_io.h"
 
-/* copied 1:1 from the LEGO communication developer manual */
+/** copied 1:1 from the LEGO communication developer manual */
 static const u8 run1[] = {0xC0, 0x08, 0x82, 0x01, 0x00, 0x84};
 static const u8 run2[] = {0x60, 0x64, 0x03, 0x01, 0x60, 0x64, 0x00};
 
+/**
+ * @brief run rbf file
+ * @param [in] path path to file to execute
+ *
+ * @retval error according to enum #ERR
+ * @see http://ev3.fantastic.computer/doxygen/buildinapps.html
+ * @see mkrbf()
+ */
 int run(const char *exec)
 {
     int res;

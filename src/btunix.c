@@ -1,7 +1,7 @@
 /**
  * @file btunix.c
  * @author Ahmad Fatoum
- * @license Copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
  * @brief Unix bluetooth I/O wrappers
  */
 #include <unistd.h>
@@ -16,10 +16,11 @@
 #include <sys/time.h>
 
 #include "defs.h"
+//! default serial port name on OS X
 #define BT "/dev/cu.EV3-SerialPort"
 // ^ TODO: add ability to find differently named EV3's
 /**
- * \param [in] device path to SerialPort or NULL
+ * \param [in] device path to SerialPort or \p NULL
  * \return &fd pointer to file descriptor for use with bt_{read,write,close,error}
  * \brief open(2)s serial port  described by device. `NULL` leads to default action
  * \bug default value should be enumerating. Not hardcoded like in \p BT
@@ -33,7 +34,7 @@ void *bt_open(const char *file)
 }
 
 /**
- * \param [in] handle handle returned by bt_open
+ * \param [in] handle handle returned by bt_open()
  * \param [in] buf byte string to write, the first byte is omitted
  * \param [in] count number of characters to be written (including leading ignored byte)
  * \return status -1 on error. bytes read otherwise.	
@@ -63,7 +64,7 @@ static void handle_alarm(int sig)
 }
 
 /**
- * \param [in] device handle returned by bt_open
+ * \param [in] device handle returned by bt_open()
  * \param [in] buf buffer to write to 
  * \param [in] count number of characters to be read
  * \param [in] milliseconds number of milliseconds to wait at maximum. -1 is indefinitely
@@ -115,8 +116,8 @@ int bt_read(void* fd_, u8* buf, size_t count, int milliseconds)
 }
 
 /**
- * \param [in] device handle returned by bt_open
- * \brief Closes the file descriptor opened by \p bt_open
+ * \param [in] device handle returned by bt_open()
+ * \brief Closes the file descriptor opened by bt_open()
  */
 void bt_close(void *handle)
 {
@@ -124,10 +125,10 @@ void bt_close(void *handle)
 	free(handle);
 }
 /**
- * \param [in] device handle returned by bt_open
+ * \param [in] device handle returned by bt_open()
  * \return message An error string
  * \brief Returns an error string describing the last error occured
- * \bug it's useless. Could use wprintf and strerror
+ * \bug it's useless. Could use \p wprintf and \p strerror
  */
 const wchar_t *bt_error(void* fd_) { (void)fd_; return L"Errors not implemented yet";}
 

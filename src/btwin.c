@@ -1,7 +1,7 @@
 /**
  * @file btwin.c
  * @author Ahmad Fatoum
- * @license Copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
  * @brief Windows bluetooth I/O using virtual COM port
  */
 #include <stdlib.h>

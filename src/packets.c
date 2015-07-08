@@ -1,4 +1,10 @@
-#include "systemcmd.h"
+/**
+ * @file packets.c
+ * @author Ahmad Fatoum
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @brief contains inital values for all these packets
+ */
+ #include "packets.h"
 
 const BEGIN_DOWNLOAD
 BEGIN_DOWNLOAD_INIT = { .hidLayer = 0x00, .replyType = 0x01, .cmd = 0x92 };
