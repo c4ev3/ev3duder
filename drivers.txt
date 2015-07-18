@@ -1,0 +1,4 @@
+  wext = Linux wireless extensions (generic)
+  hostap = Host AP driver (Intersil Prism2/2.5/3)
+  wired = wpa_supplicant wired Ethernet driver
+

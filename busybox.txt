@@ -1,0 +1,23 @@
+Currently defined functions:
+
+        [, [[, addgroup, adduser, ar, ash, awk, basename, blkid, bunzip2, bzcat,
+        cat, chattr, chgrp, chmod, chown, chpasswd, chroot, chvt, clear, cmp,
+        cp, cpio, cryptpw, cut, date, dc, dd, deallocvt, delgroup, deluser,
+        df, dhcprelay, diff, dirname, dmesg, du, dumpkmap, dumpleases, echo,
+        egrep, env, expr, false, fbset, fbsplash, fdisk, fgrep, find, free,
+        freeramdisk, fsck, fsck.minix, fuser, getopt, getty, grep, gunzip,
+        gzip, halt, head, hexdump, hostname, httpd, hwclock, id, ifconfig,
+        ifdown, ifup, inetd, init, insmod, ip, kill, killall, klogd, last,
+        less, linuxrc, ln, loadfont, loadkmap, logger, login, logname, logread,
+        losetup, ls, lsmod, makedevs, md5sum, mdev, microcom, mkdir, mkfifo,
+        mkfs.minix, mknod, mkswap, mktemp, modprobe, more, mount, mv, nc, netstat,
+        nice, nohup, nslookup, od, openvt, passwd, patch, pidof, ping, ping6,
+        pivot_root, poweroff, printf, ps, pwd, rdate, rdev, readahead, readlink,
+        readprofile, realpath, reboot, renice, reset, rm, rmdir, rmmod, route,
+        rtcwake, run-parts, sed, seq, setconsole, setfont, sh, showkey, sleep,
+        sort, start-stop-daemon, strings, stty, su, sulogin, swapoff, swapon,
+        switch_root, sync, sysctl, syslogd, tail, tar, tcpsvd, tee, telnet,
+        telnetd, test, tftp, tftpd, time, top, touch, tr, traceroute, true,
+        tty, udhcpc, udhcpd, udpsvd, umount, uname, uniq, unzip, uptime, usleep,
+        vi, vlock, watch, wc, wget, which, who, whoami, xargs, yes, zcat
+

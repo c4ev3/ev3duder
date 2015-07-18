@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
+#include <errno.h>
 
 #include "ev3_io.h"
 
@@ -23,101 +25,86 @@
  */
 int dl(const char *path, FILE *fp)
 {
-    int res;
+	int res;
 	size_t path_sz = strlen(path) + 1;
-	if (!fp)
-		fp = fopen(strrchr(path, '/') + 1, "w");
 
-    BEGIN_UPLOAD *bu = packet_alloc(BEGIN_UPLOAD, path_sz);
-    memcpy(bu->fileName, path, path_sz);
+	BEGIN_UPLOAD *bu = packet_alloc(BEGIN_UPLOAD, path_sz);
+	memcpy(bu->fileName, path, path_sz);
 	bu->maxBytes = CHUNK_SIZE;
 
-    print_bytes(bu, bu->packetLen + PREFIX_SIZE);
-    res = ev3_write(handle, (u8 *)bu, bu->packetLen + PREFIX_SIZE);
-    if (res < 0)
-    {
-        errmsg = "Unable to write BEGIN_UPLOAD.";
-        hiderr = ev3_error(handle);
-        return ERR_HID;
-    }
-    fputs("Checking reply: \n", stderr);
-    size_t file_chunksz = sizeof(BEGIN_UPLOAD_REPLY) + bu->maxBytes;
-    void *file_chunk = malloc(file_chunksz);
+	print_bytes(bu, bu->packetLen + PREFIX_SIZE);
+	res = ev3_write(handle, (u8 *)bu, bu->packetLen + PREFIX_SIZE);
+	if (res < 0)
+	{
+		errmsg = "Unable to write BEGIN_UPLOAD.";
+		return ERR_COMM;
+	}
+	fputs("Checking reply: \n", stderr);
+	size_t file_chunksz = sizeof(BEGIN_UPLOAD_REPLY) + bu->maxBytes;
+	void *file_chunk = malloc(file_chunksz);
+
 	BEGIN_UPLOAD_REPLY *burep = file_chunk;
 
-    res = ev3_read_timeout(handle, (u8 *)burep, file_chunksz, TIMEOUT);
-    if (res <= 0)
-    {
-        errmsg = "Unable to read BEGIN_UPLOAD";
-        hiderr = ev3_error(handle);
-        return ERR_HID;
-    }
+	res = ev3_read_timeout(handle, (u8 *)burep, file_chunksz, TIMEOUT);
+	if (res <= 0)
+	{
+		errmsg = "Unable to read BEGIN_UPLOAD";
+		return ERR_COMM;
+	}
 
-    if (burep->type == VM_ERROR)
-    {
-        if (burep->ret < ARRAY_SIZE(ev3_error_msgs))
-            hiderr = ev3_error_msgs[burep->ret];
-        else
-            hiderr = L"ERROR_OUT_OF_BOUNDS";
-        fputs("Operation failed.\nlast_reply=", stderr);
-        print_bytes(burep, burep->packetLen);
+	if (burep->type == VM_ERROR)
+	{
+		errno = burep->ret;
+		fputs("Operation failed.\nlast_reply=", stderr);
+		print_bytes(burep, burep->packetLen);
 
 
-        errmsg = "`BEGIN_UPLOAD` was denied.";
-        return ERR_VM;
-    }
-    fwrite(burep->bytes, CHUNK_SIZE, 1, fp);
+		errmsg = "`BEGIN_UPLOAD` was denied.";
+		return ERR_VM;
+	}
+	unsigned read_so_far = burep->packetLen + 2 - offsetof(BEGIN_UPLOAD_REPLY, bytes);
+	fwrite(burep->bytes, read_so_far, 1, fp);
 
-	size_t read_so_far = burep->packetLen + 2 - offsetof(BEGIN_UPLOAD_REPLY, bytes);
-	size_t total = burep->fileSize;
-	free(burep);
+	unsigned total = burep->fileSize;
 
-    CONTINUE_UPLOAD cu = CONTINUE_UPLOAD_INIT;
+	CONTINUE_UPLOAD cu = CONTINUE_UPLOAD_INIT;
 	cu.fileHandle =burep->fileHandle;
 	cu.maxBytes = CHUNK_SIZE + sizeof(BEGIN_UPLOAD_REPLY) - sizeof(CONTINUE_UPLOAD_REPLY);
-	fprintf(stderr, "read %zu from total %zu bytes.\n", read_so_far, total);
+	fprintf(stderr, "read %u from total %u bytes.\n", read_so_far, total);
 	CONTINUE_UPLOAD_REPLY *curep = file_chunk;
-	int ret = curep->ret;
-	while(ret != END_OF_FILE)
+	while(read_so_far < total)
 	{
-	res = ev3_write(handle, (u8*)&cu, sizeof cu);
-    if (res < 0)
-    {
-		errmsg = "Unable to write BEGIN_UPLOAD";
-        hiderr = ev3_error(handle);
-        return ERR_HID;
-    }
+		res = ev3_write(handle, (u8*)&cu, sizeof cu);
+		if (res < 0)
+		{
+			errmsg = "Unable to write CONTINUE_UPLOAD";
+			return ERR_COMM;
+		}
 
-	    res = ev3_read_timeout(handle, (u8 *)curep, file_chunksz, TIMEOUT);
-    	if (res <= 0)
-    	{
-			errmsg = "Unable to read BEGIN_UPLOAD_REPLY";
-			hiderr = ev3_error(handle);
-			return ERR_HID;
-    	}
+		res = ev3_read_timeout(handle, (u8 *)curep, file_chunksz, TIMEOUT);
+		if (res <= 0)
+		{
+			errmsg = "Unable to read CONTINUE_UPLOAD_REPLY";
+			return ERR_COMM;
+		}
 		if (curep->type == VM_ERROR)
 		{
-			if (curep->ret < ARRAY_SIZE(ev3_error_msgs))
-				hiderr = ev3_error_msgs[curep->ret];
-			else
-				hiderr = L"ERROR_OUT_OF_BOUNDS";
+			errno = curep->ret;
 			fputs("Operation failed.\nlast_reply=", stderr);
 			print_bytes(curep, curep->packetLen);
 
-
-			errmsg = "`BEGIN_UPLOAD` was denied.";
+			errmsg = "`CONTINUE_UPLOAD` was denied.";
 			return ERR_VM;
 		}	
-		fwrite(burep->bytes, cu.maxBytes, 1, fp);
+		size_t read_this_time = curep->packetLen + 2 - offsetof(CONTINUE_UPLOAD_REPLY, bytes);
+		fwrite(curep->bytes, read_this_time, 1, fp);
 		cu.fileHandle = curep->fileHandle;
-	size_t read_so_far = curep->packetLen + 2 - offsetof(CONTINUE_UPLOAD_REPLY, bytes);
-	fflush(stdout);
-	fprintf(stderr, "read %zu from total %zu bytes.\n", read_so_far, file_chunksz);
-	ret = curep->ret;
+		read_so_far += read_this_time;
+		fprintf(stderr, "read %u from total %u bytes.\n", read_so_far, total);
 	}
 
-    errmsg = "`BEGIN_UPLOAD` was successful.";
-    return ERR_UNK;
+	errmsg = "`BEGIN_UPLOAD` was successful.";
+	return ERR_UNK;
 
 }
 

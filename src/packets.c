@@ -19,7 +19,7 @@ const BEGIN_UPLOAD
 BEGIN_UPLOAD_INIT = { .hidLayer = 0x00, .replyType = 0x01, .cmd = 0x94 };
 
 const CONTINUE_UPLOAD
-CONTINUE_UPLOAD_INIT = {  .hidLayer = 0x00, .replyType = 0x01, .cmd = 0x95};
+CONTINUE_UPLOAD_INIT = { .hidLayer = 0x00, .packetLen = sizeof (CONTINUE_UPLOAD) - PREFIX_SIZE, .replyType = 0x01, .cmd = 0x95};
 
 const LIST_FILES
 LIST_FILES_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0x99 };

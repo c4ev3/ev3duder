@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "ev3_io.h"
 
@@ -27,110 +28,97 @@
  */
 int up(FILE *fp, const char *dst)
 {
-    int res;
+	int res;
 
-    fseek(fp, 0, SEEK_END);
-    long fsize = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
+	fseek(fp, 0, SEEK_END);
+	long fsize = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
 
-    if ((unsigned long)fsize > (u32)-1)
-      return ERR_FTOOBIG;   
+	if ((unsigned long)fsize > (u32)-1)
+		return ERR_FTOOBIG;   
 
-    unsigned chunks   = fsize / CHUNK_SIZE;
-    unsigned final_chunk_sz = fsize % CHUNK_SIZE;
+	unsigned chunks   = fsize / CHUNK_SIZE;
+	unsigned final_chunk_sz = fsize % CHUNK_SIZE;
 
-    fprintf(stderr, "Attempting file upload (%ldb total; %u chunks): \n", fsize, chunks + 1);
+	fprintf(stderr, "Attempting file upload (%ldb total; %u chunks): \n", fsize, chunks + 1);
 
 	size_t dst_len = strlen(dst) + 1;
-    BEGIN_DOWNLOAD *bd = packet_alloc(BEGIN_DOWNLOAD, dst_len);
-    bd->fileSize = fsize;
-    memcpy(bd->fileName, dst, dst_len);
+	BEGIN_DOWNLOAD *bd = packet_alloc(BEGIN_DOWNLOAD, dst_len);
+	bd->fileSize = fsize;
+	memcpy(bd->fileName, dst, dst_len);
 
-    res = ev3_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
-    if (res < 0)
-    {
-        errmsg = "Unable to write BEGIN_DOWNLOAD.";
-        hiderr = ev3_error(handle);
-        return ERR_HID;
-    }
-    fputs("Checking reply: \n", stderr);
+	res = ev3_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
+	if (res < 0)
+	{
+		errmsg = "Unable to write BEGIN_DOWNLOAD.";
+		return ERR_COMM;
+	}
+	fputs("Checking reply: \n", stderr);
 
-    BEGIN_DOWNLOAD_REPLY bdrep;
+	BEGIN_DOWNLOAD_REPLY bdrep;
 
-    res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
-    if (res <= 0)
-    {
-        errmsg = "Unable to read BEGIN_DOWNLOAD";
-        hiderr = ev3_error(handle);
-        return ERR_HID;
-    }
+	res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+	if (res <= 0)
+	{
+		errmsg = "Unable to read BEGIN_DOWNLOAD";
+		return ERR_COMM;
+	}
 
-    if (bdrep.type == VM_ERROR)
-    {
-        if (bdrep.ret < ARRAY_SIZE(ev3_error_msgs))
-            hiderr = ev3_error_msgs[bdrep.ret];
-        else
-            hiderr = L"ERROR_OUT_OF_BOUNDS";
-
-        errmsg = "BEGIN_DOWNLOAD was denied.";
-        return ERR_VM;
-    }
+	if (bdrep.type == VM_ERROR)
+	{
+		errno = bdrep.ret;
+		errmsg = "BEGIN_DOWNLOAD was denied.";
+		return ERR_VM;
+	}
 
 	CONTINUE_DOWNLOAD *cd = packet_alloc(CONTINUE_DOWNLOAD, CHUNK_SIZE);
-    for (size_t i = 0; i < chunks; ++i)
-    {
-        cd->fileHandle = bdrep.fileHandle;
+	for (size_t i = 0; i < chunks; ++i)
+	{
+		cd->fileHandle = bdrep.fileHandle;
 		fread(cd->fileChunk, 1, CHUNK_SIZE, fp);
-        res = ev3_write(handle, (u8 *)cd, cd->packetLen + PREFIX_SIZE);
+		res = ev3_write(handle, (u8 *)cd, cd->packetLen + PREFIX_SIZE);
 
-        if (res < 0)
-        {
-            errmsg = "Unable to write CONTINUE_DOWNLOAD.";
-            hiderr = ev3_error(handle);
-            return ERR_HID;
-        }
-        res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
-        if (res <= 0)
-        {
-            errmsg = "Unable to read CONTINUE_DOWNLOAD";
-            hiderr = ev3_error(handle);
-            return ERR_HID;
-        }
-    }
+		if (res < 0)
+		{
+			errmsg = "Unable to write CONTINUE_DOWNLOAD.";
+			return ERR_COMM;
+		}
+		res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+		if (res <= 0)
+		{
+			errmsg = "Unable to read CONTINUE_DOWNLOAD";
+			return ERR_COMM;
+		}
+	}
 	cd->packetLen = sizeof(CONTINUE_DOWNLOAD) + final_chunk_sz - PREFIX_SIZE;
 	fread(cd->fileChunk, 1, final_chunk_sz, fp);
 	ev3_write(handle, (u8*)cd, cd->packetLen + PREFIX_SIZE);
 	if (res < 0)
 	{
 		errmsg = "Unable to write CONTINUE_DOWNLOAD.";
-		hiderr = ev3_error(handle);
-		return ERR_HID;
+		return ERR_COMM;
 	}
 	res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
 	if (res <= 0)
 	{
 		errmsg = "Unable to read CONTINUE_DOWNLOAD";
-		hiderr = ev3_error(handle);
-		return ERR_HID;
+		return ERR_COMM;
 	}
-    if (bdrep.type == VM_ERROR)
-    {
-        if (bdrep.ret < ARRAY_SIZE(ev3_error_msgs))
-            hiderr = ev3_error_msgs[bdrep.ret];
-        else
-            hiderr = L"ERROR_OUT_OF_BOUNDS";
+	if (bdrep.type == VM_ERROR)
+	{
+		errno = bdrep.ret;
 
-        fputs("Transfer failed.\nlast_reply=", stderr);
+		fputs("Transfer failed.\nlast_reply=", stderr);
 
-        print_bytes(&bdrep, bdrep.packetLen);
+		print_bytes(&bdrep, bdrep.packetLen);
 
-        errmsg = "CONTINUE_DOWNLOAD was denied.";
-        return ERR_VM;
-    }
+		errmsg = "CONTINUE_DOWNLOAD was denied.";
+		return ERR_VM;
+	}
 
-    fprintf(stderr, "Transfer has been successful! (ret=%d)\n", bdrep.type);
+	fprintf(stderr, "Transfer has been successful! (ret=%d)\n", bdrep.type);
 
-    errmsg = "`upload` was successful.";
-    return ERR_UNK;
+	errmsg = "`upload` was successful.";
+	return ERR_UNK;
 }
 

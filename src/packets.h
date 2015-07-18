@@ -118,7 +118,7 @@ typedef struct
 {
 	EV3_COMMAND_FIELDS
 
-	u32 maxBytes;
+	u16 maxBytes;
 	char fileName[];
 } BEGIN_UPLOAD;
 
@@ -138,7 +138,7 @@ typedef struct
 	EV3_COMMAND_FIELDS
 
 	u8 fileHandle;
-	u32 maxBytes;
+	u16 maxBytes;
 } CONTINUE_UPLOAD;
 	
 //! doesn't work
