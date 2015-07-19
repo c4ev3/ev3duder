@@ -1,6 +1,8 @@
 /**
- * @file dl.c
- * @brief untested
+ * @file getfilec.c
+ * @brief untested and ununsed
+ * @note what's the difference between @getfile and @dl?
+ * 		 Maybe behavior when file is locked?
  */
 #include <stdio.h>
 #include <stdlib.h>

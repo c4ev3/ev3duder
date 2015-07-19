@@ -1,6 +1,7 @@
 /**
  * @file dl.c
- * @brief untested
+ * @brief downloads files from brick
+ * @note doesn't download from /tmp/ for whatever reason
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -21,7 +22,6 @@
  * \param path path on the ev3
  * \param fp FILE* to write data to
  * \retval error according to enum #ERR
- * \bug doesn't work, needs more debugging (over WiFi maybe)
  */
 int dl(const char *path, FILE *fp)
 {

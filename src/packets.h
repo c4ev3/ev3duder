@@ -113,40 +113,48 @@ typedef BEGIN_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY;
 extern const CONTINUE_DOWNLOAD_REPLY CONTINUE_DOWNLOAD_REPLY_SUCCESS;
 
 //! download from EV3
-//! no documentation as it doesn't even work
 typedef struct
 {
 	EV3_COMMAND_FIELDS
 
+	/** maxBytes for a single chunk. Use 1000 */
 	u16 maxBytes;
+	/** UTF-8 encoded, NUL-terminated string */
 	char fileName[];
 } BEGIN_UPLOAD;
 
-//! doesn't work
+//! download from EV3 reply
 typedef struct
 {
 	EV3_REPLY_FIELDS
 		
+	/** Total file size **/
 	u32 fileSize;
+	/** Handle for use in successive operations **/
 	u8 fileHandle;
+	/** First chunk **/
 	u8 bytes[];
 } BEGIN_UPLOAD_REPLY;
 
-//! doesn't work
+//! continue download from ev3
 typedef struct
 {
 	EV3_COMMAND_FIELDS
 
+	/** recieved in BEGIN_UPLOAD_REPLY **/
 	u8 fileHandle;
+	/** chunk size **/
 	u16 maxBytes;
 } CONTINUE_UPLOAD;
 	
-//! doesn't work
+//! continue download from ev3 reply
 typedef struct
 {
 	EV3_REPLY_FIELDS
 
+	/** recieved in BEGIN_UPLOAD_REPLY **/
 	u8 fileHandle;
+	/** successive chunks **/
 	u8 bytes[];
 } CONTINUE_UPLOAD_REPLY;
 	

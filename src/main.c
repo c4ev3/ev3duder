@@ -14,7 +14,7 @@
 
 #undef assert
 //FIXME: add better error message
-#define assert(cond) do{ if (!(cond)) if (handle) {ev3_close(handle);exit(ERR_ARG);}}while(0)
+#define assert(cond) do{ if (!(cond)) if (handle) ev3_close(handle);exit(ERR_ARG);}while(0)
 
 #include <hidapi.h>
 #include "btserial.h"
@@ -25,8 +25,14 @@
 #include "error.h"
 #include "funcs.h"
 
-#define VendorID 0x694 /* LEGO GROUP */
+//! LEGO GROUP
+#define VendorID 0x694
+//! EV3
 #define ProductID 0x005 /* EV3 */
+//! Filename used for executing command with `exec`
+#define ExecName  "/tmp/Executing shell cmd.rbf"
+//! Filename used for saving output with `exece` (tmp won't work because it's not readable? wtf)
+#define OutputName "/home/root/o"
 
 const char* const params =
     "USAGE: ev3duder " "[ up loc rem | dl rem loc | rm rem | ls [rem] | test |\n"
@@ -36,7 +42,7 @@ const char* const params =
     "rem = remote (EV3) path, loc = local path, dev = device identifier"	"\n";
 const char* const params_desc =
     " up\t"		"upload local file to remote ev3 brick\n"
-    " dl\t"		"should be downloading\n" //FIXME
+    " dl\t"		"download remote file to local system\n"
     " rm\t"		"remove file on ev3 brick\n"
     " ls\t"		"list files. Standard value is '/'\n"
     " test\t"	"attempt a beep and print information about the connection\n"
@@ -49,6 +55,7 @@ const char* const params_desc =
     "\t"		"\t/media/usb/myappps/ USB stick\n"
     "run\t"		"instruct the VM to run a rbf file\n"
     "exec\t"	"pass cmd to root shell. Handle with caution\n"
+    "exece\t"	"pass cmd to root shell and echo output. Handle with caution\n"
     "wpa2\t"	"connect to WPA-Network SSID, if pass isn't specified, read from stdin\n"
     ;
 
@@ -62,6 +69,7 @@ ARG(rm)              \
 ARG(mkdir)           \
 ARG(mkrbf)           \
 ARG(exec)            \
+ARG(exece)            \
 ARG(wpa2)            \
 ARG(end)
 
@@ -161,6 +169,9 @@ int main(int argc, char *argv[])
     int ret;
     switch (i)
     {
+        FILE *fp = NULL;
+        char *buf = NULL;
+        size_t len = 0;
     case ARG_test:
         assert(argc == 0);
         ret = test();
@@ -168,40 +179,33 @@ int main(int argc, char *argv[])
 
     case ARG_up:
         assert(argc == 2);
+        fp = fopen(SANITIZE(argv[0]), "rb");
+        if (!fp)
         {
-            FILE *fp = fopen(SANITIZE(argv[0]), "rb");
-            if (!fp)
-            {
-                printf("File <%s> doesn't exist.\n", argv[0]);
-                return ERR_IO;
-            }
-            ret = up(fp, argv[1]);
+            printf("File <%s> doesn't exist.\n", argv[0]);
+            return ERR_IO;
         }
+        ret = up(fp, argv[1]);
         break;
-
     case ARG_dl:
         assert(argc <= 2);
+        if (argc == 1)
         {
-            FILE *fp;
-            char *name;
-            if (argc == 1)
-            {
-                name = strrchr(argv[0], '/');
-                if (name)
-                    name++; // character after slash
-                else
-                    name = argv[0];
-            } else name = argv[1];
+            buf = strrchr(argv[0], '/');
+            if (buf)
+                buf++; // character after slash
+            else
+                buf = argv[0];
+        } else buf = argv[1];
 
-            fp = fopen(name, "wb"); //TODO: no sanitize here?
-            if(!fp)
-            {
-                printf("File <%s> couldn't be opened for writing.\n", name);
-                return ERR_IO;
-            }
-
-            ret = dl(argv[0], fp);
+        fp = fopen(buf, "wb"); //TODO: no sanitize here?
+        if(!fp)
+        {
+            printf("File <%s> couldn't be opened for writing.\n", buf);
+            return ERR_IO;
         }
+
+        ret = dl(argv[0], fp);
         break;
     case ARG_run:
         assert(argc == 1);
@@ -222,16 +226,13 @@ int main(int argc, char *argv[])
         break;
     case ARG_mkrbf:
         assert(argc >= 2);
-        {
-            FILE *fp = fopen(SANITIZE(argv[1]), "wb");
-            if (!fp)
-                return ERR_IO;
+        fp = fopen(SANITIZE(argv[1]), "wb");
+        if (!fp)
+            return ERR_IO;
 
-            char *buf;
-            size_t bytes = mkrbf(&buf, argv[0]);
-            fwrite(buf, bytes, 1, fp);
-            fclose(fp);
-        }
+        len = mkrbf(&buf, argv[0]);
+        fwrite(buf, len, 1, fp);
+        fclose(fp);
         return ERR_UNK;
     case ARG_wpa2:
         assert(argc >= 1);
@@ -249,21 +250,41 @@ int main(int argc, char *argv[])
 
         }*/
         return ERR_UNK;
+    case ARG_exece:
+    {
+        size_t len_cmd = strlen(argv[0]),
+               len_out = sizeof " &>" OutputName;
+        buf = malloc(len_cmd + len_out);
+        (void)mempcpy(mempcpy(buf,
+                              argv[0], len_cmd),
+                      " &>" OutputName, len_out);
+        argv[0] = buf;
+    }
     case ARG_exec: //FIXME: dumping on disk and reading is stupid
         assert(argc >= 1);
-        {
-            char *buf;
-            size_t bytes = mkrbf(&buf, argv[0]);
-            FILE *fp = tmpfile();
-            if (!fp)
-                return ERR_IO;
-            fwrite(buf, bytes, 1, fp);
-            rewind(fp);
-            ret = up(fp, "/tmp/Executing shell cmd.rbf");
-            if (ret != ERR_UNK)
-                break;
-            ret = run("/tmp/Executing shell cmd.rbf");
-        }
+        len = mkrbf(&buf, argv[0]);
+        fp = tmpfile();
+        if (!fp)
+            return ERR_IO;
+        fwrite(buf, len, 1, fp);
+        rewind(fp);
+        ret = up(fp, ExecName);
+        if (ret != ERR_UNK)
+            break;
+        ret = run(ExecName);
+        if (ret != ERR_UNK)
+            break;
+
+		if (i == ARG_exece)
+		{
+			fp = freopen(NULL, "wb", fp); // clear file
+			dl(OutputName, fp);
+			char buffer[1024];
+			while((len = fread(buffer, 1, 1024, fp)))
+				fwrite(buffer, 1, len, stdout);
+			free(buf);
+		}
+		fclose(fp);
         break;
     case ARG_rm:
         assert(argc == 1);
