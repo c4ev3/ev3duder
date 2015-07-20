@@ -14,7 +14,7 @@
 
 #undef assert
 //FIXME: add better error message
-#define assert(cond) do{ if (!(cond)) if (handle) ev3_close(handle);exit(ERR_ARG);}while(0)
+#define assert(cond) do{ if (!(cond)) {if (handle) ev3_close(handle);exit(ERR_ARG);}}while(0)
 
 #include <hidapi.h>
 #include "btserial.h"
@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
         break;
     default:
         ret = ERR_ARG;
-        printf("<%s> hasn't been implemented yet.", argv[0]);
+        printf("<%s> hasn't been implemented yet.\n", argv[0]);
     }
 
     FILE *out = ret == ERR_UNK ? stderr : stdout;
