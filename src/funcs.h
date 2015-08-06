@@ -52,6 +52,11 @@ extern int mkdir(const char *rem);
 //! fill \p *buf with a rbf file executing \p cmd
 extern size_t mkrbf(char **buf, const char *cmd);
 
+//! tunnel stdio to established ev3 connection
+extern int tunnel();
+extern int listen();
+
+
 #if 0 // not yet implemented
 //! concatenate contents of \p count of \p rem FILEs to the EV3's LCD
 extern int cat(const char *rem, size_t count);

@@ -18,6 +18,7 @@
 
 #include <hidapi.h>
 #include "btserial.h"
+#include "tcp.h"
 #include "ev3_io.h"
 
 #include "defs.h"
@@ -32,12 +33,13 @@
 //! Filename used for executing command with `exec`
 #define ExecName  "/tmp/Executing shell cmd.rbf"
 //! Filename used for saving output with `exece` (tmp won't work because it's not readable? wtf)
-#define OutputName "/home/root/o"
+#define OutputName "/home/root/lms2012/prjs/o"
 
 const char* const params =
-    "USAGE: ev3duder " "[ up loc rem | dl rem loc | rm rem | ls [rem] | test |\n"
+    "USAGE: ev3duder " "[ --tcp | --usb | --bt | --fifo | --stdio ] [-d dev]\n"
+    "                " "[ up loc rem | dl rem loc | rm rem | ls [rem] |\n"
     "                " "  mkdir rem | mkrbf rem loc | run rem | exec cmd |\n"
-    "                " "  wpa2 SSID [pass] ]\n"
+    "                " "  exece [cmd] | wpa2 SSID [pass] | test | tunnel ]\n"
     "       "
     "rem = remote (EV3) path, loc = local path, dev = device identifier"	"\n";
 const char* const params_desc =
@@ -47,7 +49,7 @@ const char* const params_desc =
     " ls\t"		"list files. Standard value is '/'\n"
     " test\t"	"attempt a beep and print information about the connection\n"
     " mkdir\t"	"create directory. Relative to path of VM.\n"
-    " mkrbf\t"	"creates rbf (menu entry) file locally. Sensible upload paths are:\n"
+    " mkrbf\t"	"create rbf (menu entry) file locally. Sensible upload paths are:\n"
     "\t"		"\t../prjs/BrkProg_SAVE/ Internal memory\n"
     "\t"		"\t../prjs/BrkProg_DL/ Internal memory\n"
     "\t"		"\t./apps/ Internal memory - Applicatios (3rd tab)\n"
@@ -56,7 +58,9 @@ const char* const params_desc =
     "run\t"		"instruct the VM to run a rbf file\n"
     "exec\t"	"pass cmd to root shell. Handle with caution\n"
     "exece\t"	"pass cmd to root shell and echo output. Handle with caution\n"
+	"\t"		"if no cmd is given, last exece's output is printed\n"
     "wpa2\t"	"connect to WPA-Network SSID, if pass isn't specified, read from stdin\n"
+    "tunnel\t"	"connects stdout/stdin to the ev3 VM\n"
     ;
 
 #define FOREACH_ARG(ARG) \
@@ -68,6 +72,8 @@ ARG(ls)              \
 ARG(rm)              \
 ARG(mkdir)           \
 ARG(mkrbf)           \
+ARG(tunnel)			\
+ARG(listen)			\
 ARG(exec)            \
 ARG(exece)            \
 ARG(wpa2)            \
@@ -77,7 +83,7 @@ ARG(end)
 #define MK_STR(x) #x,
 enum ARGS { FOREACH_ARG(MK_ENUM) };
 static const char *args[] = { FOREACH_ARG(MK_STR) };
-static const char *offline_args[] = { MK_STR(mkrbf) };
+static const char *offline_args[] = { MK_STR(mkrbf) /*MK_STR(tunnel)*/ };
 
 static char* chrsub(char *s, char old, char new);
 #ifdef _WIN32
@@ -110,7 +116,7 @@ int main(int argc, char *argv[])
         return ERR_UNK;
     }
 
-    const char *device = NULL;
+    const char *device = NULL, *device2 = NULL;
     char buffer[32];
     FILE *fp;
     if (strcmp(argv[1], "-d") == 0)
@@ -118,16 +124,20 @@ int main(int argc, char *argv[])
         device = argv[2];
         argv+=2;
         argc-=2;
-#ifdef _WIN32 //FIXME: do that in the plugin, but first enumerate
-    } else if ((fp = fopen("C:\\ev3\\uploader\\.ev3duder", "r")))
-#else
-    }
+    } else if (strcmp(argv[1], "-d2") == 0)
+    {
+        device = argv[2];
+        device2 = argv[3];
+        argv+=3;
+        argc-=3;
+	}	//FIXME: .ev3duder is in the getcwd(3). should be something absolute instead
+#ifdef USE_COMPORT_FILE
     else if ((fp = fopen(".ev3duder", "r")))
-#endif
     {
         fgets(buffer, sizeof buffer, fp);
         device = buffer;
     }
+#endif
     int i;
 
     for (i = 0; i < (int)ARRAY_SIZE(offline_args); ++i)
@@ -151,7 +161,18 @@ int main(int argc, char *argv[])
             ev3_read_timeout = bt_read;
             ev3_error = bt_error;
             ev3_close = bt_close;
-        } else {
+        }
+		else if ((handle = tcp_open(device)))
+		{
+			struct tcp_handle *info = (struct tcp_handle*)handle;
+            fprintf(stderr, "TCP connection established (%s@%s:%u).\n", info->name, info->ip, info->tcp_port);
+			ev3_write = tcp_write;
+			ev3_read_timeout = tcp_read;
+			ev3_error = tcp_error;
+			ev3_close = tcp_close;
+			
+		}	
+		else {
             puts("EV3 not found. Either plug it into the USB port or pair over Bluetooth.\n");
 #ifdef __linux__
             puts("Insufficient access to the usb device might be a reason too, try sudo.");
@@ -219,7 +240,12 @@ int main(int argc, char *argv[])
         assert(argc <= 1);
         ret = ls(argc == 1 ? argv[0] : ".");
         break;
-
+	case ARG_tunnel:
+        ret = tunnel();
+        break;
+	case ARG_listen:
+        ret = listen();
+        break;
     case ARG_mkdir:
         assert(argc == 1);
         ret = mkdir(argv[0]);
@@ -251,7 +277,18 @@ int main(int argc, char *argv[])
         }*/
         return ERR_UNK;
     case ARG_exece:
-    {
+		if (argc == 0)
+		{
+			fp = tmpfile();
+			dl(OutputName, fp);
+			char buffer[1024];
+			rewind(fp);
+			while((len = fread(buffer, 1, 1024, fp)))
+				fwrite(buffer, 1, len, stdout);
+			return ERR_UNK;
+		}
+		else
+		{
         size_t len_cmd = strlen(argv[0]),
                len_out = sizeof " &>" OutputName;
         buf = malloc(len_cmd + len_out);
@@ -259,7 +296,7 @@ int main(int argc, char *argv[])
                               argv[0], len_cmd),
                       " &>" OutputName, len_out);
         argv[0] = buf;
-    }
+		}
     case ARG_exec: //FIXME: dumping on disk and reading is stupid
         assert(argc >= 1);
         len = mkrbf(&buf, argv[0]);
@@ -277,9 +314,10 @@ int main(int argc, char *argv[])
 
 		if (i == ARG_exece)
 		{
-			fp = freopen(NULL, "wb", fp); // clear file
+			fp = freopen(NULL, "wb+", fp); // clear file
 			dl(OutputName, fp);
 			char buffer[1024];
+			rewind(fp);
 			while((len = fread(buffer, 1, 1024, fp)))
 				fwrite(buffer, 1, len, stdout);
 			free(buf);
@@ -298,7 +336,7 @@ int main(int argc, char *argv[])
     FILE *out = ret == ERR_UNK ? stderr : stdout;
     if (ret == ERR_COMM)
         fprintf(out, "%s (%ls)\n", errmsg, ev3_error(handle));
-    else {
+    else if (ret == ERR_VM){
         const char *err;
         if (errno < (int)ARRAY_SIZE(ev3_error_msgs))
             err =  ev3_error_msgs[errno];
@@ -306,7 +344,9 @@ int main(int argc, char *argv[])
             err = "An unknown error occured";
 
         fprintf(out, "%s (%s)\n", err, errmsg);
-    }
+    }else {
+		fprintf(out, "%s\n", errmsg);
+	}
 
     // maybe \n to stderr?
     if (handle) ev3_close(handle);

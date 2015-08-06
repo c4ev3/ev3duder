@@ -1,7 +1,7 @@
 /**
  * @file mkdir.c
  * @author Ahmad Fatoum
- * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 3.0
  * @brief creates a directory structure on the ev3
  */
 #include <stdio.h>

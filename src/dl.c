@@ -32,14 +32,13 @@ int dl(const char *path, FILE *fp)
 	memcpy(bu->fileName, path, path_sz);
 	bu->maxBytes = CHUNK_SIZE;
 
-	print_bytes(bu, bu->packetLen + PREFIX_SIZE);
+	//print_bytes(bu, bu->packetLen + PREFIX_SIZE);
 	res = ev3_write(handle, (u8 *)bu, bu->packetLen + PREFIX_SIZE);
 	if (res < 0)
 	{
 		errmsg = "Unable to write BEGIN_UPLOAD.";
 		return ERR_COMM;
 	}
-	fputs("Checking reply: \n", stderr);
 	size_t file_chunksz = sizeof(BEGIN_UPLOAD_REPLY) + bu->maxBytes;
 	void *file_chunk = malloc(file_chunksz);
 
@@ -70,7 +69,7 @@ int dl(const char *path, FILE *fp)
 	CONTINUE_UPLOAD cu = CONTINUE_UPLOAD_INIT;
 	cu.fileHandle =burep->fileHandle;
 	cu.maxBytes = CHUNK_SIZE + sizeof(BEGIN_UPLOAD_REPLY) - sizeof(CONTINUE_UPLOAD_REPLY);
-	fprintf(stderr, "read %u from total %u bytes.\n", read_so_far, total);
+	//fprintf(stderr, "read %u from total %u bytes.\n", read_so_far, total);
 	CONTINUE_UPLOAD_REPLY *curep = file_chunk;
 	while(read_so_far < total)
 	{
@@ -100,7 +99,7 @@ int dl(const char *path, FILE *fp)
 		fwrite(curep->bytes, read_this_time, 1, fp);
 		cu.fileHandle = curep->fileHandle;
 		read_so_far += read_this_time;
-		fprintf(stderr, "read %u from total %u bytes.\n", read_so_far, total);
+		//fprintf(stderr, "read %u from total %u bytes.\n", read_so_far, total);
 	}
 
 	errmsg = "`BEGIN_UPLOAD` was successful.";

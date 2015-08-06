@@ -1,7 +1,7 @@
 /**
- * @file btunix.c
+ * @file bt-unix.c
  * @author Ahmad Fatoum
- * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 3.0
  * @brief Unix bluetooth I/O wrappers
  */
 #include <unistd.h>
@@ -13,7 +13,8 @@
 
 #include <signal.h>
 #include <setjmp.h>
-#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include "defs.h"
 //! default serial port name on OS X
@@ -25,12 +26,22 @@
  * \brief open(2)s serial port  described by device. `NULL` leads to default action
  * \bug default value should be enumerating. Not hardcoded like in \p BT
  */ 
-void *bt_open(const char *file)
+enum {READ=0, WRITE=1};
+void *bt_open(const char *file, const char*file2)
 {
 	//  signal(SIGINT, handle_sigint);
-	int *fd = malloc(sizeof(int));
-	*fd = open(file ?: BT, O_RDWR);
-	return *fd != -1 ? fd : NULL;
+	int *fd = malloc(2*sizeof(int));
+	struct stat buf;
+	fd[0] = fd[1] = open(file ?: BT, O_RDWR);
+	if (*fd == -1) return NULL;
+    fstat(*fd, &buf);
+	if (S_ISFIFO(buf.st_mode))
+	{
+		close(*fd);
+		fd[READ] = open(file ?: BT, O_RDONLY);
+		fd[WRITE] = open(file ?: BT, O_WRONLY);
+	}
+	return fd;
 }
 
 /**
@@ -43,9 +54,9 @@ void *bt_open(const char *file)
  */ 
 int bt_write(void* fd_, const u8* buf, size_t count)
 {
-	size_t sent;
-	int fd = *(int*)fd_;
+	int fd = ((int*)fd_)[WRITE];
 	buf++;count--; // omit HID report number
+	size_t sent;
 	for (ssize_t ret = sent = 0; sent < count; sent += ret)
 	{
 		ret = write(fd, buf, count-sent);
@@ -74,45 +85,35 @@ static void handle_alarm(int sig)
  */ 
 int bt_read(void* fd_, u8* buf, size_t count, int milliseconds)
 {
-	int fd = *(int*)fd_;
+	int fd = ((int*)fd_)[READ];
 	size_t recvd =0;
 	size_t packet_len = 2;
-	signal(SIGALRM, handle_alarm);
-	struct itimerval timer;
-	milliseconds = 1;
-	if (milliseconds != -1)
-	{
-		timer.it_value.tv_sec = milliseconds / 1000;
-		timer.it_value.tv_usec = milliseconds % 1000 * 1000;
-	}
-	while(setjmp(env) == 0)
-	{
-		for (ssize_t ret=recvd; recvd < packet_len; recvd += ret)
+	ssize_t ret;
+	do {
+		ret = read(fd, buf+recvd, packet_len-recvd);
+		if (ret == -1)
 		{
-			if (milliseconds != -1) {
-				setitimer(ITIMER_REAL, &timer, NULL);  //TODO: maybe move this out the loop? would handle diosconnects that way
-				ret = read(fd, buf+recvd, packet_len-recvd);
-				alarm(0);
-			}else
-			ret = read(fd, buf+recvd, packet_len-recvd);
-			if (ret == -1)
-			{
-				perror("read failed");
-				return -1; 
-			}
-			// bug one should handle disconnects during transfer. if this happens read keeps returning zeros
+				perror("read failed"); return -1; 
 		}
-		if (recvd == 2)
-		{
-			packet_len += buf[0] | (buf[1] << 8);
-			if (packet_len > 2*count) //FIXME: remove 2*
-				return -1;
-			continue;
-		}
-		break;
-	}
-	return recvd;
+	}while ((recvd += ret) != 2);
 
+	packet_len += buf[0] | (buf[1] << 8);
+
+	if (packet_len > 2*count) //FIXME: remove 2*
+		return -1;
+
+	for (ssize_t ret=recvd; recvd < packet_len; recvd += ret)
+	{
+		ret = read(fd, buf+recvd, packet_len-recvd);
+		if (ret == -1)
+		{
+			perror("read failed");
+			return -1; 
+		}
+		// bug one should handle disconnects during transfer. if this happens read keeps returning zeros
+	}
+
+return recvd;
 }
 
 /**
@@ -121,7 +122,8 @@ int bt_read(void* fd_, u8* buf, size_t count, int milliseconds)
  */
 void bt_close(void *handle)
 {
-	close(*(int*)handle);
+	close(((int*)handle)[WRITE]);
+	close(((int*)handle)[READ]);
 	free(handle);
 }
 /**

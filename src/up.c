@@ -1,7 +1,7 @@
 /**
  * @file up.c
  * @author Ahmad Fatoum
- * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 3.0
  * @brief uploads a file to the ev3
  */
 
@@ -40,7 +40,7 @@ int up(FILE *fp, const char *dst)
 	unsigned chunks   = fsize / CHUNK_SIZE;
 	unsigned final_chunk_sz = fsize % CHUNK_SIZE;
 
-	fprintf(stderr, "Attempting file upload (%ldb total; %u chunks): \n", fsize, chunks + 1);
+	//fprintf(stderr, "Attempting file upload (%ldb total; %u chunks): \n", fsize, chunks + 1);
 
 	size_t dst_len = strlen(dst) + 1;
 	BEGIN_DOWNLOAD *bd = packet_alloc(BEGIN_DOWNLOAD, dst_len);
@@ -53,10 +53,8 @@ int up(FILE *fp, const char *dst)
 		errmsg = "Unable to write BEGIN_DOWNLOAD.";
 		return ERR_COMM;
 	}
-	fputs("Checking reply: \n", stderr);
 
 	BEGIN_DOWNLOAD_REPLY bdrep;
-
 	res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
 	if (res <= 0)
 	{
@@ -115,8 +113,6 @@ int up(FILE *fp, const char *dst)
 		errmsg = "CONTINUE_DOWNLOAD was denied.";
 		return ERR_VM;
 	}
-
-	fprintf(stderr, "Transfer has been successful! (ret=%d)\n", bdrep.type);
 
 	errmsg = "`upload` was successful.";
 	return ERR_UNK;

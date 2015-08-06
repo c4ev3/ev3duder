@@ -58,7 +58,7 @@ def FlagsForFile( filename , **kwargs ):
             '-DSYSTEM="Vim"',
             '-DVERSION="0xa3f"',
             '-isystem', '/usr/local/include',
-            '-isystem', 'hidapi/hidapi',
+            '-isystem', './hidapi/hidapi',
             '-isystem', '/usr/local/mingw/i686-w64-mingw32/include',
             # for removing the warning about unsupported __stdcall (on non-win32 hosts)
             #'-DWINAPI=/*__stdcall*/',

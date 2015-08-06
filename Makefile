@@ -13,7 +13,7 @@ FLAGS += -std=c99 -Wall -Wextra -DVERSION='"$(VERSION)"'
 SRCDIR = src
 OBJDIR = build
 
-SRCS = src/main.c src/packets.c src/run.c src/test.c src/up.c src/ls.c src/rm.c src/mkdir.c src/mkrbf.c src/dl.c
+SRCS = src/main.c src/packets.c src/run.c src/test.c src/up.c src/ls.c src/rm.c src/mkdir.c src/mkrbf.c src/dl.c src/listen.c
 
 INC += -Ihidapi/hidapi/
  
@@ -31,7 +31,7 @@ endif
 FLAGS += -DCONFIGURATION='"HIDAPI/hid.dll"' -DSYSTEM="Windows"
 # TODO: remove all %zu prints altogether?
 FLAGS += -Wno-unused-value -D__USE_MINGW_ANSI_STDIO=1
-SRCS += src/btwin.c
+SRCS += src/bt-win.c
 HIDSRC += hidapi/windows/hid.c
 LDFLAGS += -mwindows -lsetupapi -municode 
 BIN_NAME := $(addsuffix .exe, $(BIN_NAME))
@@ -64,7 +64,9 @@ INC += -I/usr/local/include
 endif
 
 ## ALL UNICES
-SRCS += src/btunix.c
+SRCS += src/bt-unix.c
+SRCS += src/tcp-unix.c
+SRCS += src/tunnel.c
 endif
 
 

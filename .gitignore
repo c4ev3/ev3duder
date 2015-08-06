@@ -50,8 +50,7 @@ ev3duder
 #doxygen
 doc
 #vim
-*.swp
-*.swo
+*.sw*
 *.pyc
 
 doc/
