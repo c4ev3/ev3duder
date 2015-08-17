@@ -116,6 +116,7 @@ int main(int argc, char *argv[])
         return ERR_UNK;
     }
     const char *device = NULL; const char *device2 = NULL;
+	(void) device2; // surpress warnings as we don't always use device2
 	while (argv[1] && *argv[1] == '-')
 	{
 		if (argv[1][1] == '-')

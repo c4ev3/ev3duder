@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 
 #include <hidapi.h>
 #include "ev3_io.h"
@@ -19,6 +20,9 @@
 #include "error.h"
 #include "funcs.h"
 
+#ifdef _WIN32
+#define isatty _isatty
+#endif
 
 static int hex2nib(char hex);
 
@@ -94,7 +98,7 @@ int tunnel()
 		size_t len = (binbuf[1] | (binbuf[2] << 4));
 		printf("len%zu\n", len);
 		fread(binbuf+3, 1, len, stdin);
-		print_bytes(binbuf, len+3);
+		print_bytes(binbuf, (int)len+3);
 
 	}
 

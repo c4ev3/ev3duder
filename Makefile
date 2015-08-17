@@ -13,7 +13,7 @@ FLAGS += -std=c99 -Wall -Wextra -DVERSION='"$(VERSION)"'
 SRCDIR = src
 OBJDIR = build
 
-SRCS = src/main.c src/packets.c src/run.c src/info.c src/up.c src/ls.c src/rm.c src/mkdir.c src/mkrbf.c src/dl.c src/listen.c src/send.c
+SRCS = src/main.c src/packets.c src/run.c src/info.c src/up.c src/ls.c src/rm.c src/mkdir.c src/mkrbf.c src/dl.c src/listen.c src/send.c src/tunnel.c
 
 INC += -Ihidapi/hidapi/
  
@@ -22,19 +22,20 @@ CREATE_BUILD_DIR := $(shell mkdir build 2>&1)
 ifeq ($(OS),Windows_NT)
 
 ## No rm?
-ifneq (, $(shell where rm 2>NUL)) 
+ifeq (, $(shell where rm)) 
 RM = del /Q
 # Powershell, cygwin and msys all provide rm(1)
 endif
 
 ## Win32
 ifneq ($(MAKECMDGOALS),cross)
-FLAGS += -DCONFIGURATION='"HIDAPI/hid.dll"' -DSYSTEM="Windows"
+FLAGS += -DCONFIGURATION='"HIDAPI/hid.dll"' -DSYSTEM='"Windows"'
 # TODO: remove all %zu prints altogether?
 FLAGS += -Wno-unused-value -D__USE_MINGW_ANSI_STDIO=1
 SRCS += src/bt-win.c
+SRCS += src/tcp-win.c
 HIDSRC += hidapi/windows/hid.c
-LDFLAGS += -mwindows -lsetupapi -municode 
+LDFLAGS += -lsetupapi 
 BIN_NAME := $(addsuffix .exe, $(BIN_NAME))
 # CodeSourcery prefix
 endif
@@ -77,7 +78,6 @@ endif
 ## ALL UNICES
 SRCS += src/bt-unix.c
 SRCS += src/tcp-unix.c
-SRCS += src/tunnel.c
 endif
 
 CROSS_PREFIX ?= arm-linux-gnueabi-g
@@ -111,9 +111,7 @@ cross: HIDFLAGS += `pkg-config libusb-1.0 --cflags`
 cross: LDFLAGS += `pkg-config libusb-1.0 --libs` -lrt -lpthread
 cross: $(BIN_NAME)
 
-# linux only for now, installs udev rules, for rootless access to ev3
 .PHONY: install
-<<<<<<< HEAD
 install: $(BIN_NAME) ev3-udev.rules udev.sh
 	ifneq ($(OS),Windows_NT)
 	-@mkdir /usr/lib/ev3duder/
@@ -121,6 +119,7 @@ install: $(BIN_NAME) ev3-udev.rules udev.sh
 	ln -s /usr/lib/ev3duder/$(BIN_NAME) /usr/bin/ev3
 	$(INSTALL)
 	endif
+
 .PHONY: clean
 clean:
 	$(RM) $(BIN_NAME) && cd $(OBJDIR) && $(RM) *.o *.d 
