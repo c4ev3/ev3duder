@@ -14,8 +14,7 @@ $RECYCLE.BIN/
 *.msm
 *.msp
 
-# Windows shortcuts
-*.lnk
+# Windows shortcuts *.lnk
 
 # =========================
 # Operating System Files
@@ -51,5 +50,12 @@ ev3duder
 #doxygen
 doc
 #vim
-*.swp
-*.swo
+*.sw*
+*.pyc
+
+doc/
+html/
+latex/
+s/
+
+tags

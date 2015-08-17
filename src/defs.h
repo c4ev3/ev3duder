@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 
+// shorter type names
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
@@ -23,6 +24,7 @@ typedef int64_t i64;
 	} while (0)
 
 #ifndef _GNU_SOURCE
+//! \brief returns dst+len instead of len for easiert chaining
 #define mempcpy(dst, src, len) ((char*)memcpy((dst), (src), (len)) + (len))
 #endif
 

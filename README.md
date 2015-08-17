@@ -2,52 +2,44 @@
 
 The LEGO® EV3 Downloader/Uploader utility.
 
-ev3duder is an utitlity for ....
+ev3duder is an implementation of the LEGO EV3's protocol over USB (HID) and Bluetooth (RFCOMM).
 
 Click here for precompiled binaries for Linux, Windows and OS X.
 Building ev3duder on your own is quite easy too, though.
-# Compilation
 ## Compiling ev3duder
 
 ev3duder requires a gnu99 compatible compiler, that is GCC 3.2 and
 above or compatible compilers.
 Any recent version of gcc, clang or icc should be able to compile it.
 MS Visual C++ isn't supported, due to the use of C99 features and GNU extensions.
-Also required is the Make utility and the HIDAPI library.
+Also required is GNU Make.
 
-### Debian Linux
-    $ apt-get install hidapi
+### Getting the source
+Get the source with git:
+    $ git clone --recursive https://github.com/a3f/ev3duder
+If you haven't got git, you will have to download these seperately:
+	https://github.com/a3f/ev3duder/archive/master.zip
+and
+	https://github.com/signal11/hidapi/archive/master.zip
+then unpack the hidapi archive into the hidapi directory of the ev3duder extraction path.
+
+### Building from source
     $ make
-On other systems, use your packet manager to get HIDAPI installed.
-Make and gcc are always there by default.
-### Mac OS X
-    $ brew install hidapi
-    $ make
-MacPorts (`ports install hidapi`) also works. If no package
-manager is available, you could build it yourself following the
-Windows instructions.
-### Microsoft Windows
-You will need to build HIDAPI yourself, which is quite straight
-forward:
-Get the HIDAPI sourced from here:
-
-Get the Minimalist GNU for Windows toolchain from here:
-
-HIDAPI is easily compiled by make:
-     C:/> make
-ev3duder is also only 1 make away:
-     C:/> cd ev3duder
-     C:/> make
+#### Linux
+On Linux, you additionally need libusb-1.0 to be installed. On Ubuntu and other Debian-based system this can be done via
+    $ sudo apt-get install libusb1.0.0-dev
+Also to allow access to the ev3 over USB without requiring root, appropriate udev rules must be created. This can be easily done with
+    $ make install
 ### Tests
 The test/ directionry contains some sample projects that do stuff on
-the EV3. `perl flash.pl tests/test1.c` builds, uploads and executes
-the test1 project and checks for the output to make sure it worked correctly. 
+the EV3. `perl flash.pl Test_Motors` uploads and executes
+the Test_Motors project. 
 
 ## Compiling programs for the EV3
 
 Generally, 2 files are needed: 
 1) An ELF executable built for Linux on ARM. libc need not be
-dynamically linked (The standard firmware uses musl(?) libc).
+dynamically linked (The standard firmware uses glibc).
 stdlibc++ is _not_ provided by default and would need to be
 uploaded separately and dynamically loaded or linked statically.
 
@@ -55,24 +47,60 @@ uploaded separately and dynamically loaded or linked statically.
 menu. This is not strictly required, as ev3duder can execute
 programs too, but a menu entry is more convenient.
 
-### Compiling for EV3 using gcc
+## Compiling for EV3 using gcc
+### Getting the toolchain
+In order to compile C/C++ application you will need the arm-none-linux-gnueabi GCC or arm-linux-gnueabi GCC (Both are the same thing).
+The `symlink_cross.sh` script can be used to symlink the latter to the former.
+
+#### Windows
+Easiest way is via the CodeSourcery Lite package which can be gotten here:
+TODO: add link
+
+#### Linux
+Debian/Ubuntu offer the Linaro toolchain in the repositories. It can be got by running
+    $ sudo apt-get install gcc-arm-linux-gnueabi
+For C++:
+    $ sudo apt-get install g++-arm-linux-gnueabi
+
+Keep in mind that for some reason, I couldn't get this to work my system. ev3duder compiles and uploads just fine though.	  
+
+#### OS X
+Carlson-Minot Inc. provides binary builds of CodeSourcery's GNU/ARM toolchain for OS X. It can be gotten here:
+http://www.carlson-minot.com/available-arm-gnu-linux-g-lite-builds-for-mac-os-x
+
+### Uploading
 
 Optimzing for size (-Os) is preferred. As ev3duder doesn't
 handle remote debugging yet and AFAIK nothing else does,
 debug symbols should be skipped too (no need for -g).
-That's it, example commands to compile, upload and execute:
+
+Example commands to compile, upload and execute:
     $ arm-linux-gnueabi-gcc main.c file.c -Os -o test
-    $ ev3duder cd ../prjs/BrkPrg_SAVE
-    $ ev3duder up test .
-    $ ev3duder mk-launcher test test.rbf
-    $ ev3duder up test.rbf .
-    $ ev3duder exec test.rbf
+    $ ev3duder up test.elf ../prjs/BrkPrg_SAVE/test
+    $ ev3duder mkrbf /home/a3f/lms2012/BrkPrg_SAVE/test test.rbf
+    $ ev3duder up test.rbf ../prjs/BrkPrg_SAVE/test.rbf
+    $ ev3duder run test.rbf
 
 Alternatively, steps 4 and 5 can be omitted and the last step changed to
-`ev3duder exev test.rbf`; The downside of thisis that no menu
+`ev3duder exec test.rbf`; The downside of this is that no menu
 entry is generated. Another option is also _installing_ the
 application, which will make it available with an optional icon in
 the apps menu:
-    $ ev3duder install test
-or
-    $ ev3duder install test test.ico
+
+    $ ev3duder up test.rbf ../apps/test.rbf
+
+For uploading to a SD Card, the paths `/media/card` or `../prjs/SD_Card/` can be used instead. A connected USB stick would be available under `/media/usb/`. Keep in mind that the Lego Menu doesn't show .rbf files at the root of the SD card, so it needs to be uploaded into a directory. `ev3duder up` does create the paths by default.
+
+## Documentation
+As the commands ev3duder supports mirror the functions internally used to implement them, the doxygen documentation of ["funcs.h"] should do as user manual. It's available at https://a3f.github.io/ev3duder or can be locally generated by running `doxygen` and openning the index.html file in a webbrowser.
+
+### Language
+The utlity is written in GNU C99. The Makefile is GNU Make specific. The perl and shell scripts are complementary and not necessary.
+
+## TODO
+- The virtual COM port for Bluetooth on Windows takes some seconds to close after calling `CloseHandle`. This results on quick successive bluetooth commands to lock the COM port for a minute or two.
+- Bluetooth COM ports and device names are hardcoded or specifiable via -d. Enumerating them and checking friendly name would be nice.
+- Ability to cat files to ev3 screen
+- Ability to recieve stdout from the ev3 after calling exec
+- Sessions, similar to `nginx -s`?
+

@@ -1,19 +1,28 @@
 /**
- * @file btserial.h
+ * @file tcp.h
  * @author Ahmad Fatoum
  * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 3.0
- * @brief Input/Output wrappers for Bluetooth
+ * @brief BSD sockets Input/Output wrappers
  */
 
 #include "defs.h"
 
+struct tcp_handle {
+	int fd[2];
+	char serial[15];
+	char ip[48]; // enough for ipv6
+	unsigned tcp_port;
+	char name[96];
+	char protocol[8];
+};
+//FIXME: copy more stuff here
 /**
- * \param [in] device string describing the bluetooth device
- * \return handle a opaque handle for use with bt_{read,write,close,error}
+ * \param [in] serial of Ev3 to connect to
+ * \return handle a opaque handle for use with tcp_{read,write,close,error}
  * \brief open a bluetooth device described by device. `NULL` leads to default action
  * \see implementation at bt-win.c and bt-unix.c
  */ 
-void *bt_open(const char *device);
+void *tcp_open(const char *serial);
 
 /**
  * \param [in] device handle returned by bt_open
@@ -24,7 +33,7 @@ void *bt_open(const char *device);
  * \bug the first byte is omitted for compatiblity with the leading report byte demanded by \p hid_write. Wrapping HIDAPI could fix this.
  * \see implementation at bt-win.c and bt-unix.c
  */ 
-int bt_write(void* device, const u8* buf, size_t count);
+extern int (*tcp_write)(void* device, const u8* buf, size_t count);
 
 /**
  * \param [in] device handle returned by bt_open
@@ -36,14 +45,14 @@ int bt_write(void* device, const u8* buf, size_t count);
  * \bug the milliseconds part needs to be tested more throughly
  * \see implementation at bt-win.c and bt-unix.c
  */ 
-int bt_read(void* device, u8* buf, size_t count, int milliseconds);
+extern int (*tcp_read)(void* device, u8* buf, size_t count, int milliseconds);
 
 /**
  * \param [in] device handle returned by bt_open
  * \brief Closes the resource opened by \p bt_open
  * \see implementation at bt-win.c and bt-unix.c
  */
- void bt_close(void*);
+void tcp_close(void*);
 /**
  * \param [in] device handle returned by bt_open
  * \return message An error string
@@ -51,5 +60,14 @@ int bt_read(void* device, u8* buf, size_t count, int milliseconds);
  * \see implementation at bt-win.c and bt-unix.c
  * \bug it's useless
  */
-const wchar_t *bt_error(void* device); 
+const wchar_t *tcp_error(void* device); 
+
+/**
+ * \param [in] device handle returned by bt_open
+ * \return message An error string
+ * \brief Returns an error string describing the last error occured
+ * \see implementation at bt-win.c and bt-unix.c
+ * \bug it's useless
+ */
+const wchar_t *tcp_info(void* device); 
 

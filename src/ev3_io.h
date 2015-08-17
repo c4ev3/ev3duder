@@ -1,5 +1,6 @@
 #ifndef EV3DUDER_EV3_IO_H
 #define EV3DUDER_EV3_IO_H
+//! For avoiding the need to separately define and declare stuff
 #undef EXTERN
 #ifdef MAIN
 #define EXTERN

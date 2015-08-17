@@ -1,306 +1,381 @@
+/**
+ * @file main.c
+ * @author Ahmad Fatoum
+ * @brief Argument parsing, device opening and file creation/openning
+ */
+//! For avoiding the need to separately define and declare stuff
 #define MAIN
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
 #include <wchar.h>
+#include <errno.h>
 
 #undef assert
-#define assert(cond) do{ if (!(cond)) if (handle) {ev3_close(handle);exit(ERR_ARG);}}while(0)
+//FIXME: add better error message
+#define assert(cond) do{ if (!(cond)) {if (handle) ev3_close(handle);exit(ERR_ARG);}}while(0)
 
 #include <hidapi.h>
 #include "btserial.h"
+#include "tcp.h"
 #include "ev3_io.h"
 
 #include "defs.h"
-#include "systemcmd.h"
+#include "packets.h"
 #include "error.h"
-#include "utf8.h"
 #include "funcs.h"
 
-#define VendorID 0x694 /* LEGO GROUP */
+//! LEGO GROUP
+#define VendorID 0x694
+//! EV3
 #define ProductID 0x005 /* EV3 */
+//! Filename used for executing command with `exec`
+#define ExecName  "/tmp/Executing shell cmd.rbf"
+// FIXME: general solution
+//! Filename used for saving output with `exece` (tmp won't work because it's not readable? wtf)
+#define OutputName "/dev/lms_usbdev"
 
-static void params_print()
-{
-    puts(	"USAGE: ev3duder "
-            "[ up loc rem | dl rem loc | run rem | exec cmd | kill rem |\n"
-            "                  "
-            "cp rem rem | mv rem rem | rm rem | ls [rem] | tree [rem] |\n"
-            "                  "
-            "shell str | pwd [rem] | cat [rem] | test ]\n"
-            "\n"
-            "       "
-            "rem = remote (EV3) system path, loc = (local file system) path"	"\n");
-}
+const char* const params =
+    "USAGE: ev3duder " "[ --tcp | --usb | --serial | --stdio ] [-d dev | -d2 dev1 dev2]\n"
+    "                " "[ up loc rem | dl rem loc | rm rem | ls [rem] |\n"
+    "                " "  mkdir rem | mkrbf rem loc | run rem | exec cmd |\n"
+    "                " "  wpa2 SSID [pass] | info | tunnel ]\n"
+    "       "
+    "rem = remote (EV3) path, loc = local path, dev = device identifier"	"\n";
+const char* const params_desc =
+    " up\t"		"upload local file to remote ev3 brick\n"
+    " dl\t"		"download remote file to local system\n"
+    " rm\t"		"remove file on ev3 brick\n"
+    " ls\t"		"list files. Standard value is '/'\n"
+    " info\t"	"attempt a beep and print information about the connection\n"
+    " mkdir\t"	"create directory. Relative to path of VM.\n"
+    " mkrbf\t"	"create rbf (menu entry) file locally. Sensible upload paths are:\n"
+    "\t"		"\t../prjs/BrkProg_SAVE/ Internal memory\n"
+    "\t"		"\t../prjs/BrkProg_DL/ Internal memory\n"
+    "\t"		"\t./apps/ Internal memory - Applicatios (3rd tab)\n"
+    "\t"		"\t/media/card/myapps/ Memory card\n"
+    "\t"		"\t/media/usb/myappps/ USB stick\n"
+    "run\t"		"instruct the VM to run a rbf file\n"
+    "exec\t"	"pass cmd to root shell. Handle with caution\n"
+    "wpa2\t"	"connect to WPA-Network SSID, if pass isn't specified, read from stdin\n"
+    "tunnel\t"	"connects stdout/stdin to the ev3 VM\n"
+    ;
+
 #define FOREACH_ARG(ARG) \
-    ARG(test)            \
-    ARG(up)              \
-    ARG(dl)              \
-    ARG(run)            \
-    ARG(pwd)             \
-    ARG(ls)              \
-    ARG(cat)              \
-    ARG(rm)              \
-    ARG(mkdir)           \
-    ARG(mkrbf)           \
-    ARG(exec)           \
-    ARG(end)
+ARG(info)            \
+ARG(up)              \
+ARG(dl)              \
+ARG(run)             \
+ARG(ls)              \
+ARG(rm)              \
+ARG(mkdir)           \
+ARG(mkrbf)           \
+ARG(tunnel)			\
+ARG(listen)			\
+ARG(send)			\
+ARG(exec)            \
+ARG(wpa2)            \
+ARG(end)
 
 #define MK_ENUM(x) ARG_##x,
-#define MK_STR(x) T(#x),
+#define MK_STR(x) #x,
 enum ARGS { FOREACH_ARG(MK_ENUM) };
-static const tchar *args[] = { FOREACH_ARG(MK_STR) };
-static tchar * tstrjoin(tchar *, tchar *, size_t *);
-static tchar* tchrsub(tchar *s, tchar old, tchar new);
+static const char *args[] = { FOREACH_ARG(MK_STR) };
+static const char *offline_args[] = { MK_STR(mkrbf) /*MK_STR(tunnel)*/ };
+
+static char* chrsub(char *s, char old, char new);
 #ifdef _WIN32
-#define SANITIZE(s) (tchrsub((s), '/', '\\'))
+#define SANITIZE(s) (chrsub((s), '/', '\\'))
 #else
 #define SANITIZE
 #endif
+static struct {
+	unsigned select:1;
+	unsigned hid:1;
+	unsigned serial:1;
+	unsigned tcp:1;
+} switches;
 
-int main(int argc, tchar *argv[])
+int main(int argc, char *argv[])
 {
-    if (argc == 1)
+    handle = NULL;
+    if (argc == 2 && (
+                strcmp(argv[1], "-h") == 0 ||
+                strcmp(argv[1], "--help") == 0 ||
+                strcmp(argv[1], "/?") == 0))
     {
-        params_print();
-        return ERR_ARG;
+        printf("%s (%s; %s) v%s\n"
+               "Copyright (C) 2015 Ahmad Fatoum\n"
+               "This is free software; see the source for copying conditions.   There is NO\n"
+               "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+               "Source is available under the GNU GPL v3.0 https://github.com/a3f/ev3duder/\n\n",
+               argv[0], CONFIGURATION, SYSTEM, VERSION);
+        puts(params);
+        puts(params_desc);
+        return ERR_UNK;
     }
-	const tchar *device = NULL;
-	tchar buffer[32];
-	FILE *fp;
+    const char *device = NULL; const char *device2 = NULL;
+	while (argv[1] && *argv[1] == '-')
+	{
+		if (argv[1][1] == '-')
+		{/* switches */
+			char *a = argv[1] + 2;
+			if (a == '\0')
+			{
+				argc--, argv++; break;
+			}
+			
+			if (strcmp("usb", a) == 0 || strcmp("hid", a) == 0)
+				switches.select = switches.hid = 1;
+			else if (strcmp("tcp", a) == 0 || strcmp("inet", a) == 0)
+				switches.select = switches.tcp = 1;
+			else if (strcmp("serial", a) == 0 || strcmp("bt", a) == 0)
+				switches.select = switches.serial = 1;
+			else
+			{
+				fprintf(stderr, "Invalid switch '%s'\n", argv[1]);
+				return ERR_ARG;
+			}
 
-	if (tstrcmp(argv[1], T("-d")) == 0)
-	{	
-		device = argv[2];
-		argv+=2;
-		argc-=2;
-#ifdef _WIN32 //FIXME: do that in the plugin
-	}else if ((fp = fopen("C:\\ev3\\uploader\\.ev3duder", "r")))
-#else
-	}else if ((fp = fopen(".ev3duder", "r")))
-	#endif
-{
-			fgetts(buffer, sizeof buffer, fp);
-			device = buffer;
+			argc--, argv++;
+		}else
+		{
+    		if (strcmp(argv[1]+1, "d") == 0)
+    		{
+				device = argv[2];
+				argv+=2;
+				argc-=2;
+			} else if (strcmp(argv[1]+1, "d2") == 0)
+			{
+				device = argv[2];
+				device2 = argv[3];
+				argv+=3;
+				argc-=3;
+			} else {
+				fprintf(stderr, "Invalid parameter '%s'\n", argv[1]);
+				return ERR_ARG;
+			}
+		}
+
 	}
-	
-    if ((handle = hid_open(VendorID, ProductID, NULL))) // TODO: last one is SerialID, make it specifiable via commandline
-    {
-      fputs("USB connection established.\n", stderr);
-      // the things you do for type safety...
-      ev3_write = (int (*)(void*, const u8*, size_t))hid_write;
-      ev3_read_timeout = (int (*)(void*, u8*, size_t, int))hid_read_timeout;
-      ev3_error = (const wchar_t* (*)(void*))hid_error;
-	  ev3_close = hid_close;
+	if (argc == 1) {
+		puts(params);
+		return ERR_ARG;
 	}
-    else if ((handle = bt_open(device)))
-    {
-      fprintf(stderr, "Bluetooth serial connection established (%" PRIts ").\n", device);
-      ev3_write = bt_write;
-      ev3_read_timeout = bt_read;
-      ev3_error = bt_error;
-	  ev3_close = bt_close;
-    } else {
-        puts("EV3 not found. Either plug it into the USB port or pair over Bluetooth.\nInsufficient access to the usb device might be a reason too, try sudo.");
-        return ERR_HID; // TODO: rename
-    }
-	
 
     int i;
+    for (i = 0; i < (int)ARRAY_SIZE(offline_args); ++i)
+        if (strcmp(argv[1], offline_args[i]) == 0) break;
+
+    if (i == ARRAY_SIZE(offline_args))
+    {
+        if ((switches.hid || !switches.select) &&
+			(handle = hid_open(VendorID, ProductID, NULL))) // TODO: last one is SerialID, make it specifiable via commandline
+        {
+        if (!switches.select)
+            fputs("USB connection established.\n", stderr);
+            // the things you do for type safety...
+            ev3_write = (int (*)(void*, const u8*, size_t))hid_write;
+            ev3_read_timeout = (int (*)(void*, u8*, size_t, int))hid_read_timeout;
+            ev3_error = (const wchar_t* (*)(void*))hid_error;
+            ev3_close = (void (*)(void*))hid_close;
+        }
+        else if ((switches.serial || !switches.select) &&
+        		 (handle = bt_open(device)))
+        {
+        if (!switches.select)
+            fprintf(stderr, "Bluetooth serial connection established (%s).\n", device);
+            ev3_write = bt_write;
+            ev3_read_timeout = bt_read;
+            ev3_error = bt_error;
+            ev3_close = bt_close;
+        }
+        else if ((switches.tcp || !switches.select) &&
+				 (handle = tcp_open(device)))
+		{
+        if (!switches.select)
+		{
+			struct tcp_handle *info = (struct tcp_handle*)handle;
+            fprintf(stderr, "TCP connection established (%s@%s:%u).\n", info->name, info->ip, info->tcp_port);
+		}
+			ev3_write = tcp_write;
+			ev3_read_timeout = tcp_read;
+			ev3_error = tcp_error;
+			ev3_close = tcp_close;
+			
+		}	
+		else {
+            puts("EV3 not found. Either plug it into the USB port or pair over Bluetooth.\n");
+#ifdef __linux__
+            puts("Insufficient access to the usb device might be a reason too, try sudo.");
+#endif
+            return ERR_COMM;
+        }
+    }
+
+
     for (i = 0; i < ARG_end; ++i)
-        if (tstrcmp(argv[1], args[i]) == 0) break;
+        if (strcmp(argv[1], args[i]) == 0) break;
 
     argc -= 2;
     argv += 2;
+
     int ret;
-#ifdef CD
-    tchar *cd = tgetenv(T("CD"));
-#else
-	tchar *cd = NULL;
-#endif
     switch (i)
     {
-    case ARG_test:
-        assert(argc == 0);
-        ret = test();
+        FILE *fp = NULL;
+        char *buf = NULL;
+        size_t len = 0;
+    case ARG_info:
+        ret = info(argv[0]);
         break;
 
     case ARG_up:
         assert(argc == 2);
+        fp = fopen(SANITIZE(argv[0]), "rb");
+        if (!fp)
         {
-		FILE *fp = tfopen(SANITIZE(argv[0]), "rb");
-		size_t len;
-		tchar *path = tstrjoin(cd, argv[1], &len); 
-		if (!fp)
-		{
-			printf("File <%" PRIts "> doesn't exist.\n", argv[0]);
-			return ERR_IO;
-		}
-		ret = up(fp, U8(path, len));
+            printf("File <%s> doesn't exist.\n", argv[0]);
+            return ERR_IO;
         }
+        ret = up(fp, argv[1]);
         break;
-
     case ARG_dl:
         assert(argc <= 2);
+        if (argc == 1)
         {
-		FILE *fp;
-		size_t len;
-		if (argc == 2 && !(fp = tfopen(SANITIZE(argv[1]), "wb")))
-			{
-				printf("File <%" PRIts "> doesn't exist.\n", argv[1]);
-				return ERR_IO;
-			}
-		fp = NULL;
+            buf = strrchr(argv[0], '/');
+            if (buf)
+                buf++; // character after slash
+            else
+                buf = argv[0];
+        } else buf = argv[1];
 
-		tchar *path = tstrjoin(cd, argv[0], &len); 
-
-		ret = dl(U8(path, len), fp);
+        fp = fopen(buf, "wb"); //TODO: no sanitize here?
+        if(!fp)
+        {
+            printf("File <%s> couldn't be opened for writing.\n", buf);
+            return ERR_IO;
         }
+
+        ret = dl(argv[0], fp);
         break;
     case ARG_run:
         assert(argc == 1);
-        {
-        size_t len;
-        tchar *path = tstrjoin(cd, argv[0], &len); 
-        ret = run(U8(path, len));
-        }
+        ret = run(argv[0]);
         break;
 
     case ARG_end:
-        params_print();
+        puts(params);
         return ERR_ARG;
-    case ARG_pwd:
-        assert(argc <= 1);
-        {
-		size_t len;
-		tchar *path = tstrjoin(cd, argv[0], &len); 
-		printf("path:%" PRIts " (len=%zu)\nuse export cd=dir to cd to dir\n",
-			path ?: T("."), len);  
-        }
-        return ERR_UNK;
     case ARG_ls:
         assert(argc <= 1);
-        {
-        size_t len;
-        tchar *path = tstrjoin(cd, argv[0], &len);
-        ret = ls(len ? U8(path, len) : ".");
-		
-        }
+        ret = ls(argv[0] ?: "/");
         break;
-
+	case ARG_tunnel:
+        ret = tunnel();
+        break;
+	case ARG_listen:
+        ret = listen();
+        break;
+	case ARG_send:;
+		int send(void);
+        ret = send();
+        break;
     case ARG_mkdir:
         assert(argc == 1);
-        {
-        size_t len;
-        tchar *path = tstrjoin(cd, argv[0], &len); 
-        ret = mkdir(U8(path, len));
-        }
+        ret = mkdir(argv[0]);
         break;
     case ARG_mkrbf:
         assert(argc >= 2);
-        {
-        FILE *fp = tfopen(SANITIZE(argv[1]), "wb");
+        fp = fopen(SANITIZE(argv[1]), "wb");
         if (!fp)
-          return ERR_IO;
-	  
-		char *buf;
-        size_t path_sz = tstrlen(argv[0]);
-		size_t bytes = mkrbf(&buf, U8(argv[0], path_sz));
-        fwrite(buf, bytes, 1, fp);
-		
+            return ERR_IO;
+
+        len = mkrbf(&buf, argv[0]);
+        fwrite(buf, len, 1, fp);
         fclose(fp);
-        }
         return ERR_UNK;
-	case ARG_exec: //FIXME: dumping on disk and reading is stupid
-		assert(argc >= 1);
-		{
-		char *buf;
-		size_t bytes = mkrbf(&buf, U8(argv[0], tstrlen(argv[0])));
-		FILE *fp = tmpfile();
+    case ARG_wpa2:
+        assert(argc >= 1);
+        /*{
+        #define MAX_WPA_PASS 32
+        char buf[MAX_WPA_PASS];
+        #define WPA2_TEMP_FILE "/tmp/ev3duder_wpa2.conf"
+        char wpa_passphrase[256];
+        char *pass = argv[1];
+        while (!pass)
+        pass = fgets(buf, MAX_WPA_PASS, stdin);
+        snprintf(wpa_passphrase, sizeof wpa_passphrase, "wpa_passphrase '%s' '%s' > '" WPA2_TEMP "'" argv[0], pass);
+        exec(wpa_passphrase);
+        exec("wpa_supplicant -Dwext -iwlan0 -c" WPA2_TEMP);
+
+        }*/
+        return ERR_UNK;
+    case ARG_exec:
+        assert(argc >= 1);
+        size_t len_cmd = strlen(argv[0]),
+               len_out = sizeof " &>" OutputName;
+        buf = malloc(len_cmd + len_out);
+        (void)mempcpy(mempcpy(buf,
+                              argv[0], len_cmd),
+                      " &>" OutputName, len_out);
+        argv[0] = buf;
+        len = mkrbf(&buf, argv[0]);
+        fp = tmpfile();
         if (!fp)
-          return ERR_IO;
-        fwrite(buf, bytes, 1, fp);
-		rewind(fp);
-		ret = up(fp, "/tmp/Executing shell cmd.rbf");
-		if (ret != ERR_UNK)
-			break;
-		ret = run("/tmp/Executing shell cmd.rbf");
-		}
-		break;
+            return ERR_IO;
+        fwrite(buf, len, 1, fp);
+        rewind(fp);
+        ret = up(fp, ExecName);
+        if (ret != ERR_UNK)
+            break;
+        ret = run(ExecName);
+        if (ret != ERR_UNK)
+            break;
+
+		fclose(fp);
+        break;
     case ARG_rm:
         assert(argc == 1);
-        {
-		if(tstrchr(argv[0], '*'))
-		{
-			printf("This will probably remove more than one file. Are you sure to proceed? (Y/n)");
-			char ch;
-			scanf("%c", &ch);
-			if ((ch | ' ') == 'n') // check if 'n' or 'N'
-			{
-				ret = ERR_UNK;
-				break;
-			}
-			fflush(stdin); // technically UB, but POSIX and Windows allow for it
-		}
-		size_t len;
-		tchar *path = tstrjoin(cd, argv[0], &len); 
-		ret = rm(U8(path, len));
-        }
+        ret = rm(argv[0]);
         break;
     default:
         ret = ERR_ARG;
-        printf("<%" PRIts "> hasn't been implemented yet.", argv[0]);
+        printf("<%s> hasn't been implemented yet.\n", argv[0]);
     }
-	
-	if (handle)
-		ev3_close(handle);
-	FILE *out = ret == EXIT_SUCCESS ? stderr : stdout;
-    if (ret == ERR_HID)
-        fprintf(out, "%ls\n", hiderr);
-    else
-        fprintf(out, "%s (%ls)\n", errmsg, hiderr ?: L"null");
+
+    FILE *out = ret == ERR_UNK ? stderr : stdout;
+    if (ret == ERR_COMM)
+        fprintf(out, "%s (%ls)\n", errmsg ?: "-", ev3_error(handle) ?: L"-");
+    else if (ret == ERR_VM){
+        const char *err;
+        if (errno < (int)ARRAY_SIZE(ev3_error_msgs))
+            err =  ev3_error_msgs[errno];
+        else
+            err = "An unknown error occured";
+
+        fprintf(out, "%s (%s)\n", err ?: "-", errmsg ?: "-");
+    }else {
+		if (errmsg) fprintf(out, "%s\n", errmsg);
+	}
 
     // maybe \n to stderr?
+    if (handle) ev3_close(handle);
     return ret;
 }
-static tchar *tstrjoin(tchar *s1, tchar *s2, size_t *len)
-{
-    if (s1 == NULL || *s1 == '\0') {
-      if (s2 != NULL)
-        *len = tstrlen(s2);
-      else
-        *len = 0;
-      return s2;
-    }
-    if (s2 == NULL || *s2 == '\0') {
-      if (s1 != NULL)
-        *len = tstrlen(s1);
-      else
-        *len = 0;
-      return s1;
-    }
 
-    size_t s1_sz = tstrlen(s1),
-           s2_sz = tstrlen(s2);
-    *len = sizeof(tchar[s1_sz+s2_sz]);
-    tchar *ret = malloc(*len+1);
-    mempcpy(mempcpy(ret,
-                s1, sizeof(tchar[s1_sz+1])),
-                s2, sizeof(tchar[s2_sz+1])
-           );
-    ret[s1_sz] = '/';
-    return ret;
-}
-static tchar* tchrsub(tchar *s, tchar old, tchar new)
+#pragma GCC diagnostic ignored "-Wunused"
+static char* chrsub(char *s, char old, char new)
 {
-	tchar *ptr = s;
-	if (ptr == NULL || *ptr == T('\0'))
-		return NULL;
-	do
-	{
-		if (*ptr == old) *ptr = new;
-	}while(*++ptr);
-	return s;
+    char *ptr = s;
+    if (ptr == NULL || *ptr == '\0')
+        return NULL;
+    do
+    {
+        if (*ptr == old) *ptr = new;
+    } while(*++ptr);
+    return s;
 }
 

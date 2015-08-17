@@ -1,122 +1,120 @@
+/**
+ * @file up.c
+ * @author Ahmad Fatoum
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 3.0
+ * @brief uploads a file to the ev3
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include "ev3_io.h"
 
 #include "defs.h"
-#include "systemcmd.h"
+#include "packets.h"
 #include "error.h"
 #include "funcs.h"
 
-#define CHUNK_SIZE 1000 // EV3's HID driver doesn't do packets > 1024B
+#define CHUNK_SIZE 1000 // The EV3 doesn't do packets > 1024B
 
+/**
+ * @brief Uploads file to the ev3. path is always relative to <em>/home/root/lms2012/prjs/sys/<em>
+ * @param [in] fp Local FILE* to upload
+ * @param [in] dst destination path to upload to (UTF-8 encoded)
+ * @retval error according to enum #ERR
+ * @bug might not handle files bigger than 2gb :-)
+ */
 int up(FILE *fp, const char *dst)
 {
-    int res;
+	int res;
 
-    fseek(fp, 0, SEEK_END);
-    long fsize = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    if ((unsigned long)fsize > (u32)-1)
-      return ERR_FTOOBIG;   
+	fseek(fp, 0, SEEK_END);
+	long fsize = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
 
-    size_t extra_chunks   = fsize / CHUNK_SIZE;
-    size_t final_chunk_sz = fsize % CHUNK_SIZE;
+	if ((unsigned long)fsize > (u32)-1)
+		return ERR_FTOOBIG;   
 
-    fprintf(stderr, "Attempting file upload (%ldb total; %zu chunks): \n", fsize, extra_chunks + 1);
+	unsigned chunks   = fsize / CHUNK_SIZE;
+	unsigned final_chunk_sz = fsize % CHUNK_SIZE;
 
-    CONTINUE_DOWNLOAD **cd = malloc((1 + extra_chunks) * sizeof(*cd));
-    {
-        size_t ret;
-        size_t i = 0;
-        for (; i < extra_chunks; ++i)
-        {
-            cd[i] = packet_alloc(CONTINUE_DOWNLOAD, CHUNK_SIZE);
-            ret = fread(cd[i]->fileChunk, 1, CHUNK_SIZE, fp);
-        }
+	//fprintf(stderr, "Attempting file upload (%ldb total; %u chunks): \n", fsize, chunks + 1);
 
-        cd[i] = packet_alloc(CONTINUE_DOWNLOAD, final_chunk_sz);
+	size_t dst_len = strlen(dst) + 1;
+	BEGIN_DOWNLOAD *bd = packet_alloc(BEGIN_DOWNLOAD, dst_len);
+	bd->fileSize = fsize;
+	memcpy(bd->fileName, dst, dst_len);
 
-        ret = fread(cd[i]->fileChunk, 1, final_chunk_sz, fp);
-        (void) ret;
-        fclose(fp);
-    }
+	res = ev3_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
+	if (res < 0)
+	{
+		errmsg = "Unable to write BEGIN_DOWNLOAD.";
+		return ERR_COMM;
+	}
 
-    //TODO: read in chunks, whatif long isnt big enough
-    BEGIN_DOWNLOAD *bd = packet_alloc(BEGIN_DOWNLOAD, strlen(dst) + 1);
-    bd->fileSize = fsize;
-    strcpy(bd->fileName, dst);
+	BEGIN_DOWNLOAD_REPLY bdrep;
+	res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+	if (res <= 0)
+	{
+		errmsg = "Unable to read BEGIN_DOWNLOAD";
+		return ERR_COMM;
+	}
 
-    res = ev3_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
-    if (res < 0)
-    {
-        errmsg = "Unable to write BEGIN_DOWNLOAD.";
-        hiderr = ev3_error(handle);
-        return ERR_HID;
-    }
-    fputs("Checking reply: \n", stderr);
+	if (bdrep.type == VM_ERROR)
+	{
+		errno = bdrep.ret;
+		errmsg = "BEGIN_DOWNLOAD was denied.";
+		return ERR_VM;
+	}
 
-    BEGIN_DOWNLOAD_REPLY bdrep;
+	CONTINUE_DOWNLOAD *cd = packet_alloc(CONTINUE_DOWNLOAD, CHUNK_SIZE);
+	for (size_t i = 0; i < chunks; ++i)
+	{
+		cd->fileHandle = bdrep.fileHandle;
+		fread(cd->fileChunk, 1, CHUNK_SIZE, fp);
+		res = ev3_write(handle, (u8 *)cd, cd->packetLen + PREFIX_SIZE);
 
-    res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
-    if (res <= 0)
-    {
-        errmsg = "Unable to read BEGIN_DOWNLOAD";
-        hiderr = ev3_error(handle);
-        return ERR_HID;
-    }
+		if (res < 0)
+		{
+			errmsg = "Unable to write CONTINUE_DOWNLOAD.";
+			return ERR_COMM;
+		}
+		res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+		if (res <= 0)
+		{
+			errmsg = "Unable to read CONTINUE_DOWNLOAD";
+			return ERR_COMM;
+		}
+	}
+	cd->packetLen = sizeof(CONTINUE_DOWNLOAD) + final_chunk_sz - PREFIX_SIZE;
+	fread(cd->fileChunk, 1, final_chunk_sz, fp);
+	ev3_write(handle, (u8*)cd, cd->packetLen + PREFIX_SIZE);
+	if (res < 0)
+	{
+		errmsg = "Unable to write CONTINUE_DOWNLOAD.";
+		return ERR_COMM;
+	}
+	res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+	if (res <= 0)
+	{
+		errmsg = "Unable to read CONTINUE_DOWNLOAD";
+		return ERR_COMM;
+	}
+	if (bdrep.type == VM_ERROR)
+	{
+		errno = bdrep.ret;
 
-    if (bdrep.type == VM_ERROR)
-    {
-        if (bdrep.ret < ARRAY_SIZE(ev3_error_msgs))
-            hiderr = ev3_error_msgs[bdrep.ret];
-        else
-            hiderr = L"ERROR_OUT_OF_BOUNDS";
+		fputs("Transfer failed.\nlast_reply=", stderr);
 
-        errmsg = "BEGIN_DOWNLOAD was denied.";
-        return ERR_VM;
-    }
+		print_bytes(&bdrep, bdrep.packetLen);
 
-    for (size_t i = 0; i <= extra_chunks; ++i)
-    {
-        cd[i]->fileHandle = bdrep.fileHandle;
-        res = ev3_write(handle, (u8 *)cd[i], cd[i]->packetLen + PREFIX_SIZE);
+		errmsg = "CONTINUE_DOWNLOAD was denied.";
+		return ERR_VM;
+	}
 
-        if (res < 0)
-        {
-            errmsg = "Unable to write CONTINUE_DOWNLOAD.";
-            hiderr = ev3_error(handle);
-            return ERR_HID;
-        }
-        res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
-        if (res <= 0)
-        {
-            errmsg = "Unable to read CONTINUE_DOWNLOAD";
-            hiderr = ev3_error(handle);
-            return ERR_HID;
-        }
-
-    }
-
-    if (bdrep.type == VM_ERROR)
-    {
-        if (bdrep.ret < ARRAY_SIZE(ev3_error_msgs))
-            hiderr = ev3_error_msgs[bdrep.ret];
-        else
-            hiderr = L"ERROR_OUT_OF_BOUNDS";
-
-        fputs("Transfer failed.\nlast_reply=", stderr);
-
-        print_bytes(&bdrep, bdrep.packetLen);
-
-        errmsg = "CONTINUE_DOWNLOAD was denied.";
-        return ERR_VM;
-    }
-
-    fprintf(stderr, "Transfer has been successful! (ret=%d)\n", bdrep.type);
-
-    errmsg = "`upload` was successful.";
-    return ERR_UNK;
+	errmsg = "`upload` was successful.";
+	return ERR_UNK;
 }
 
