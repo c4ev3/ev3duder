@@ -87,8 +87,12 @@ debug: binary
 
 .PHONY: install
 install: binary ev3-udev.rules udev.sh
+	ifneq ($(OS),Windows_NT)
+	-@mkdir /usr/lib/ev3duder/
+	cp $(BIN_NAME) /usr/lib/ev3duder
+	ln -s /usr/lib/ev3duder/$(BIN_NAME) /usr/bin/ev3
 	$(INSTALL)
-
+	endif
 .PHONY: clean
 clean:
 	$(RM) $(BIN_NAME) && cd $(OBJDIR) && $(RM) *.o *.d 
