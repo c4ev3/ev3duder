@@ -1,7 +1,7 @@
 /**
  * @file packets.h
  * @author Ahmad Fatoum
- * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 2.0
+ * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 3.0
  * @brief packed structs for the packets.
  * @bug A more standard approach like libpack might be worthwhile.
  */
