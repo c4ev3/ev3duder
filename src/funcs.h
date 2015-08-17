@@ -33,8 +33,8 @@ extern int up(FILE* loc, const char *rem);
 //! download remote source \p rem to local file \p loc
 extern int dl(const char *rem, FILE* loc);
 
-//! print HID information, beep and exit
-extern int test(void);
+//! print connection information, beep and exit
+extern int info(const char *arg);
 
 //! run remote .rbf file \p rem via VM
 extern int run(const char *rem);

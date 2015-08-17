@@ -32,14 +32,15 @@
 #define ProductID 0x005 /* EV3 */
 //! Filename used for executing command with `exec`
 #define ExecName  "/tmp/Executing shell cmd.rbf"
+// FIXME: general solution
 //! Filename used for saving output with `exece` (tmp won't work because it's not readable? wtf)
-#define OutputName "/home/root/lms2012/prjs/o"
+#define OutputName "/dev/lms_usbdev"
 
 const char* const params =
-    "USAGE: ev3duder " "[ --tcp | --usb | --bt | --fifo | --stdio ] [-d dev]\n"
+    "USAGE: ev3duder " "[ --tcp | --usb | --serial | --stdio ] [-d dev | -d2 dev1 dev2]\n"
     "                " "[ up loc rem | dl rem loc | rm rem | ls [rem] |\n"
     "                " "  mkdir rem | mkrbf rem loc | run rem | exec cmd |\n"
-    "                " "  exece [cmd] | wpa2 SSID [pass] | test | tunnel ]\n"
+    "                " "  wpa2 SSID [pass] | info | tunnel ]\n"
     "       "
     "rem = remote (EV3) path, loc = local path, dev = device identifier"	"\n";
 const char* const params_desc =
@@ -47,7 +48,7 @@ const char* const params_desc =
     " dl\t"		"download remote file to local system\n"
     " rm\t"		"remove file on ev3 brick\n"
     " ls\t"		"list files. Standard value is '/'\n"
-    " test\t"	"attempt a beep and print information about the connection\n"
+    " info\t"	"attempt a beep and print information about the connection\n"
     " mkdir\t"	"create directory. Relative to path of VM.\n"
     " mkrbf\t"	"create rbf (menu entry) file locally. Sensible upload paths are:\n"
     "\t"		"\t../prjs/BrkProg_SAVE/ Internal memory\n"
@@ -57,14 +58,12 @@ const char* const params_desc =
     "\t"		"\t/media/usb/myappps/ USB stick\n"
     "run\t"		"instruct the VM to run a rbf file\n"
     "exec\t"	"pass cmd to root shell. Handle with caution\n"
-    "exece\t"	"pass cmd to root shell and echo output. Handle with caution\n"
-	"\t"		"if no cmd is given, last exece's output is printed\n"
     "wpa2\t"	"connect to WPA-Network SSID, if pass isn't specified, read from stdin\n"
     "tunnel\t"	"connects stdout/stdin to the ev3 VM\n"
     ;
 
 #define FOREACH_ARG(ARG) \
-	ARG(test)            \
+ARG(info)            \
 ARG(up)              \
 ARG(dl)              \
 ARG(run)             \
@@ -74,8 +73,8 @@ ARG(mkdir)           \
 ARG(mkrbf)           \
 ARG(tunnel)			\
 ARG(listen)			\
+ARG(send)			\
 ARG(exec)            \
-ARG(exece)            \
 ARG(wpa2)            \
 ARG(end)
 
@@ -91,15 +90,16 @@ static char* chrsub(char *s, char old, char new);
 #else
 #define SANITIZE
 #endif
-
+static struct {
+	unsigned select:1;
+	unsigned hid:1;
+	unsigned serial:1;
+	unsigned tcp:1;
+} switches;
 
 int main(int argc, char *argv[])
 {
     handle = NULL;
-    if (argc == 1) {
-        puts(params);
-        return ERR_ARG;
-    }
     if (argc == 2 && (
                 strcmp(argv[1], "-h") == 0 ||
                 strcmp(argv[1], "--help") == 0 ||
@@ -109,44 +109,71 @@ int main(int argc, char *argv[])
                "Copyright (C) 2015 Ahmad Fatoum\n"
                "This is free software; see the source for copying conditions.   There is NO\n"
                "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-               "Source is available under the GNU GPL 2.0 @ https://github.com/a3f/ev3duder\n\n",
+               "Source is available under the GNU GPL v3.0 https://github.com/a3f/ev3duder/\n\n",
                argv[0], CONFIGURATION, SYSTEM, VERSION);
         puts(params);
         puts(params_desc);
         return ERR_UNK;
     }
+    const char *device = NULL; const char *device2 = NULL;
+	while (argv[1] && *argv[1] == '-')
+	{
+		if (argv[1][1] == '-')
+		{/* switches */
+			char *a = argv[1] + 2;
+			if (a == '\0')
+			{
+				argc--, argv++; break;
+			}
+			
+			if (strcmp("usb", a) == 0 || strcmp("hid", a) == 0)
+				switches.select = switches.hid = 1;
+			else if (strcmp("tcp", a) == 0 || strcmp("inet", a) == 0)
+				switches.select = switches.tcp = 1;
+			else if (strcmp("serial", a) == 0 || strcmp("bt", a) == 0)
+				switches.select = switches.serial = 1;
+			else
+			{
+				fprintf(stderr, "Invalid switch '%s'\n", argv[1]);
+				return ERR_ARG;
+			}
 
-    const char *device = NULL, *device2 = NULL;
-    char buffer[32];
-    FILE *fp;
-    if (strcmp(argv[1], "-d") == 0)
-    {
-        device = argv[2];
-        argv+=2;
-        argc-=2;
-    } else if (strcmp(argv[1], "-d2") == 0)
-    {
-        device = argv[2];
-        device2 = argv[3];
-        argv+=3;
-        argc-=3;
-	}	//FIXME: .ev3duder is in the getcwd(3). should be something absolute instead
-#ifdef USE_COMPORT_FILE
-    else if ((fp = fopen(".ev3duder", "r")))
-    {
-        fgets(buffer, sizeof buffer, fp);
-        device = buffer;
-    }
-#endif
+			argc--, argv++;
+		}else
+		{
+    		if (strcmp(argv[1]+1, "d") == 0)
+    		{
+				device = argv[2];
+				argv+=2;
+				argc-=2;
+			} else if (strcmp(argv[1]+1, "d2") == 0)
+			{
+				device = argv[2];
+				device2 = argv[3];
+				argv+=3;
+				argc-=3;
+			} else {
+				fprintf(stderr, "Invalid parameter '%s'\n", argv[1]);
+				return ERR_ARG;
+			}
+		}
+
+	}
+	if (argc == 1) {
+		puts(params);
+		return ERR_ARG;
+	}
+
     int i;
-
     for (i = 0; i < (int)ARRAY_SIZE(offline_args); ++i)
         if (strcmp(argv[1], offline_args[i]) == 0) break;
 
     if (i == ARRAY_SIZE(offline_args))
     {
-        if ((handle = hid_open(VendorID, ProductID, NULL))) // TODO: last one is SerialID, make it specifiable via commandline
+        if ((switches.hid || !switches.select) &&
+			(handle = hid_open(VendorID, ProductID, NULL))) // TODO: last one is SerialID, make it specifiable via commandline
         {
+        if (!switches.select)
             fputs("USB connection established.\n", stderr);
             // the things you do for type safety...
             ev3_write = (int (*)(void*, const u8*, size_t))hid_write;
@@ -154,18 +181,24 @@ int main(int argc, char *argv[])
             ev3_error = (const wchar_t* (*)(void*))hid_error;
             ev3_close = (void (*)(void*))hid_close;
         }
-        else if ((handle = bt_open(device)))
+        else if ((switches.serial || !switches.select) &&
+        		 (handle = bt_open(device)))
         {
+        if (!switches.select)
             fprintf(stderr, "Bluetooth serial connection established (%s).\n", device);
             ev3_write = bt_write;
             ev3_read_timeout = bt_read;
             ev3_error = bt_error;
             ev3_close = bt_close;
         }
-		else if ((handle = tcp_open(device)))
+        else if ((switches.tcp || !switches.select) &&
+				 (handle = tcp_open(device)))
+		{
+        if (!switches.select)
 		{
 			struct tcp_handle *info = (struct tcp_handle*)handle;
             fprintf(stderr, "TCP connection established (%s@%s:%u).\n", info->name, info->ip, info->tcp_port);
+		}
 			ev3_write = tcp_write;
 			ev3_read_timeout = tcp_read;
 			ev3_error = tcp_error;
@@ -177,7 +210,7 @@ int main(int argc, char *argv[])
 #ifdef __linux__
             puts("Insufficient access to the usb device might be a reason too, try sudo.");
 #endif
-            return ERR_COMM; // TODO: rename
+            return ERR_COMM;
         }
     }
 
@@ -187,15 +220,15 @@ int main(int argc, char *argv[])
 
     argc -= 2;
     argv += 2;
+
     int ret;
     switch (i)
     {
         FILE *fp = NULL;
         char *buf = NULL;
         size_t len = 0;
-    case ARG_test:
-        assert(argc == 0);
-        ret = test();
+    case ARG_info:
+        ret = info(argv[0]);
         break;
 
     case ARG_up:
@@ -238,13 +271,17 @@ int main(int argc, char *argv[])
         return ERR_ARG;
     case ARG_ls:
         assert(argc <= 1);
-        ret = ls(argc == 1 ? argv[0] : ".");
+        ret = ls(argv[0] ?: "/");
         break;
 	case ARG_tunnel:
         ret = tunnel();
         break;
 	case ARG_listen:
         ret = listen();
+        break;
+	case ARG_send:;
+		int send(void);
+        ret = send();
         break;
     case ARG_mkdir:
         assert(argc == 1);
@@ -276,19 +313,8 @@ int main(int argc, char *argv[])
 
         }*/
         return ERR_UNK;
-    case ARG_exece:
-		if (argc == 0)
-		{
-			fp = tmpfile();
-			dl(OutputName, fp);
-			char buffer[1024];
-			rewind(fp);
-			while((len = fread(buffer, 1, 1024, fp)))
-				fwrite(buffer, 1, len, stdout);
-			return ERR_UNK;
-		}
-		else
-		{
+    case ARG_exec:
+        assert(argc >= 1);
         size_t len_cmd = strlen(argv[0]),
                len_out = sizeof " &>" OutputName;
         buf = malloc(len_cmd + len_out);
@@ -296,9 +322,6 @@ int main(int argc, char *argv[])
                               argv[0], len_cmd),
                       " &>" OutputName, len_out);
         argv[0] = buf;
-		}
-    case ARG_exec: //FIXME: dumping on disk and reading is stupid
-        assert(argc >= 1);
         len = mkrbf(&buf, argv[0]);
         fp = tmpfile();
         if (!fp)
@@ -312,16 +335,6 @@ int main(int argc, char *argv[])
         if (ret != ERR_UNK)
             break;
 
-		if (i == ARG_exece)
-		{
-			fp = freopen(NULL, "wb+", fp); // clear file
-			dl(OutputName, fp);
-			char buffer[1024];
-			rewind(fp);
-			while((len = fread(buffer, 1, 1024, fp)))
-				fwrite(buffer, 1, len, stdout);
-			free(buf);
-		}
 		fclose(fp);
         break;
     case ARG_rm:
@@ -335,7 +348,7 @@ int main(int argc, char *argv[])
 
     FILE *out = ret == ERR_UNK ? stderr : stdout;
     if (ret == ERR_COMM)
-        fprintf(out, "%s (%ls)\n", errmsg, ev3_error(handle));
+        fprintf(out, "%s (%ls)\n", errmsg ?: "-", ev3_error(handle) ?: L"-");
     else if (ret == ERR_VM){
         const char *err;
         if (errno < (int)ARRAY_SIZE(ev3_error_msgs))
@@ -343,9 +356,9 @@ int main(int argc, char *argv[])
         else
             err = "An unknown error occured";
 
-        fprintf(out, "%s (%s)\n", err, errmsg);
+        fprintf(out, "%s (%s)\n", err ?: "-", errmsg ?: "-");
     }else {
-		fprintf(out, "%s\n", errmsg);
+		if (errmsg) fprintf(out, "%s\n", errmsg);
 	}
 
     // maybe \n to stderr?

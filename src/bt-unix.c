@@ -11,8 +11,6 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#include <signal.h>
-#include <setjmp.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 
@@ -29,7 +27,6 @@
 enum {READ=0, WRITE=1};
 void *bt_open(const char *file, const char*file2)
 {
-	//  signal(SIGINT, handle_sigint);
 	int *fd = malloc(2*sizeof(int));
 	struct stat buf;
 	fd[0] = fd[1] = open(file ?: BT, O_RDWR);
@@ -68,11 +65,6 @@ int bt_write(void* fd_, const u8* buf, size_t count)
 	}
 	return sent;
 }
-static jmp_buf env;
-static void handle_alarm(int sig)
-{
-	(void)sig; longjmp(env, 1);
-}
 
 /**
  * \param [in] device handle returned by bt_open()
@@ -85,13 +77,14 @@ static void handle_alarm(int sig)
  */ 
 int bt_read(void* fd_, u8* buf, size_t count, int milliseconds)
 {
+	(void) milliseconds;
 	int fd = ((int*)fd_)[READ];
 	size_t recvd =0;
 	size_t packet_len = 2;
 	ssize_t ret;
 	do {
 		ret = read(fd, buf+recvd, packet_len-recvd);
-		if (ret == -1)
+		if (ret <= 0)
 		{
 				perror("read failed"); return -1; 
 		}
@@ -105,12 +98,13 @@ int bt_read(void* fd_, u8* buf, size_t count, int milliseconds)
 	for (ssize_t ret=recvd; recvd < packet_len; recvd += ret)
 	{
 		ret = read(fd, buf+recvd, packet_len-recvd);
+		if (ret == 0) break; // EOF; turning off bluetooth during transfer
+		//FIXME: would returning -1 for EOF make more sense?
 		if (ret == -1)
 		{
 			perror("read failed");
 			return -1; 
 		}
-		// bug one should handle disconnects during transfer. if this happens read keeps returning zeros
 	}
 
 return recvd;

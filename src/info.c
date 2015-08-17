@@ -1,8 +1,8 @@
 /**
- * @file test.c
+ * @file info.c
  * @author Ahmad Fatoum
  * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 3.0
- * @brief test function - beeps and prints info
+ * @brief info function - beeps and prints info
  */
 
 #include <stdio.h>
@@ -32,8 +32,22 @@ static const u8 tone[] = "\x0\x0F\x00\0\0\x80\x00\x00\x94\x01\x81\x02\x82\xE8\x0
  * \bug needs more detailed information for bluetooth/wlan
  * 		should print COM port, device name
  */ 
-int test()
+int info(const char*arg)
 {
+	wchar_t wstr[MAX_STR];
+	if (arg)
+	{
+		if ((void*)ev3_write != (void*)hid_write)
+			return ERR_ARG;
+		if (strcmp(arg, "serial") == 0)
+		{
+			hid_get_serial_number_string(handle, wstr, MAX_STR);
+			fputws(wstr, stdout);
+			fputwc(L'\n', stdout);
+			return ERR_UNK;
+		}
+	}
+
 	int res;
 	//TODO: 
 	res = ev3_write(handle, tone, sizeof tone - 1);
@@ -52,7 +66,6 @@ int test()
 	//! Print udev rules
 	printf("SUBSYSTEM==\"%s\", ATTRS{idVendor}==\"0694\", ATTRS{idProduct}==\"0005\a, MODE=\"0666\"\n", isOld ? "usb_device" : "usb");
 #endif
-	wchar_t wstr[MAX_STR];
 	res = hid_get_manufacturer_string(handle, wstr, MAX_STR);
 	printf("Manufacturer String: %ls\n", wstr);
 	res = hid_get_product_string(handle, wstr, MAX_STR);

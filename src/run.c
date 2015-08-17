@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <hidapi.h>
 
 #include "defs.h"
 #include "packets.h"
@@ -29,7 +30,10 @@ static const u8 run2[] = {0x60, 0x64, 0x03, 0x01, 0x60, 0x64, 0x00};
 int run(const char *exec)
 {
 	int res;
-	VM_REPLY reply;
+	union {
+		VM_REPLY packet;
+		u8 bytes[1024];
+	}reply;
 	size_t exec_sz = strlen(exec) + 1;
 
 	EXECUTE_FILE *run = packet_alloc(EXECUTE_FILE, sizeof (run1) + exec_sz + sizeof (run2));
@@ -48,23 +52,24 @@ int run(const char *exec)
 		return ERR_COMM;
 	}
 
-	res = ev3_read_timeout(handle, (u8 *)&reply, sizeof reply + 2, TIMEOUT / 10);
+	res = ev3_read_timeout(handle, reply.bytes, sizeof reply + 2, TIMEOUT);
 	if (res < 0)
 	{
 		errmsg = NULL;
 		return ERR_COMM;
 	}
-	else if (res == 0 || (res > 0 && memcmp(&reply, &EXECUTE_FILE_REPLY_SUCCESS, sizeof reply) == 0))
-		//FIXME!!!!!!!
+	else if (res == 0 || (res > 0 && memcmp(&reply.packet, &EXECUTE_FILE_REPLY_SUCCESS, sizeof reply.packet) == 0))
 	{
 		errmsg = "`exec` has been successful.";
 		return ERR_UNK;
 	}
 	else
 	{
-		//TODO: check for underlying app first?
-		errmsg = "`exec` failed.";
-		return ERR_VM;
+		if (ev3_close == (void (*)())hid_close) //FIXME: to more general solution after ev3 tunnel is fully implemented
+			printf("%.*s\n", 1024, (char*)reply.bytes);
+
+		errmsg = "`exec` status unknown.";
+		return ERR_UNK;
 	}
 }
 

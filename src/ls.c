@@ -68,7 +68,7 @@ int ls(const char *path)
 		errmsg = "`LIST_FILES` was denied.";
 		return ERR_VM;
 	}
-	printf("listrep->packetLen=%hu, res=%d\n", listrep->packetLen, res);
+	//printf("listrep->packetLen=%hu, res=%d\n", listrep->packetLen, res);
 	//FIXME: buffer overrun
 	fwrite(listrep->list, 1, listrep->packetLen - 10, stdout); // No NUL Termination over Serial COM for whatever reason.
 	//
