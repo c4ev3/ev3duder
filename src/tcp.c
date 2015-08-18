@@ -72,10 +72,9 @@ void *tcp_open(const char *serial)
 
 	struct tcp_handle *fdp = malloc(sizeof *fdp);
 	SOCKET fd;
-
 	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 	{
-		bailout("Failed to create socket.");
+		bailout("Failed to create socket");
 		return NULL;
 	}
 
@@ -84,7 +83,6 @@ void *tcp_open(const char *serial)
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr=htonl(INADDR_ANY);
 	servaddr.sin_port = htons(UDP_PORT);
-
 	if (bind(fd, (struct sockaddr *)&servaddr, sizeof servaddr) == SOCKET_ERROR)
 	{
 		closesocket(fd);
@@ -95,33 +93,26 @@ void *tcp_open(const char *serial)
 	socklen_t len = sizeof cliaddr;
 	char buffer[128];
 	ssize_t n;
-
 	do {
 		n = recvfrom(fd, buffer,1000,0,(struct sockaddr *)&cliaddr,&len);
-		printf("n eqals = %d\n", n);
-
 		if (n == SOCKET_ERROR)
 		{
 			closesocket(fd);
-			bailout("Failed to recieve broadcast");
+			bailout("Failed to recieve broadcast"); // is that even a thing for nonblocking socks?
 			return NULL;
 		}
 
 		buffer[n] = '\0';
-		printf(">>%s<<\n", buffer);
 		sscanf(buffer, 
 				"Serial-Number: %s\r\n"
 				"Port: %u\r\n"
 				"Name: %s\r\n"
 				"Protocol: %s\r\n",
 				fdp->serial, &fdp->tcp_port, fdp->name, fdp->protocol);
-
 	}while(serial && strcmp(serial, fdp->serial) != 0);
 
 	n = sendto(fd, (char[]){0x00}, 1, 0, (struct sockaddr *)&cliaddr, sizeof cliaddr);
-
 	closesocket(fd);
-
 	if (n == SOCKET_ERROR)
 	{
 		bailout("Failed to initiate handshake");
@@ -134,9 +125,9 @@ void *tcp_open(const char *serial)
 	// TODO: couldn't I use cliaddr directly?!
 	servaddr.sin_family = AF_INET;
 	servaddr.sin_addr.s_addr = cliaddr.sin_addr.s_addr;
-
 	inet_ntop(AF_INET, &cliaddr.sin_addr, fdp->ip, sizeof fdp->ip);
 	servaddr.sin_port = htons(fdp->tcp_port);
+	
 	connect(fd, (struct sockaddr *)&servaddr, sizeof servaddr);
 	if (n == SOCKET_ERROR)
 	{
@@ -144,11 +135,10 @@ void *tcp_open(const char *serial)
 		bailout("Failed to initiate TCP connection");
 		return NULL;
 	}
+	
 	n = snprintf(buffer, sizeof buffer, 
 			"GET /target?sn=%s VMTP1.0\nProtocol: %s",
 			fdp->serial, fdp->protocol);
-	printf("buffer: %s\n", buffer);
-
 	n = sendto(fd, buffer, n, 0, (struct sockaddr *)&servaddr, sizeof servaddr);
 	if (n == SOCKET_ERROR)
 	{
@@ -156,16 +146,17 @@ void *tcp_open(const char *serial)
 		bailout("Failed to handshake over TCP");
 		return NULL;
 	}
+	
 	n=recvfrom(fd, buffer, sizeof buffer, 0, NULL, NULL);
 	if (n == SOCKET_ERROR)
 	{
 		closesocket(fd);
-		bailout("Failed to recieve TCP-connection confirmation");
+		bailout("Failed to recieve TCP-connection confirmation"); 
 		return NULL;
 	}
-	buffer[n] = '\0';
-	printf("buffer=%s\n", buffer);
 
+	buffer[n] = '\0';
+	//	printf("buffer=%s\n", buffer);
 #ifdef _WIN32
 	fdp->sock = (LPVOID)fd;
 #else
@@ -218,9 +209,10 @@ int (*tcp_read)(void* device, u8* buf, size_t count, int milliseconds) = bt_read
 static inline const char *inet_ntop(int af, const void * restrict src, char * restrict dst, socklen_t size)
 {
 	assert(af == AF_INET);
-	union { u32 addr; u8 sub[4];} ip = {(struct in_addr*)src->s_addr};
+	union { u32 addr; u8 sub[4];} ip = {(*(struct in_addr*)src).s_addr};
 	snprintf(dst, size, "%u.%u.%u.%u", 
 			ip.sub[0], ip.sub[1], ip.sub[2], ip.sub[3]);
+	return dst;
 }
 #endif
  
