@@ -15,6 +15,8 @@
 #define SHUT_RDWR SD_BOTH
 
 static inline const char * inet_ntop(int af, const void * restrict src, char * restrict dst, socklen_t size);
+static inline int inet_pton(int af, const char *src, void *dst);
+
 typedef int socklen_t;
 
 #else /* POSIX */
@@ -234,10 +236,24 @@ int (*tcp_read)(void* device, u8* buf, size_t count, int milliseconds) = bt_read
 static inline const char *inet_ntop(int af, const void * restrict src, char * restrict dst, socklen_t size)
 {
 	assert(af == AF_INET);
-	union { u32 addr; u8 sub[4];} ip = {(*(struct in_addr*)src).s_addr};
+	union { u32 addr; u8 sub[4];} ip = {((struct in_addr*)src)->s_addr};
 	snprintf(dst, size, "%u.%u.%u.%u", 
 			ip.sub[0], ip.sub[1], ip.sub[2], ip.sub[3]);
 	return dst;
 }
+static inline int inet_pton(int af, const char *src, void *dst)
+{
+	assert(af == AF_INET);
+	union { u32 addr; u8 sub[4];} ip;
+	int n = 
+	sscanf(src, "%hhu.%hhu.%hhu.%hhu", 
+			&ip.sub[0], &ip.sub[1], &ip.sub[2], &ip.sub[3]);
+	if (n != 4)
+		return 0;
+	
+	((struct in_addr*)dst)->s_addr = ip.addr;
+	return 1;
+}
+
 #endif
  
