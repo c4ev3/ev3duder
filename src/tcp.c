@@ -120,7 +120,7 @@ void *tcp_open(const char *serial)
 		struct sockaddr_in cliaddr;
 		socklen_t len = sizeof cliaddr;
 		do {
-			n = recvfrom(fd, buffer,1000,0,(struct sockaddr *)&cliaddr,&len);
+			n = recvfrom(fd, buffer,sizeof buffer,0,(struct sockaddr *)&cliaddr,&len);
 			if (n == SOCKET_ERROR)
 			{
 				closesocket(fd);
