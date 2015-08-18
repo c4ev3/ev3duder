@@ -35,7 +35,7 @@ FLAGS += -Wno-unused-value -D__USE_MINGW_ANSI_STDIO=1
 SRCS += src/bt-win.c
 SRCS += src/tcp-win.c
 HIDSRC += hidapi/windows/hid.c
-LDFLAGS += -lsetupapi 
+LDFLAGS += -lsetupapi -lws2_32 
 BIN_NAME := $(addsuffix .exe, $(BIN_NAME))
 # CodeSourcery prefix
 endif

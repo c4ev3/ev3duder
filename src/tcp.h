@@ -7,8 +7,13 @@
 
 #include "defs.h"
 
+//FIXME: encapsulate
 struct tcp_handle {
+#ifdef _WIN32
+	void* sock; // HANDLE/SOCKET
+#else
 	int fd[2];
+#endif
 	char serial[15];
 	char ip[48]; // enough for ipv6
 	unsigned tcp_port;
@@ -32,9 +37,12 @@ void *tcp_open(const char *serial);
  * \brief writes buf[1] till buf[count - 2] to device
  * \bug the first byte is omitted for compatiblity with the leading report byte demanded by \p hid_write. Wrapping HIDAPI could fix this.
  * \see implementation at bt-win.c and bt-unix.c
- */ 
+ */
+#ifdef _WIN32
+int tcp_write(void* device, const u8* buf, size_t count);
+#else
 extern int (*tcp_write)(void* device, const u8* buf, size_t count);
-
+#endif
 /**
  * \param [in] device handle returned by bt_open
  * \param [in] buf buffer to write to 
@@ -45,7 +53,11 @@ extern int (*tcp_write)(void* device, const u8* buf, size_t count);
  * \bug the milliseconds part needs to be tested more throughly
  * \see implementation at bt-win.c and bt-unix.c
  */ 
+#ifdef _WIN32
+extern int tcp_read(void* device, u8* buf, size_t count, int milliseconds);
+#else
 extern int (*tcp_read)(void* device, u8* buf, size_t count, int milliseconds);
+#endif
 
 /**
  * \param [in] device handle returned by bt_open

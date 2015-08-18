@@ -39,7 +39,7 @@
 
 void *tcp_open(const char *serial)
 {
-	struct tcp_handle *fdp = malloc(sizeof(fdp));
+	struct tcp_handle *fdp = malloc(sizeof *fdp);
 	int fd;
 	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == -1)
 	{
