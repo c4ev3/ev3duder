@@ -2,7 +2,7 @@
  * @file tcp.h
  * @author Ahmad Fatoum
  * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 3.0
- * @brief BSD sockets Input/Output wrappers
+ * @brief BSD sockets/Winsock2 Input/Output wrappers
  */
 
 #include "defs.h"
