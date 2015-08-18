@@ -169,10 +169,10 @@ void *tcp_open(const char *serial)
  * \param [in] device handle returned by tcp_open()
  * \brief releases the socket file descriptor opened by tcp_open()
  */
-void tcp_close(void *handle)
+void tcp_close(void *sock)
 {
-	shutdown(*(int*)handle, SD_BOTH);
-	closesocket(*(int*)handle);
+	shutdown(*(SOCKET*)sock, SD_BOTH);
+	closesocket(*(SOCKET*)sock);
 	WSACleanup();
 }
 /**
@@ -184,11 +184,13 @@ void tcp_close(void *handle)
 const wchar_t *tcp_error(void* fd_) { (void)fd_; return L"Errors not implemented yet";}
 
 int tcp_write(void* sock, const u8* buf, size_t count) {
+	buf++;count--;
 	return send(*(SOCKET*)sock, (char*)buf, count, 0); 
 }
 int tcp_read(void* sock, u8* buf, size_t count, int milliseconds) {
 	//FIXME: Timeout!
 	(void) milliseconds;
+	buf++;count--;
 	return recv(*(SOCKET*)sock, (char*)buf, count, 0);
 }
 
