@@ -316,6 +316,7 @@ int main(int argc, char *argv[])
         return ERR_UNK;
     case ARG_exec:
         assert(argc >= 1);
+		//FIXME: >1024 bytes hang the thing; maybe pipe through head -c1000
         size_t len_cmd = strlen(argv[0]),
                len_out = sizeof " &>" OutputName;
         buf = malloc(len_cmd + len_out);

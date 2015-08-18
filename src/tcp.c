@@ -1,5 +1,5 @@
 /**
- * @file tcp-win.c
+ * @file tcp.c
  * @author Ahmad Fatoum
  * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 3.0
  * @brief BSD Sockets/Winsock2 I/O wrappers
@@ -45,12 +45,14 @@ typedef int SOCKET;
 
 //! default UDP broadcast port
 #define UDP_PORT 3015
+#define TCP_PORT 5555
 /**
- * \param [in] serial Serial-Number of Ev3. `NULL` connects to the first available
+ * \param [in] serial IP-Address or Serial-Number of Ev3. `NULL` connects to the first available
  * \return &fd pointer to file descriptor for use with tcp_{read,write,close,error}
  * \brief connects to a ev3 device on the same subnet.
  *
- * The Ev3 broadcast a UDP-packet every 5 seconds. This functions waits 7 seconds
+ * If the serial number contains a dot, a direct TCP connection is attempted.
+ * The Ev3 broadcasts a UDP-packet every 5 seconds. This functions waits 7 seconds
  * for that to happen. It then compares the broadcasted serial number with the
  * value set should serial be non-`NULL`. If serial is `NULL` or the serial numbers
  * match, a udp packet is sent to the source port on the ev3.
@@ -72,63 +74,86 @@ void *tcp_open(const char *serial)
 
 	struct tcp_handle *fdp = malloc(sizeof *fdp);
 	SOCKET fd;
-	if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
-	{
-		bailout("Failed to create socket");
-		return NULL;
-	}
-
-	struct sockaddr_in servaddr, cliaddr;
-	memset(&servaddr, 0, sizeof servaddr);
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr=htonl(INADDR_ANY);
-	servaddr.sin_port = htons(UDP_PORT);
-	if (bind(fd, (struct sockaddr *)&servaddr, sizeof servaddr) == SOCKET_ERROR)
-	{
-		closesocket(fd);
-		bailout("Failed to bind");
-		return NULL;
-	}
-
-	socklen_t len = sizeof cliaddr;
 	char buffer[128];
+	struct sockaddr_in servaddr;
+	memset(&servaddr, 0, sizeof servaddr);
 	ssize_t n;
-	do {
-		n = recvfrom(fd, buffer,1000,0,(struct sockaddr *)&cliaddr,&len);
-		if (n == SOCKET_ERROR)
+
+	if (serial && strchr(serial, '.')) // we have got an ip
+	{
+		/*
+		 * This only works because the LEGO firmware doesn't even parse the 
+		 * submitted serialnumber. It just strstr(2)s for /target?sn and reports
+		 * success if its found. This isn't guaranteed to stay, however
+		 */
+		servaddr.sin_family = AF_INET;
+		switch(inet_pton(AF_INET, serial, &servaddr.sin_addr)){
+			case 1: break;
+			case 0: fprintf(stderr, "Invalid IP specified '%s'\n", serial); return NULL;
+			case -1: bailout("Parsing IP failed"); return NULL;
+		}
+		strncpy(fdp->name, "[n/a]", sizeof fdp->name);
+		strncpy(fdp->protocol, "[n/a]", sizeof fdp->protocol);
+		strncpy(fdp->serial, "[n/a]", sizeof fdp->serial);
+		servaddr.sin_port = htons(fdp->tcp_port = TCP_PORT);
+		strncpy(fdp->ip, serial, sizeof fdp->ip);
+		
+	}else{ // we need to search for it
+		if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 		{
-			closesocket(fd);
-			bailout("Failed to recieve broadcast"); // is that even a thing for nonblocking socks?
+			bailout("Failed to create socket");
 			return NULL;
 		}
 
-		buffer[n] = '\0';
-		sscanf(buffer, 
-				"Serial-Number: %s\r\n"
-				"Port: %u\r\n"
-				"Name: %s\r\n"
-				"Protocol: %s\r\n",
-				fdp->serial, &fdp->tcp_port, fdp->name, fdp->protocol);
-	}while(serial && strcmp(serial, fdp->serial) != 0);
+		servaddr.sin_family = AF_INET;
+		servaddr.sin_addr.s_addr=htonl(INADDR_ANY);
+		servaddr.sin_port = htons(UDP_PORT);
+		if (bind(fd, (struct sockaddr *)&servaddr, sizeof servaddr) == SOCKET_ERROR)
+		{
+			closesocket(fd);
+			bailout("Failed to bind");
+			return NULL;
+		}
 
-	n = sendto(fd, (char[]){0x00}, 1, 0, (struct sockaddr *)&cliaddr, sizeof cliaddr);
-	closesocket(fd);
-	if (n == SOCKET_ERROR)
-	{
-		bailout("Failed to initiate handshake");
-		return NULL;
+		struct sockaddr_in cliaddr;
+		socklen_t len = sizeof cliaddr;
+		do {
+			n = recvfrom(fd, buffer,1000,0,(struct sockaddr *)&cliaddr,&len);
+			if (n == SOCKET_ERROR)
+			{
+				closesocket(fd);
+				bailout("Failed to recieve broadcast"); // is that even a thing for nonblocking socks?
+				return NULL;
+			}
+
+			buffer[n] = '\0';
+			sscanf(buffer, 
+					"Serial-Number: %s\r\n"
+					"Port: %u\r\n"
+					"Name: %s\r\n"
+					"Protocol: %s\r\n",
+					fdp->serial, &fdp->tcp_port, fdp->name, fdp->protocol);
+		}while(serial && strcmp(serial, fdp->serial) != 0);
+
+		n = sendto(fd, (char[]){0x00}, 1, 0, (struct sockaddr *)&cliaddr, sizeof cliaddr);
+		closesocket(fd);
+		if (n == SOCKET_ERROR)
+		{
+			bailout("Failed to initiate handshake");
+			return NULL;
+		}
+
+		memset(&servaddr, 0, sizeof servaddr);
+		// FIXME: use designated initializers, use getpeername, use C99 (gustedt)
+		// TODO: couldn't I use cliaddr directly?!
+		servaddr.sin_family = AF_INET;
+		servaddr.sin_addr.s_addr = cliaddr.sin_addr.s_addr;
+		inet_ntop(AF_INET, &cliaddr.sin_addr, fdp->ip, sizeof fdp->ip);
+		servaddr.sin_port = htons(fdp->tcp_port);
 	}
-
+		
 	fd = socket(AF_INET, SOCK_STREAM, 0);
-	memset(&servaddr, 0, sizeof servaddr);
-	// FIXME: use designated initializers, use getpeername, use C99 (gustedt)
-	// TODO: couldn't I use cliaddr directly?!
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = cliaddr.sin_addr.s_addr;
-	inet_ntop(AF_INET, &cliaddr.sin_addr, fdp->ip, sizeof fdp->ip);
-	servaddr.sin_port = htons(fdp->tcp_port);
-	
-	connect(fd, (struct sockaddr *)&servaddr, sizeof servaddr);
+	n = connect(fd, (struct sockaddr *)&servaddr, sizeof servaddr);
 	if (n == SOCKET_ERROR)
 	{
 		closesocket(fd);
