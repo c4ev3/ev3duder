@@ -16,7 +16,7 @@
 //FIXME: add better error message
 #define assert(cond) do{ if (!(cond)) {if (handle) ev3_close(handle);exit(ERR_ARG);}}while(0)
 
-#include <hidapi.h>
+#include <hidapi/hidapi.h>
 #include "btserial.h"
 #include "tcp.h"
 #include "ev3_io.h"
@@ -63,7 +63,7 @@ const char* const params_desc =
     ;
 
 #define FOREACH_ARG(ARG) \
-ARG(info)            \
+	ARG(info)            \
 ARG(up)              \
 ARG(dl)              \
 ARG(run)             \
@@ -91,10 +91,10 @@ static char* chrsub(char *s, char old, char new);
 #define SANITIZE
 #endif
 static struct {
-	unsigned select:1;
-	unsigned hid:1;
-	unsigned serial:1;
-	unsigned tcp:1;
+    unsigned select:1;
+    unsigned hid:1;
+    unsigned serial:1;
+    unsigned tcp:1;
 } switches;
 
 int main(int argc, char *argv[])
@@ -115,55 +115,52 @@ int main(int argc, char *argv[])
         puts(params_desc);
         return ERR_UNK;
     }
-    const char *device = NULL; const char *device2 = NULL;
-	(void) device2; // surpress warnings as we don't always use device2
-	while (argv[1] && *argv[1] == '-')
-	{
-		if (argv[1][1] == '-')
-		{/* switches */
-			char *a = argv[1] + 2;
-			if (a == '\0')
-			{
-				argc--, argv++; break;
-			}
-			
-			if (strcmp("usb", a) == 0 || strcmp("hid", a) == 0)
-				switches.select = switches.hid = 1;
-			else if (strcmp("tcp", a) == 0 || strcmp("inet", a) == 0)
-				switches.select = switches.tcp = 1;
-			else if (strcmp("serial", a) == 0 || strcmp("bt", a) == 0)
-				switches.select = switches.serial = 1;
-			else
-			{
-				fprintf(stderr, "Invalid switch '%s'\n", argv[1]);
-				return ERR_ARG;
-			}
+    const char *device = NULL;
+    const char *device2 = NULL;
+    (void) device2; // surpress warnings as we don't always use device2
+    while (argv[1] && *argv[1] == '-')
+    {
+        if (argv[1][1] == '-')
+        {   /* switches */
+            char *a = argv[1] + 2;
+            if (a == '\0')
+            {
+                argc--, argv++;
+                break;
+            }
 
-			argc--, argv++;
-		}else
-		{
-    		if (strcmp(argv[1]+1, "d") == 0)
-    		{
-				device = argv[2];
-				argv+=2;
-				argc-=2;
-			} else if (strcmp(argv[1]+1, "d2") == 0)
-			{
-				device = argv[2];
-				device2 = argv[3];
-				argv+=3;
-				argc-=3;
-			} else {
-				fprintf(stderr, "Invalid parameter '%s'\n", argv[1]);
-				return ERR_ARG;
-			}
-		}
+            if (strcmp("usb", a) == 0 || strcmp("hid", a) == 0)
+                switches.select = switches.hid = 1;
+            else if (strcmp("tcp", a) == 0 || strcmp("inet", a) == 0)
+                switches.select = switches.tcp = 1;
+            else if (strcmp("serial", a) == 0 || strcmp("bt", a) == 0)
+                switches.select = switches.serial = 1;
+            else {
+                fprintf(stderr, "Invalid switch '%s'\n", argv[1]);
+                return ERR_ARG;
+            }
+            argc--, argv++;
+        } else if (strcmp(argv[1]+1, "d") == 0)
+        {
+            device = argv[2];
+            argv+=2;
+            argc-=2;
+        } else if (strcmp(argv[1]+1, "d2") == 0)
+        {
+            device = argv[2];
+            device2 = argv[3];
+            argv+=3;
+            argc-=3;
+        } else {
+            fprintf(stderr, "Invalid parameter '%s'\n", argv[1]);
+            return ERR_ARG;
+        }
 
-	}
-	if (argc == 1) {
-		puts(params);
-		return ERR_ARG;
-	}
+    }
+    if (argc == 1) {
+        puts(params);
+        return ERR_ARG;
+    }
 
     int i;
     for (i = 0; i < (int)ARRAY_SIZE(offline_args); ++i)
@@ -172,10 +169,10 @@ int main(int argc, char *argv[])
     if (i == ARRAY_SIZE(offline_args))
     {
         if ((switches.hid || !switches.select) &&
-			(handle = hid_open(VendorID, ProductID, NULL))) // TODO: last one is SerialID, make it specifiable via commandline
+                (handle = hid_open(VendorID, ProductID, NULL))) // TODO: last one is SerialID, make it specifiable via commandline
         {
-        if (!switches.select)
-            fputs("USB connection established.\n", stderr);
+            if (!switches.select)
+                fputs("USB connection established.\n", stderr);
             // the things you do for type safety...
             ev3_write = (int (*)(void*, const u8*, size_t))hid_write;
             ev3_read_timeout = (int (*)(void*, u8*, size_t, int))hid_read_timeout;
@@ -183,30 +180,30 @@ int main(int argc, char *argv[])
             ev3_close = (void (*)(void*))hid_close;
         }
         else if ((switches.serial || !switches.select) &&
-        		 (handle = bt_open(device)))
+                 (handle = bt_open(device)))
         {
-        if (!switches.select)
-            fprintf(stderr, "Bluetooth serial connection established (%s).\n", device);
+            if (!switches.select)
+                fprintf(stderr, "Bluetooth serial connection established (%s).\n", device);
             ev3_write = bt_write;
             ev3_read_timeout = bt_read;
             ev3_error = bt_error;
             ev3_close = bt_close;
         }
         else if ((switches.tcp || !switches.select) &&
-				 (handle = tcp_open(device)))
-		{
-        if (!switches.select)
-		{
-			struct tcp_handle *info = (struct tcp_handle*)handle;
-            fprintf(stderr, "TCP connection established (%s@%s:%u).\n", info->name, info->ip, info->tcp_port);
-		}
-			ev3_write = tcp_write;
-			ev3_read_timeout = tcp_read;
-			ev3_error = tcp_error;
-			ev3_close = tcp_close;
-			
-		}	
-		else {
+                 (handle = tcp_open(device)))
+        {
+            if (!switches.select)
+            {
+                struct tcp_handle *info = (struct tcp_handle*)handle;
+                fprintf(stderr, "TCP connection established (%s@%s:%u).\n", info->name, info->ip, info->tcp_port);
+            }
+            ev3_write = tcp_write;
+            ev3_read_timeout = tcp_read;
+            ev3_error = tcp_error;
+            ev3_close = tcp_close;
+
+        }
+        else {
             puts("EV3 not found. Either plug it into the USB port or pair over Bluetooth.\n");
 #ifdef __linux__
             puts("Insufficient access to the usb device might be a reason too, try sudo.");
@@ -274,14 +271,15 @@ int main(int argc, char *argv[])
         assert(argc <= 1);
         ret = ls(argv[0] ?: "/");
         break;
-	case ARG_tunnel:
+    case ARG_tunnel:
         ret = tunnel();
         break;
-	case ARG_listen:
+    case ARG_listen:
         ret = listen();
         break;
-	case ARG_send:;
-		int send(void);
+    case ARG_send:
+        ;
+        int send(void);
         ret = send();
         break;
     case ARG_mkdir:
@@ -316,7 +314,6 @@ int main(int argc, char *argv[])
         return ERR_UNK;
     case ARG_exec:
         assert(argc >= 1);
-		//FIXME: >1024 bytes hang the thing; maybe pipe through head -c1000
         size_t len_cmd = strlen(argv[0]),
                len_out = sizeof " &>" OutputName;
         buf = malloc(len_cmd + len_out);
@@ -337,7 +334,7 @@ int main(int argc, char *argv[])
         if (ret != ERR_UNK)
             break;
 
-		fclose(fp);
+        fclose(fp);
         break;
     case ARG_rm:
         assert(argc == 1);
@@ -351,7 +348,7 @@ int main(int argc, char *argv[])
     FILE *out = ret == ERR_UNK ? stderr : stdout;
     if (ret == ERR_COMM)
         fprintf(out, "%s (%ls)\n", errmsg ?: "-", ev3_error(handle) ?: L"-");
-    else if (ret == ERR_VM){
+    else if (ret == ERR_VM) {
         const char *err;
         if (errno < (int)ARRAY_SIZE(ev3_error_msgs))
             err =  ev3_error_msgs[errno];
@@ -359,17 +356,17 @@ int main(int argc, char *argv[])
             err = "An unknown error occured";
 
         fprintf(out, "%s (%s)\n", err ?: "-", errmsg ?: "-");
-    }else {
-		if (errmsg) fprintf(out, "%s\n", errmsg);
-	}
+    } else {
+        if (errmsg) fprintf(out, "%s\n", errmsg);
+    }
 
-    // maybe \n to stderr?
+// maybe \n to stderr?
     if (handle) ev3_close(handle);
     return ret;
 }
 
 #pragma GCC diagnostic ignored "-Wunused"
-static char* chrsub(char *s, char old, char new)
+static char* _chrsub(char *s, char old, char new)
 {
     char *ptr = s;
     if (ptr == NULL || *ptr == '\0')

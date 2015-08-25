@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <hidapi.h>
+#include <hidapi/hidapi.h>
 #include <string.h>
 #include "defs.h"
 #include "ev3_io.h"

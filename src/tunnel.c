@@ -12,7 +12,6 @@
 #include <unistd.h>
 #include <ctype.h>
 
-#include <hidapi.h>
 #include "ev3_io.h"
 
 #include "defs.h"
@@ -94,7 +93,7 @@ int tunnel()
 	}
 	else{
 	/* FIXME: switch to binary setmode */
-		printf("%d\n", fread(binbuf+1, 1, 2, stdin));
+		printf("%zu\n", fread(binbuf+1, 1, 2, stdin));
 		size_t len = (binbuf[1] | (binbuf[2] << 4));
 		printf("len%zu\n", len);
 		fread(binbuf+3, 1, len, stdin);

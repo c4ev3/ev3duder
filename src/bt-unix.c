@@ -28,16 +28,14 @@ enum {READ=0, WRITE=1};
 void *bt_open(const char *file, const char*file2)
 {
 	int *fd = malloc(2*sizeof(int));
-	struct stat buf;
-	fd[0] = fd[1] = open(file ?: BT, O_RDWR);
-	if (*fd == -1) return NULL;
-    fstat(*fd, &buf);
-	if (S_ISFIFO(buf.st_mode))
+	if (file2)
 	{
-		close(*fd);
 		fd[READ] = open(file ?: BT, O_RDONLY);
 		fd[WRITE] = open(file ?: BT, O_WRONLY);
-	}
+	}else 
+		fd[0] = fd[1] = open(file ?: BT, O_RDWR);
+
+	if (fd[WRITE] == -1 || fd[READ] == -1) return NULL;
 	return fd;
 }
 

@@ -22,9 +22,13 @@ CREATE_BUILD_DIR := $(shell mkdir build 2>&1)
 ifeq ($(OS),Windows_NT)
 
 ## No rm?
-ifeq (, $(shell where rm)) 
-RM = del /Q
+ifeq (, $(shell where rm 2>NUL)) 
+RM = del /Q 2>NUL
 # Powershell, cygwin and msys all provide rm(1)
+endif
+
+ifeq (, $(shell where $(CC) 2>NUL)) 
+CC = gcc
 endif
 
 ## Win32
@@ -81,20 +85,28 @@ endif
 CROSS_PREFIX ?= arm-linux-gnueabi-g
 
 OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+DWS := 
+DWS += 
+DWS += 
+
 
 .DEFAULT: all
 all: $(BIN_NAME)
 
 $(BIN_NAME): $(OBJS) $(OBJDIR)/hid.o
-	$(PREFIX)$(CC) $(OBJS) $(OBJDIR)/hid.o $(LDFLAGS) $(LIBS) -o $(BIN_NAME)
+	$(info $(DWS)CCLD$(DWS) $@)
+	@$(PREFIX)$(CC) $(OBJS) $(OBJDIR)/hid.o $(LDFLAGS) $(LIBS) -o $(BIN_NAME)
 
 # static enables valgrind to act better -DDEBUG!
 $(OBJS): $(OBJDIR)/%.o: $(SRCDIR)/%.c
-	$(PREFIX)$(CC) -c $< -MMD $(FLAGS) $(INC) -o $@
+	$(info $(DWS)CC$(DWS)$(DWS) $@)
+	@$(PREFIX)$(CC) -c $< -MMD $(FLAGS) $(INC) -o $@
+
 -include $(OBJDIR)/*.d
 
 $(OBJDIR)/hid.o: $(HIDSRC)
-	$(PREFIX)$(CC) -c $< -o $@ $(INC) $(HIDFLAGS)
+	$(info $(DWS)CC$(DWS)$(DWS) $@)
+	@$(PREFIX)$(CC) -c $< -o $@ $(INC) $(HIDFLAGS)
 
 
 debug: FLAGS += -g
@@ -120,5 +132,6 @@ install: $(BIN_NAME) ev3-udev.rules udev.sh
 
 .PHONY: clean
 clean:
-	$(RM) $(BIN_NAME) && cd $(OBJDIR) && $(RM) *.o *.d 
+	$(RM) $(BIN_NAME) 
+	cd $(OBJDIR) && $(RM) *.o *.d 
 

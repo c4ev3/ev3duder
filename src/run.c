@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <hidapi.h>
+#include <hidapi/hidapi.h>
 
 #include "defs.h"
 #include "packets.h"

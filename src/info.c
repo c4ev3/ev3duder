@@ -9,7 +9,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <hidapi.h>
+#include <hidapi/hidapi.h>
+#include "tcp.h"
 #include "ev3_io.h"
 
 #include "defs.h"
@@ -37,15 +38,25 @@ int info(const char*arg)
 	wchar_t wstr[MAX_STR];
 	if (arg)
 	{
-		if ((void*)ev3_write != (void*)hid_write)
-			return ERR_ARG;
-		if (strcmp(arg, "serial") == 0)
+		if((void*)ev3_close == (void*)hid_close)
 		{
-			hid_get_serial_number_string(handle, wstr, MAX_STR);
-			fputws(wstr, stdout);
-			fputwc(L'\n', stdout);
-			return ERR_UNK;
+			if (strcmp(arg, "serial") == 0)
+			{
+				hid_get_serial_number_string(handle, wstr, MAX_STR);
+				fputws(wstr, stdout);
+				fputwc(L'\n', stdout);
+				return ERR_UNK;
+			}
+		}else if(ev3_close == tcp_close)
+		{
+			if (strcmp(arg, "ip") == 0)
+			{
+				puts(((struct tcp_handle*)handle)->ip);
+				return ERR_UNK;
+			}
 		}
+
+		return ERR_ARG;
 	}
 
 	int res;
