@@ -76,6 +76,7 @@ ARG(listen)			\
 ARG(send)			\
 ARG(exec)            \
 ARG(wpa2)            \
+ARG(nop)            \
 ARG(end)
 
 #define MK_ENUM(x) ARG_##x,
@@ -153,6 +154,12 @@ int main(int argc, char *argv[])
 				params.serial_id[0] = device;
 				params.serial_id[1] = device2; 
 			}
+			else if (strcmp("nop", a) == 0)
+				; /* So, this program doesn't handle empty *argv, which
+					 is understandable, but would ease programming the
+					 plugin a bit. So let the plugin just specify
+					 --nop. It's just a semicolon
+					 */
             else {
                 fprintf(stderr, "Invalid switch '%s'\n", argv[1]);
                 return ERR_ARG;
@@ -279,7 +286,8 @@ int main(int argc, char *argv[])
         assert(argc == 1);
         ret = run(argv[0]);
         break;
-
+	case ARG_nop: // just connect and do nothing
+		return ERR_UNK;
     case ARG_end:
         puts(usage);
         return ERR_ARG;

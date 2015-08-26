@@ -81,7 +81,6 @@ void *tcp_open(const char *serial, unsigned timeout)
 #else
 	struct timeval tv = {.tv_sec = timeout};
 #endif
-	printf("timeout: %us\n", timeout);
 
 	struct tcp_handle *fdp = malloc(sizeof *fdp);
 	SOCKET fd;
