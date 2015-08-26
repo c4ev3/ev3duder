@@ -166,14 +166,18 @@ int main(int argc, char *argv[])
             }
 
             argc--, argv++;
-        } else if (strcmp(argv[1]+1, "t") == 0)
+        } else if (argv[1][1] == 't')
         {
-			params.timeout = atoi(argv[2]);
 			// we don't care about negative numbers as any non-integer
 			// means indefinitely. negative numbers are so big they are
 			// practically infinite
-            argv+=2;
-            argc-=2;
+			if (argv[1][2] == '=')
+				params.timeout = atoi(&argv[1][3]);
+			else {
+				params.timeout = atoi(argv[2]);
+				argv++, argc--;
+			}
+            argv++, argc--;
         } else {
             fprintf(stderr, "Invalid parameter '%s'\n", argv[1]);
             return ERR_ARG;
