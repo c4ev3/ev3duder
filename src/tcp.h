@@ -23,11 +23,12 @@ struct tcp_handle {
 //FIXME: copy more stuff here
 /**
  * \param [in] serial of Ev3 to connect to
+ * \param [in] timeout for UDP recv
  * \return handle a opaque handle for use with tcp_{read,write,close,error}
  * \brief open a bluetooth device described by device. `NULL` leads to default action
  * \see implementation at bt-win.c and bt-unix.c
  */ 
-void *tcp_open(const char *serial);
+void *tcp_open(const char *serial, unsigned timeout);
 
 /**
  * \param [in] device handle returned by bt_open

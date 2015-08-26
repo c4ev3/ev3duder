@@ -8,12 +8,13 @@
 #include "defs.h"
 
 /**
- * \param [in] device string describing the bluetooth device
+ * \param [in] file_in string describing the bluetooth device
+ * \param [in] only for *nix: non-NULL for cases where read/write files differ
  * \return handle a opaque handle for use with bt_{read,write,close,error}
  * \brief open a bluetooth device described by device. `NULL` leads to default action
  * \see implementation at bt-win.c and bt-unix.c
  */ 
-void *bt_open(const char *device);
+void *bt_open(const char *file_in, const char *file_out);
 
 /**
  * \param [in] device handle returned by bt_open

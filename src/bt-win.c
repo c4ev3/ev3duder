@@ -20,8 +20,9 @@
  * \brief opens COM Porte described by device. `NULL` leads to default action
  * \bug default value should be enumerating. Not hardcoded like in \p BT
  */ 
-void *bt_open(const char *device)
+void *bt_open(const char *device , const char* unused)
 {
+	(void) unused;
 	HANDLE handle = CreateFileA(device ?: BT, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 	return handle != INVALID_HANDLE_VALUE ? handle : NULL;
 }
@@ -78,5 +79,12 @@ void bt_close(void *handle)
  * \brief Returns an error string describing the last error occured
  * \bug it's useless. Could be done with GetLastError + FormatMessageW
  */
-const wchar_t *bt_error(void* fd_) { (void)fd_; return L"Errors not implemented yet";}
+const wchar_t *bt_error(void* fd_) { 
+	(void)fd_;
+	wchar_t **buf = NULL; 
+	FormatMessageW( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
+    NULL, GetLastError(), 0, (wchar_t*)&buf, 0, NULL); //leaks
+
+	return buf ? *buf : L"Error in printing error";
+}
 

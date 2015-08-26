@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <termios.h>
 #include <stdio.h>
+#include <string.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -122,7 +123,14 @@ void bt_close(void *handle)
  * \param [in] device handle returned by bt_open()
  * \return message An error string
  * \brief Returns an error string describing the last error occured
- * \bug it's useless. Could use \p wprintf and \p strerror
  */
-const wchar_t *bt_error(void* fd_) { (void)fd_; return L"Errors not implemented yet";}
+const wchar_t *bt_error(void* fd_) { 
+	(void)fd_; 
+	const char *errstr = strerror(errno);
+	size_t wlen = strlen(errstr);
+	wchar_t *werrstr = malloc(sizeof (wchar_t[wlen]));
+    return (mbstowcs(werrstr, errstr, wlen) != (size_t)-1) ?
+		werrstr :
+		L"Error in printing error";
+}
 

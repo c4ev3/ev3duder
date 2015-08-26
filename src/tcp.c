@@ -1,5 +1,4 @@
 /**
- * @file tcp.c
  * @author Ahmad Fatoum
  * @copyright (c) 2015 Ahmad Fatoum. Code available under terms of the GNU General Public License 3.0
  * @brief BSD Sockets/Winsock2 I/O wrappers
@@ -11,7 +10,13 @@
 #include <windows.h>
 #include <Ws2tcpip.h>
 
-#define bailout(msg) fprintf(stderr, "%s. Error Code : %d\n", msg, WSAGetLastError())
+#define bailout(msg) ({\
+	char **buf; \
+	FormatMessageA( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,\
+    NULL, WSAGetLastError(), 0, (char*)&buf, 0, NULL) == 0)\
+	fprintf(stderr, "%s. Error message: %s\n", msg, buf)\
+	LocalFree(buf);\
+	})
 #define SHUT_RDWR SD_BOTH
 
 static inline const char * inet_ntop(int af, const void * restrict src, char * restrict dst, socklen_t size);
@@ -63,16 +68,20 @@ typedef int SOCKET;
  * \see http://www.monobrick.dk/guides/how-to-establish-a-wifi-connection-with-the-ev3-brick/
  */ 
 
-void *tcp_open(const char *serial)
+void *tcp_open(const char *serial, unsigned timeout)
 {
 #ifdef _WIN32
+	DWORD tv = timeout;
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
 	{
 		fprintf(stderr, "Failed to initialize Winsock2. Error Code : %d\n", WSAGetLastError());
 		return NULL;
 	}
+#else
+	struct timeval tv = {.tv_sec = timeout};
 #endif
+	printf("timeout: %us\n", timeout);
 
 	struct tcp_handle *fdp = malloc(sizeof *fdp);
 	SOCKET fd;
@@ -120,11 +129,12 @@ void *tcp_open(const char *serial)
 		struct sockaddr_in cliaddr;
 		socklen_t len = sizeof cliaddr;
 		do {
+			setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (void*)&tv, sizeof tv);
 			n = recvfrom(fd, buffer,sizeof buffer,0,(struct sockaddr *)&cliaddr,&len);
 			if (n == SOCKET_ERROR)
 			{
 				closesocket(fd);
-				bailout("Failed to recieve broadcast"); // is that even a thing for nonblocking socks?
+				bailout("Failed to recieve broadcast"); // normally means timeout
 				return NULL;
 			}
 

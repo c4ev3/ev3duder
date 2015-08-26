@@ -36,14 +36,14 @@
 //! Filename used for saving output with `exece` (tmp won't work because it's not readable? wtf)
 #define OutputName "/dev/lms_usbdev"
 
-const char* const params =
-    "USAGE: ev3duder " "[ --tcp | --usb | --serial | --stdio ] [-d dev | -d2 dev1 dev2]\n"
+const char* const usage =
+    "USAGE: ev3duder " "[ --tcp | --usb | --serial ] [=dev1,dev2] \n"
     "                " "[ up loc rem | dl rem loc | rm rem | ls [rem] |\n"
     "                " "  mkdir rem | mkrbf rem loc | run rem | exec cmd |\n"
     "                " "  wpa2 SSID [pass] | info | tunnel ]\n"
     "       "
     "rem = remote (EV3) path, loc = local path, dev = device identifier"	"\n";
-const char* const params_desc =
+const char* const usage_desc =
     " up\t"		"upload local file to remote ev3 brick\n"
     " dl\t"		"download remote file to local system\n"
     " rm\t"		"remove file on ev3 brick\n"
@@ -84,18 +84,25 @@ enum ARGS { FOREACH_ARG(MK_ENUM) };
 static const char *args[] = { FOREACH_ARG(MK_STR) };
 static const char *offline_args[] = { MK_STR(mkrbf) /*MK_STR(tunnel)*/ };
 
-static char* chrsub(char *s, char old, char new);
+static char* my_chrsub(char *s, char old, char new);
 #ifdef _WIN32
-#define SANITIZE(s) (chrsub((s), '/', '\\'))
+#define SANITIZE(s) (my_chrsub((s), '/', '\\'))
 #else
 #define SANITIZE
 #endif
-static struct {
+struct {
     unsigned select:1;
     unsigned hid:1;
     unsigned serial:1;
     unsigned tcp:1;
-} switches;
+} static switches;
+
+struct {
+	char *tcp_id;
+	char *serial_id[2];
+	char *usb_id;
+	unsigned timeout;
+} static params;
 
 int main(int argc, char *argv[])
 {
@@ -111,46 +118,55 @@ int main(int argc, char *argv[])
                "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
                "Source is available under the GNU GPL v3.0 https://github.com/a3f/ev3duder/\n\n",
                argv[0], CONFIGURATION, SYSTEM, VERSION);
-        puts(params);
-        puts(params_desc);
+        puts(usage);
+        puts(usage_desc);
         return ERR_UNK;
     }
-    const char *device = NULL;
-    const char *device2 = NULL;
-    (void) device2; // surpress warnings as we don't always use device2
     while (argv[1] && *argv[1] == '-')
     {
         if (argv[1][1] == '-')
         {   /* switches */
-            char *a = argv[1] + 2;
-            if (a == '\0')
-            {
-                argc--, argv++;
+			char *a = argv[1] + 2;
+			strtok(a, "=");
+			char *device = strtok(NULL, ","),
+				*device2 = strtok(NULL, "");
+
+			if (a == '\0')
+			{
+				argc--, argv++;
                 break;
             }
 
             if (strcmp("usb", a) == 0 || strcmp("hid", a) == 0)
+			{
                 switches.select = switches.hid = 1;
+				params.usb_id = device;
+			}
             else if (strcmp("tcp", a) == 0 || strcmp("inet", a) == 0)
+			{
                 switches.select = switches.tcp = 1;
+				params.tcp_id = device;
+			}
             else if (strcmp("serial", a) == 0 || strcmp("bt", a) == 0)
+			{
                 switches.select = switches.serial = 1;
+				params.serial_id[0] = device;
+				params.serial_id[1] = device2; 
+			}
             else {
                 fprintf(stderr, "Invalid switch '%s'\n", argv[1]);
                 return ERR_ARG;
             }
+
             argc--, argv++;
-        } else if (strcmp(argv[1]+1, "d") == 0)
+        } else if (strcmp(argv[1]+1, "t") == 0)
         {
-            device = argv[2];
+			params.timeout = atoi(argv[2]);
+			// we don't care about negative numbers as any non-integer
+			// means indefinitely. negative numbers are so big they are
+			// practically infinite
             argv+=2;
             argc-=2;
-        } else if (strcmp(argv[1]+1, "d2") == 0)
-        {
-            device = argv[2];
-            device2 = argv[3];
-            argv+=3;
-            argc-=3;
         } else {
             fprintf(stderr, "Invalid parameter '%s'\n", argv[1]);
             return ERR_ARG;
@@ -158,7 +174,7 @@ int main(int argc, char *argv[])
 
     }
     if (argc == 1) {
-        puts(params);
+        puts(usage);
         return ERR_ARG;
     }
 
@@ -180,17 +196,17 @@ int main(int argc, char *argv[])
             ev3_close = (void (*)(void*))hid_close;
         }
         else if ((switches.serial || !switches.select) &&
-                 (handle = bt_open(device)))
+                 (handle = bt_open(params.serial_id[0], params.serial_id[1])))
         {
             if (!switches.select)
-                fprintf(stderr, "Bluetooth serial connection established (%s).\n", device);
+                fprintf(stderr, "Bluetooth serial connection established (%s).\n", params.serial_id[0]);
             ev3_write = bt_write;
             ev3_read_timeout = bt_read;
             ev3_error = bt_error;
             ev3_close = bt_close;
         }
         else if ((switches.tcp || !switches.select) &&
-                 (handle = tcp_open(device)))
+                 (handle = tcp_open(params.tcp_id, params.timeout)))
         {
             if (!switches.select)
             {
@@ -265,7 +281,7 @@ int main(int argc, char *argv[])
         break;
 
     case ARG_end:
-        puts(params);
+        puts(usage);
         return ERR_ARG;
     case ARG_ls:
         assert(argc <= 1);
@@ -365,8 +381,8 @@ int main(int argc, char *argv[])
     return ret;
 }
 
-#pragma GCC diagnostic ignored "-Wunused"
-static char* _chrsub(char *s, char old, char new)
+#pragma GCC diagnostic ignored "-Wunused-function"
+static char* my_chrsub(char *s, char old, char new)
 {
     char *ptr = s;
     if (ptr == NULL || *ptr == '\0')

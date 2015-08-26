@@ -44,14 +44,14 @@ int info(const char*arg)
 			{
 				hid_get_serial_number_string(handle, wstr, MAX_STR);
 				fputws(wstr, stdout);
-				fputwc(L'\n', stdout);
+				//fputwc(L'\n', stdout);
 				return ERR_UNK;
 			}
 		}else if(ev3_close == tcp_close)
 		{
 			if (strcmp(arg, "ip") == 0)
 			{
-				puts(((struct tcp_handle*)handle)->ip);
+				fputs(((struct tcp_handle*)handle)->ip, stdout);
 				return ERR_UNK;
 			}
 		}
@@ -67,9 +67,8 @@ int info(const char*arg)
 		return ERR_COMM;
 	}
 	errmsg = "\nAttempting beep..";
-	if ((void*)ev3_write != (void*)hid_write)
-		return ERR_UNK;
-
+	if ((void*)ev3_close == (void*)hid_close)
+	{
 #ifdef __linux__
 	struct utsname utsname;
 	uname(&utsname);
@@ -83,6 +82,19 @@ int info(const char*arg)
 	printf("Product String: %ls\n", wstr);
 	res = hid_get_serial_number_string(handle, wstr, MAX_STR);
 	printf("Serial Number String: %ls\n", wstr);
+	}else if (ev3_close == tcp_close)
+	{
+		struct tcp_handle* h = (struct tcp_handle*)handle;
+		printf("Serial: %s\n"
+			   "Server:	%s:%u\n"
+			   "Name: %s\n"
+			   "Protocol: %s\n",
+			   h->serial,
+			   h->ip, h->tcp_port,
+			   h->name,
+			   h->protocol
+			  );
+	}
 
 	return ERR_UNK;
 }
