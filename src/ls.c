@@ -50,7 +50,7 @@ int ls(const char *path)
 	}
 	fputs("Checking reply: \n", stderr);
 	size_t listrep_sz = sizeof(LIST_FILES_REPLY) + list->maxBytes;
-	LIST_FILES_REPLY *listrep = malloc(listrep_sz);
+	LIST_FILES_REPLY *listrep = calloc(listrep_sz, 1);
 
 	res = ev3_read_timeout(handle, (u8 *)listrep, listrep_sz, TIMEOUT);
 	if (res <= 0)
@@ -68,9 +68,9 @@ int ls(const char *path)
 		errmsg = "`LIST_FILES` was denied.";
 		return ERR_VM;
 	}
-	//printf("listrep->packetLen=%hu, res=%d\n", listrep->packetLen, res);
-	//FIXME: buffer overrun
-	fwrite(listrep->list, 1, listrep->packetLen - 10, stdout); // No NUL Termination over Serial COM for whatever reason.
+	printf("listrep->packetLen=%hu, res=%d\n", listrep->packetLen, res);
+	//
+	fwrite(listrep->list, 1, listrep->packetLen - 10 <= MAX_READ ? listrep->packetLen - 10 : 1024, stdout); // No NUL Termination over Serial COM for whatever reason.
 	//
 	// Excerpt from the lms2012O sources:  - LIST_FILES should work as long as list does not exceed 1014 bytes. CONTINUE_LISTFILES has NOT been implemented yet.
 #if !LEGO_FIXED_CONTINUE_LIST_FILES

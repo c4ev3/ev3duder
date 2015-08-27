@@ -28,7 +28,7 @@ static inline int inet_pton(int af, const char *src, void *dst);
 typedef int socklen_t;
 
 #define socksetblock(sock, y_n) \
-    ioctlsocket((sock), FIONBIO, (void*)!(y_n))
+    ioctlsocket((sock), FIONBIO, &(unsigned long){!(y_n)})
 
 #else /* POSIX */
 
@@ -62,6 +62,9 @@ typedef int SOCKET;
 //! default UDP broadcast port
 #define UDP_PORT 3015
 #define TCP_PORT 5555
+
+#define UDP_RECV_TIMEOUT 6
+#define TCP_CONNECT_TIMEOUT 1
 /**
  * \param [in] serial IP-Address or Serial-Number of Ev3. `NULL` connects to the first available
  * \return &fd pointer to file descriptor for use with tcp_{read,write,close,error}
@@ -80,8 +83,7 @@ typedef int SOCKET;
 void *tcp_open(const char *serial, unsigned timeout)
 {
 #ifdef _WIN32
-	DWORD tv_udp = timeout * 1000 ?: 6;
-	DWORD tv_tcp = timeout * 1000 ?: 1;
+	DWORD tv_udp = 1000*(timeout  ?: UDP_RECV_TIMEOUT);
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
 	{
@@ -89,8 +91,7 @@ void *tcp_open(const char *serial, unsigned timeout)
 		return NULL;
 	}
 #else
-	struct timeval tv_udp = {.tv_sec = timeout ?: 6};
-	struct timeval tv_tcp = {.tv_sec = timeout ?: 1};
+	struct timeval tv_udp = {.tv_sec = timeout ?: UDP_RECV_TIMEOUT};
 #endif
 
 	struct tcp_handle *fdp = malloc(sizeof *fdp);
@@ -177,19 +178,21 @@ void *tcp_open(const char *serial, unsigned timeout)
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 
 	socksetblock(fd, 0);
+
 	n = connect(fd, (struct sockaddr *)&servaddr, sizeof servaddr);
 	fd_set fdset;
 	FD_ZERO(&fdset);
 	FD_SET(fd, &fdset);
-
+	struct timeval tv_tcp = {.tv_sec = timeout ?: TCP_CONNECT_TIMEOUT};
+	printf("waiting for total of %us\n", (unsigned)tv_tcp.tv_sec);
 	if (select(fd + 1, NULL, &fdset, NULL, &tv_tcp) == 1)
 	{
+#ifndef _WIN32
 		int so_error;
 		socklen_t len = sizeof so_error;
-
 		getsockopt(fd, SOL_SOCKET, SO_ERROR, &so_error, &len);
-
 		if (so_error == 0)
+#endif
 		   n = 0; 
 	}
 	socksetblock(fd, 1);
