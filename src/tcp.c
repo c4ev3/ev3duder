@@ -184,7 +184,6 @@ void *tcp_open(const char *serial, unsigned timeout)
 	FD_ZERO(&fdset);
 	FD_SET(fd, &fdset);
 	struct timeval tv_tcp = {.tv_sec = timeout ?: TCP_CONNECT_TIMEOUT};
-	printf("waiting for total of %us\n", (unsigned)tv_tcp.tv_sec);
 	if (select(fd + 1, NULL, &fdset, NULL, &tv_tcp) == 1)
 	{
 #ifndef _WIN32
