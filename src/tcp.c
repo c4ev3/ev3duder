@@ -24,6 +24,9 @@ static inline int inet_pton(int af, const char *src, void *dst);
 
 typedef int socklen_t;
 
+#define socksetblock(sock, y_n) \
+    ioctlsocket((sock), FIONBIO, (char*)!y_n))
+
 #else /* POSIX */
 
 typedef int SOCKET;
@@ -31,6 +34,9 @@ typedef int SOCKET;
 #define SOCKET_ERROR (-1)
 #define bailout(msg) perror(msg)
 #define closesocket close
+#define socksetblock(sock, y_n) (y_n ? \
+	fcntl((sock), F_SETFL, fcntl((sock), F_GETFL, 0) & ~O_NONBLOCK) : \
+    fcntl((sock), F_SETFL, O_NONBLOCK))
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -164,7 +170,10 @@ void *tcp_open(const char *serial, unsigned timeout)
 	}
 		
 	fd = socket(AF_INET, SOCK_STREAM, 0);
+	socksetblock(fd, 0);
 	n = connect(fd, (struct sockaddr *)&servaddr, sizeof servaddr);
+	socksetblock(fd, 1);
+
 	if (n == SOCKET_ERROR)
 	{
 		closesocket(fd);
