@@ -91,19 +91,19 @@ static char* my_chrsub(char *s, char old, char new);
 #else
 #define SANITIZE
 #endif
-struct {
+static struct {
     unsigned select:1;
     unsigned hid:1;
     unsigned serial:1;
     unsigned tcp:1;
-} static switches;
+} switches;
 
-struct {
+static struct {
 	char *tcp_id;
 	char *serial_id[2];
 	char *usb_id;
 	unsigned timeout;
-} static params;
+} params;
 
 int main(int argc, char *argv[])
 {

@@ -15,7 +15,7 @@ OBJDIR = build
 
 SRCS = src/main.c src/packets.c src/run.c src/info.c src/up.c src/ls.c src/rm.c src/mkdir.c src/mkrbf.c src/dl.c src/listen.c src/send.c src/tunnel.c src/tcp.c
 
-INC += -Ihidapi/hidapi/
+INC += -Ihidapi/ -Ihidapi/hidapi/
  
 ####################
 CREATE_BUILD_DIR := $(shell mkdir build 2>&1)

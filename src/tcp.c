@@ -11,10 +11,13 @@
 #include <Ws2tcpip.h>
 
 #define bailout(msg) ({\
-	char **buf; \
-	FormatMessageA( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,\
-    NULL, WSAGetLastError(), 0, (char*)&buf, 0, NULL) == 0)\
-	fprintf(stderr, "%s. Error message: %s\n", msg, buf)\
+	char *buf; \
+	int error = WSAGetLastError(); \
+	if (FormatMessageA( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,\
+    NULL, error, 0, (char*)&buf, 0, NULL) && error) \
+		fprintf(stderr, "%s. Error message: %s\n", (msg), buf);\
+	else \
+		fprintf(stderr, "%s. Error code: %d\n", (msg), error); \
 	LocalFree(buf);\
 	})
 #define SHUT_RDWR SD_BOTH
@@ -25,16 +28,16 @@ static inline int inet_pton(int af, const char *src, void *dst);
 typedef int socklen_t;
 
 #define socksetblock(sock, y_n) \
-    ioctlsocket((sock), FIONBIO, (char*)!y_n))
+    ioctlsocket((sock), FIONBIO, (void*)!(y_n))
 
 #else /* POSIX */
 
 typedef int SOCKET;
 #define INVALID_SOCKET (-1)
 #define SOCKET_ERROR (-1)
-#define bailout(msg) perror(msg)
+#define bailout(msg) perror((msg))
 #define closesocket close
-#define socksetblock(sock, y_n) (y_n ? \
+#define socksetblock(sock, y_n) ((y_n) ? \
 	fcntl((sock), F_SETFL, fcntl((sock), F_GETFL, 0) & ~O_NONBLOCK) : \
     fcntl((sock), F_SETFL, O_NONBLOCK))
 
@@ -77,7 +80,7 @@ typedef int SOCKET;
 void *tcp_open(const char *serial, unsigned timeout)
 {
 #ifdef _WIN32
-	DWORD tv = timeout;
+	DWORD tv = timeout * 1000;
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
 	{
