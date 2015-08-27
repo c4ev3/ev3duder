@@ -80,7 +80,8 @@ typedef int SOCKET;
 void *tcp_open(const char *serial, unsigned timeout)
 {
 #ifdef _WIN32
-	DWORD tv = timeout * 1000;
+	DWORD tv_udp = timeout * 1000 ?: 6;
+	DWORD tv_tcp = timeout * 1000 ?: 1;
 	WSADATA wsa;
 	if (WSAStartup(MAKEWORD(2,2),&wsa) != 0)
 	{
@@ -88,7 +89,8 @@ void *tcp_open(const char *serial, unsigned timeout)
 		return NULL;
 	}
 #else
-	struct timeval tv = {.tv_sec = timeout};
+	struct timeval tv_udp = {.tv_sec = timeout ?: 6};
+	struct timeval tv_tcp = {.tv_sec = timeout ?: 1};
 #endif
 
 	struct tcp_handle *fdp = malloc(sizeof *fdp);
@@ -137,7 +139,7 @@ void *tcp_open(const char *serial, unsigned timeout)
 		struct sockaddr_in cliaddr;
 		socklen_t len = sizeof cliaddr;
 		do {
-			setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (void*)&tv, sizeof tv);
+			setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (void*)&tv_udp, sizeof tv_udp);
 			n = recvfrom(fd, buffer,sizeof buffer,0,(struct sockaddr *)&cliaddr,&len);
 			if (n == SOCKET_ERROR)
 			{
@@ -173,8 +175,23 @@ void *tcp_open(const char *serial, unsigned timeout)
 	}
 		
 	fd = socket(AF_INET, SOCK_STREAM, 0);
+
 	socksetblock(fd, 0);
 	n = connect(fd, (struct sockaddr *)&servaddr, sizeof servaddr);
+	fd_set fdset;
+	FD_ZERO(&fdset);
+	FD_SET(fd, &fdset);
+
+	if (select(fd + 1, NULL, &fdset, NULL, &tv_tcp) == 1)
+	{
+		int so_error;
+		socklen_t len = sizeof so_error;
+
+		getsockopt(fd, SOL_SOCKET, SO_ERROR, &so_error, &len);
+
+		if (so_error == 0)
+		   n = 0; 
+	}
 	socksetblock(fd, 1);
 
 	if (n == SOCKET_ERROR)

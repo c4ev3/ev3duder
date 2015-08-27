@@ -33,8 +33,29 @@
 //! Filename used for executing command with `exec`
 #define ExecName  "/tmp/Executing shell cmd.rbf"
 // FIXME: general solution
-//! Filename used for saving output with `exece` (tmp won't work because it's not readable? wtf)
-#define OutputName "/dev/lms_usbdev"
+/**
+ * suffix for commands executed with exec
+ * problem: busybox dd doesn't support conv=sync (zero-padding blocks)
+ * solution: prefix with length instead:
+ * First pipe stderr to stdout then pipe to awk which prefixes a header
+ * with the byte count to follow and then pipe that to  dd which writes
+ * to the hid device driver in chunks of 1000 bytes. 
+ * This is necessary as bs>1024 causes the system to stall 
+ * (driver buffer overflow maybe).
+ * unescaped version:
+ * echo "hey" 2>&1 | awk 'BEGIN{RS="\0"};{printf "%08x%s", length($
+0), $0}' | dd bs=1000 of=/dev/lms_usbdev
+ */
+ static const char EXEC_SUFFIX[] =
+/*cmd*/	" 2>&1 | awk '"
+		"BEGIN{"
+			"RS=\"\\0\""
+		"};"
+		"{"
+			"printf \"\\t%08x\\n%s\","
+			"length($0),$0"
+		"}"
+	   "' | dd bs=1000 of=/dev/lms_usbdev";
 
 const char* const usage =
     "USAGE: ev3duder " "[ --tcp | --usb | --serial ] [=dev1,dev2] \n"
@@ -343,11 +364,11 @@ int main(int argc, char *argv[])
     case ARG_exec:
         assert(argc >= 1);
         size_t len_cmd = strlen(argv[0]),
-               len_out = sizeof " &>" OutputName;
+               len_out = sizeof EXEC_SUFFIX;
         buf = malloc(len_cmd + len_out);
         (void)mempcpy(mempcpy(buf,
                               argv[0], len_cmd),
-                      " &>" OutputName, len_out);
+                      EXEC_SUFFIX, len_out);
         argv[0] = buf;
         len = mkrbf(&buf, argv[0]);
         fp = tmpfile();

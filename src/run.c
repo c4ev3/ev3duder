@@ -40,36 +40,44 @@ int run(const char *exec)
 
 	// *INDENT-OFF*
 	mempcpy(mempcpy(mempcpy((u8 *)&run->bytes, // run->bytes = [run1] + [exec] + [run2]
-					run1, sizeof run1),
+				run1, sizeof run1),
 				exec,  exec_sz),
-			run2, sizeof run2);
+				run2, sizeof run2);
 	// *INDENT-ON*
 
 	//FIXME: inquire whether start succeeded. check communicaton developer manual  pdf (debug mode maybe?)
 	res = ev3_write(handle, (u8 *)run, run->packetLen + PREFIX_SIZE);
 	if (res < 0)
-	{
 		return ERR_COMM;
-	}
 
 	res = ev3_read_timeout(handle, reply.bytes, sizeof reply + 2, TIMEOUT);
 	if (res < 0)
-	{
-		errmsg = NULL;
 		return ERR_COMM;
-	}
 	else if (res == 0 || (res > 0 && memcmp(&reply.packet, &EXECUTE_FILE_REPLY_SUCCESS, sizeof reply.packet) == 0))
 	{
 		errmsg = "`exec` has been successful.";
 		return ERR_UNK;
 	}
-	else
-	{
-		if (ev3_close == (void (*)())hid_close) //FIXME: to more general solution after ev3 tunnel is fully implemented
-			printf("%.*s\n", 1024, (char*)reply.bytes);
+	else if (ev3_close == (void (*)())hid_close) //FIXME: to more general solution after ev3 tunnel is fully implemented
+		{
+			u32 len;
+			if (sscanf((const char*)reply.bytes, "\t%08x\n", &len))
+			{
+				len += 10;
+				printf("%.*s", len > 1000 ? 1000 : len, (char*)reply.bytes + 10);
+				len-=1000;
+				while ((res = hid_read_timeout(handle, reply.bytes,
+							   	sizeof reply + 2, 100)) > 0 )
+				{
+					printf("%.*s", len > 1000 ? 1000 : len, (char*)reply.bytes);
+					len-=1000;
+				}
+				if (res != 0)
+					return ERR_COMM;
+			}
+		}
 
-		errmsg = "`exec` status unknown.";
-		return ERR_UNK;
-	}
+	errmsg = "`exec` status unknown.";
+	return ERR_UNK;
 }
 
