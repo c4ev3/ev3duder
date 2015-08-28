@@ -2,7 +2,7 @@
 
 The LEGO® EV3 Downloader/Uploader utility.
 
-ev3duder is an implementation of the LEGO EV3's protocol over USB (HID) and Bluetooth (RFCOMM).
+ev3duder is an implementation of the LEGO EV3's protocol over USB (HID), Bluetooth (RFCOMM) and WiFi (TCP).
 
 Click here for precompiled binaries for Linux, Windows and OS X.
 Building ev3duder on your own is quite easy too, though.
@@ -41,7 +41,7 @@ Generally, 2 files are needed:
 1) An ELF executable built for Linux on ARM. libc need not be
 dynamically linked (The standard firmware uses glibc).
 stdlibc++ is _not_ provided by default and would need to be
-uploaded separately and dynamically loaded or linked statically.
+uploaded separately and dynamically loaded or linked statically (e.g. by specifying -static-libstdc++ during linking with GCC 4.5+).
 
 2) A launcher file, so the program can be started from the built-in
 menu. This is not strictly required, as ev3duder can execute
@@ -54,15 +54,15 @@ The `symlink_cross.sh` script can be used to symlink the latter to the former.
 
 #### Windows
 Easiest way is via the CodeSourcery Lite package which can be gotten here:
-TODO: add link
+https://sourcery.mentor.com/GNUToolchain/package4574/public/arm-none-linux-gnueabi/arm-2009q1-203-arm-none-linux-gnueabi.exe
 
 #### Linux
-Debian/Ubuntu offer the Linaro toolchain in the repositories. It can be got by running
-    $ sudo apt-get install gcc-arm-linux-gnueabi
+Debian/Ubuntu offer the Linaro toolchain in the repositories, but I couldn't get it to work. CodeSourcery to the rescue again:
+    $ wget -c http://www.codesourcery.com/sgpp/lite/arm/portal/package4571/public/arm-none-linux-gnueabi/arm-2009q1-203-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2
 For C++:
-    $ sudo apt-get install g++-arm-linux-gnueabi
-
-Keep in mind that for some reason, I couldn't get this to work my system. ev3duder compiles and uploads just fine though.	  
+    $ mkdir CodeSourcery
+    $ tar -jxvf ~/arm-2009q1-203-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2 -C ~/CodeSourcery/
+    $ echo export PATH=~/CodeSourcery/arm-2009q1/bin/:$PATH >> ~/.bashrc && . ~/.bashrc
 
 #### OS X
 Carlson-Minot Inc. provides binary builds of CodeSourcery's GNU/ARM toolchain for OS X. It can be gotten here:
@@ -96,11 +96,4 @@ As the commands ev3duder supports mirror the functions internally used to implem
 
 ### Language
 The utlity is written in GNU C99. The Makefile is GNU Make specific. The perl and shell scripts are complementary and not necessary.
-
-## TODO
-- The virtual COM port for Bluetooth on Windows takes some seconds to close after calling `CloseHandle`. This results on quick successive bluetooth commands to lock the COM port for a minute or two.
-- Bluetooth COM ports and device names are hardcoded or specifiable via -d. Enumerating them and checking friendly name would be nice.
-- Ability to cat files to ev3 screen
-- Ability to recieve stdout from the ev3 after calling exec
-- Sessions, similar to `nginx -s`?
 

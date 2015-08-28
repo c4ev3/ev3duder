@@ -68,8 +68,7 @@ int ls(const char *path)
 		errmsg = "`LIST_FILES` was denied.";
 		return ERR_VM;
 	}
-	printf("listrep->packetLen=%hu, res=%d\n", listrep->packetLen, res);
-	//
+
 	fwrite(listrep->list, 1, listrep->packetLen - 10 <= MAX_READ ? listrep->packetLen - 10 : 1024, stdout); // No NUL Termination over Serial COM for whatever reason.
 	//
 	// Excerpt from the lms2012O sources:  - LIST_FILES should work as long as list does not exceed 1014 bytes. CONTINUE_LISTFILES has NOT been implemented yet.
