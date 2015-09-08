@@ -37,7 +37,7 @@ extern int dl(const char *rem, FILE* loc);
 extern int info(const char *arg);
 
 //! run remote .rbf file \p rem via VM
-extern int run(const char *rem);
+extern int run(const char *rem, unsigned timeout);
 
 //! list contents of remote directory \p rem
 extern int ls(const char *rem);

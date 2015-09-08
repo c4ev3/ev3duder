@@ -27,8 +27,9 @@ static const u8 run2[] = {0x60, 0x64, 0x03, 0x01, 0x60, 0x64, 0x00};
  * @see http://ev3.fantastic.computer/doxygen/buildinapps.html
  * @see mkrbf()
  */
-int run(const char *exec)
+int run(const char *exec, unsigned timeout)
 {
+	timeout = timeout ?: TIMEOUT;
 	int res;
 	union {
 		VM_REPLY packet;
@@ -50,7 +51,7 @@ int run(const char *exec)
 	if (res < 0)
 		return ERR_COMM;
 
-	res = ev3_read_timeout(handle, reply.bytes, sizeof reply + 2, TIMEOUT);
+	res = ev3_read_timeout(handle, reply.bytes, sizeof reply + 2, timeout);
 	if (res < 0)
 		return ERR_COMM;
 	else if (res == 0 || (res > 0 && memcmp(&reply.packet, &EXECUTE_FILE_REPLY_SUCCESS, sizeof reply.packet) == 0))

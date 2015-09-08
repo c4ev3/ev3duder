@@ -309,7 +309,7 @@ int main(int argc, char *argv[])
         break;
     case ARG_run:
         assert(argc == 1);
-        ret = run(argv[0]);
+        ret = run(argv[0], params.timeout);
         break;
 	case ARG_nop: // just connect and do nothing
 		return ERR_UNK;
@@ -379,7 +379,7 @@ int main(int argc, char *argv[])
         ret = up(fp, ExecName);
         if (ret != ERR_UNK)
             break;
-        ret = run(ExecName);
+        ret = run(ExecName, params.timeout);
         if (ret != ERR_UNK)
             break;
 
