@@ -1,0 +1,75 @@
+\hypertarget{info_8c}{}\section{src/info.c File Reference}
+\label{info_8c}\index{src/info.\+c@{src/info.\+c}}
+
+
+info function -\/ beeps and prints info  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$hidapi/hidapi.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}tcp.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}ev3\+\_\+io.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packets.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}funcs.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{info_8c_a8b6d77865140befe3a9bc16132d2e696}{M\+A\+X\+\_\+\+S\+T\+R}~256
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{info_8c_a65294a85b239c52e3d35726997374aa9}{info} (const char $\ast$arg)
+\begin{DoxyCompactList}\small\item\em cause a beep and print H\+I\+D information if applicable \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+info function -\/ beeps and prints info 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 3.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{info_8c_a8b6d77865140befe3a9bc16132d2e696}{}\index{info.\+c@{info.\+c}!M\+A\+X\+\_\+\+S\+T\+R@{M\+A\+X\+\_\+\+S\+T\+R}}
+\index{M\+A\+X\+\_\+\+S\+T\+R@{M\+A\+X\+\_\+\+S\+T\+R}!info.\+c@{info.\+c}}
+\subsubsection[{M\+A\+X\+\_\+\+S\+T\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+A\+X\+\_\+\+S\+T\+R~256}\label{info_8c_a8b6d77865140befe3a9bc16132d2e696}
+
+
+Definition at line 28 of file info.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{info_8c_a65294a85b239c52e3d35726997374aa9}{}\index{info.\+c@{info.\+c}!info@{info}}
+\index{info@{info}!info.\+c@{info.\+c}}
+\subsubsection[{info(const char $\ast$arg)}]{\setlength{\rightskip}{0pt plus 5cm}int info (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{arg}
+\end{DoxyParamCaption}
+)}\label{info_8c_a65294a85b239c52e3d35726997374aa9}
+
+
+cause a beep and print H\+I\+D information if applicable 
+
+print connection information, beep and exit
+
+
+\begin{DoxyRetVals}{Return values}
+{\em err\+\_\+code} & An error code according to {\ttfamily enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R}} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000010}{Bug}]needs more detailed information for bluetooth/wlan should print C\+O\+M port, device name \end{DoxyRefDesc}
+
+
+Definition at line 36 of file info.\+c.
+

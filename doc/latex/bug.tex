@@ -1,0 +1,75 @@
+
+\begin{DoxyRefList}
+\item[\label{bug__bug000006}%
+\hypertarget{bug__bug000006}{}%
+global\+Scope$>$ Global \hyperlink{btserial_8h_ac55022b02ba1040cb1ee132abd82e989}{bt\+\_\+close} (void $\ast$)]It takes whopping 3 seconds for the C\+O\+M port to be reclaimable. If opened before that, the device is unusable for a minute.  
+\item[\label{bug__bug000006}%
+\hypertarget{bug__bug000006}{}%
+global\+Scope$>$ Global \hyperlink{btserial_8h_ac55022b02ba1040cb1ee132abd82e989}{bt\+\_\+close} (void $\ast$)]It takes whopping 3 seconds for the C\+O\+M port to be reclaimable. If opened before that, the device is unusable for a minute.  
+\item[\label{bug__bug000009}%
+\hypertarget{bug__bug000009}{}%
+global\+Scope$>$ Global \hyperlink{btserial_8h_ad7be1494a76a1058ec4ba51588a09109}{bt\+\_\+error} (void $\ast$device)]it\textquotesingle{}s useless  
+\item[\label{bug__bug000009}%
+\hypertarget{bug__bug000009}{}%
+global\+Scope$>$ Global \hyperlink{btserial_8h_ad7be1494a76a1058ec4ba51588a09109}{bt\+\_\+error} (void $\ast$device)]it\textquotesingle{}s useless  
+\item[\label{bug__bug000005}%
+\hypertarget{bug__bug000005}{}%
+global\+Scope$>$ Global \hyperlink{bt-win_8c_a5861a216864bb97223f98e631f0c667c}{bt\+\_\+read} (void $\ast$handle, u8 $\ast$buf, size\+\_\+t count, int milliseconds)]milliseconds is ignored  
+\item[\label{bug__bug000008}%
+\hypertarget{bug__bug000008}{}%
+global\+Scope$>$ Global \hyperlink{btserial_8h_a1b964cfcb627fd4cda8298d8f2d9f0d3}{bt\+\_\+read} (void $\ast$device, u8 $\ast$buf, size\+\_\+t count, int milliseconds)]the milliseconds part needs to be tested more throughly \begin{DoxySeeAlso}{See also}
+implementation at \hyperlink{bt-win_8c}{bt-\/win.\+c} and \hyperlink{bt-unix_8c}{bt-\/unix.\+c}  
+\end{DoxySeeAlso}
+
+\item[\label{bug__bug000003}%
+\hypertarget{bug__bug000003}{}%
+global\+Scope$>$ Global \hyperlink{bt-unix_8c_a0100d3e3520a9b774896f6b2a2f589f5}{bt\+\_\+read} (void $\ast$fd\+\_\+, u8 $\ast$buf, size\+\_\+t count, int milliseconds)]the milliseconds part needs to be tested more throughly  
+\item[\label{bug__bug000004}%
+\hypertarget{bug__bug000004}{}%
+global\+Scope$>$ Global \hyperlink{bt-win_8c_a4da84bfe7c552c082e73af8f28ff2af5}{bt\+\_\+write} (void $\ast$handle, const u8 $\ast$buf, size\+\_\+t count)]the first byte is omitted for compatiblity with the leading report byte demanded by {\ttfamily hid\+\_\+write}. Wrapping H\+I\+D\+A\+P\+I could fix this.  
+\item[\label{bug__bug000002}%
+\hypertarget{bug__bug000002}{}%
+global\+Scope$>$ Global \hyperlink{bt-unix_8c_acbb62c11a110c097a4a9be010af9c4e7}{bt\+\_\+write} (void $\ast$fd\+\_\+, const u8 $\ast$buf, size\+\_\+t count)]the first byte is omitted for compatiblity with the leading report byte demanded by {\ttfamily hid\+\_\+write}. Wrapping H\+I\+D\+A\+P\+I could fix this.  
+\item[\label{bug__bug000007}%
+\hypertarget{bug__bug000007}{}%
+global\+Scope$>$ Global \hyperlink{btserial_8h_ac9b25cd932b8c5a842d1cd96e22fd200}{bt\+\_\+write} (void $\ast$device, const u8 $\ast$buf, size\+\_\+t count)]the first byte is omitted for compatiblity with the leading report byte demanded by {\ttfamily hid\+\_\+write}. Wrapping H\+I\+D\+A\+P\+I could fix this. \begin{DoxySeeAlso}{See also}
+implementation at \hyperlink{bt-win_8c}{bt-\/win.\+c} and \hyperlink{bt-unix_8c}{bt-\/unix.\+c}  
+\end{DoxySeeAlso}
+
+\item[\label{bug__bug000010}%
+\hypertarget{bug__bug000010}{}%
+global\+Scope$>$ Global \hyperlink{info_8c_a65294a85b239c52e3d35726997374aa9}{info} (const char $\ast$arg)]needs more detailed information for bluetooth/wlan should print C\+O\+M port, device name  
+\item[\label{bug__bug000011}%
+\hypertarget{bug__bug000011}{}%
+File \hyperlink{packets_8h}{packets.h} ]A more standard approach like libpack might be worthwhile.  
+\item[\label{bug__bug000012}%
+\hypertarget{bug__bug000012}{}%
+global\+Scope$>$ Global \hyperlink{packets_8h_abe208177340b58cb5096daabe07922d1}{P\+R\+E\+F\+I\+X\+\_\+\+S\+I\+Z\+E} ]hid\+Layer shouldn\textquotesingle{}t be maintained here as it\textquotesingle{}s non-\/sense to demand bluetooth to account for it Maybe wrap H\+I\+D\+A\+P\+I with a wrapper that prefixes zero automatically, instead of having \hyperlink{bt-unix_8c_acbb62c11a110c097a4a9be010af9c4e7}{bt\+\_\+write()} omit the first byte  
+\item[\label{bug__bug000013}%
+\hypertarget{bug__bug000013}{}%
+global\+Scope$>$ Global \hyperlink{tcp_8c_acb5191eb921dee0820de3cb6da0ec8e1}{tcp\+\_\+error} (void $\ast$fd\+\_\+)]it\textquotesingle{}s useless. Could use {\ttfamily wprintf} and {\ttfamily strerror}  
+\item[\label{bug__bug000016}%
+\hypertarget{bug__bug000016}{}%
+global\+Scope$>$ Global \hyperlink{tcp_8h_a3893ee96ae73bdde565a655a8921ae9c}{tcp\+\_\+error} (void $\ast$device)]it\textquotesingle{}s useless  
+\item[\label{bug__bug000017}%
+\hypertarget{bug__bug000017}{}%
+global\+Scope$>$ Global \hyperlink{tcp_8h_a0e21a1192bde43115c3763f02c51765b}{tcp\+\_\+info} (void $\ast$device)]it\textquotesingle{}s useless  
+\item[\label{bug__bug000015}%
+\hypertarget{bug__bug000015}{}%
+global\+Scope$>$ Global \hyperlink{tcp_8h_a82118920bf919568655ec9b421f5d04e}{tcp\+\_\+read} )(void $\ast$device, u8 $\ast$buf, size\+\_\+t count, int milliseconds)]the milliseconds part needs to be tested more throughly \begin{DoxySeeAlso}{See also}
+implementation at \hyperlink{bt-win_8c}{bt-\/win.\+c} and \hyperlink{bt-unix_8c}{bt-\/unix.\+c}  
+\end{DoxySeeAlso}
+
+\item[\label{bug__bug000014}%
+\hypertarget{bug__bug000014}{}%
+global\+Scope$>$ Global \hyperlink{tcp_8h_a5f7000a76dbf208a176f1b3b5ea9cebc}{tcp\+\_\+write} )(void $\ast$device, const u8 $\ast$buf, size\+\_\+t count)]the first byte is omitted for compatiblity with the leading report byte demanded by {\ttfamily hid\+\_\+write}. Wrapping H\+I\+D\+A\+P\+I could fix this. \begin{DoxySeeAlso}{See also}
+implementation at \hyperlink{bt-win_8c}{bt-\/win.\+c} and \hyperlink{bt-unix_8c}{bt-\/unix.\+c}  
+\end{DoxySeeAlso}
+
+\item[\label{bug__bug000018}%
+\hypertarget{bug__bug000018}{}%
+global\+Scope$>$ Global \hyperlink{up_8c_a01133633b700f5000c647deccfac9e3e}{up} (F\+I\+L\+E $\ast$fp, const char $\ast$dst)]might not handle files bigger than 2gb \+:-\/)  
+\item[\label{bug__bug000018}%
+\hypertarget{bug__bug000018}{}%
+global\+Scope$>$ Global \hyperlink{up_8c_a01133633b700f5000c647deccfac9e3e}{up} (F\+I\+L\+E $\ast$fp, const char $\ast$dst)]might not handle files bigger than 2gb \+:-\/) 
+\end{DoxyRefList}

@@ -1,0 +1,89 @@
+\hypertarget{ls_8c}{}\section{src/ls.c File Reference}
+\label{ls_8c}\index{src/ls.\+c@{src/ls.\+c}}
+
+
+Lists files on brick.  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}ev3\+\_\+io.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packets.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}funcs.\+h\char`\"{}}\\*
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{ls_8c_a02706310c2be4fc4b66273d8e08bcebd}{M\+A\+X\+\_\+\+R\+E\+A\+D}~1024
+\begin{DoxyCompactList}\small\item\em List files and directories at {\ttfamily path}. path is always relative to {\itshape /home/root/lms2012/prjs/sys/{\itshape  }}\end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{ls_8c_a64193a68d358fe65a676df8ddf361244}{ls} (const char $\ast$path)
+\begin{DoxyCompactList}\small\item\em list contents of remote directory {\ttfamily rem} \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Lists files on brick. 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 3.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{ls_8c_a02706310c2be4fc4b66273d8e08bcebd}{}\index{ls.\+c@{ls.\+c}!M\+A\+X\+\_\+\+R\+E\+A\+D@{M\+A\+X\+\_\+\+R\+E\+A\+D}}
+\index{M\+A\+X\+\_\+\+R\+E\+A\+D@{M\+A\+X\+\_\+\+R\+E\+A\+D}!ls.\+c@{ls.\+c}}
+\subsubsection[{M\+A\+X\+\_\+\+R\+E\+A\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+A\+X\+\_\+\+R\+E\+A\+D~1024}\label{ls_8c_a02706310c2be4fc4b66273d8e08bcebd}
+
+
+List files and directories at {\ttfamily path}. path is always relative to {\itshape /home/root/lms2012/prjs/sys/{\itshape  }}
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em loc} & Local F\+I\+L\+E$\ast$s \\
+\hline
+\mbox{\tt in}  & {\em rem} & Remote E\+V3 U\+T\+F-\/8 encoded path strings\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxySeeAlso}{See also}
+\href{http://topikachu.github.io/python-ev3/UIdesign.html}{\tt http\+://topikachu.\+github.\+io/python-\/ev3/\+U\+Idesign.\+html} 
+\end{DoxySeeAlso}
+\begin{DoxyWarning}{Warning}
+Doesn\textquotesingle{}t handle replies over 1014 byte in length. implementation of {\ttfamily C\+O\+N\+T\+I\+N\+U\+T\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} isn\textquotesingle{}t tested because \hyperlink{struct_c_o_n_t_i_n_u_e___l_i_s_t___f_i_l_e_s}{C\+O\+N\+T\+I\+N\+U\+E\+\_\+\+L\+I\+S\+T\+\_\+\+F\+I\+L\+E\+S} isn\textquotesingle{}t implemented in \char`\"{}firmware\char`\"{}. 
+
+ls /proc will lock up the virtual machine. So refrain from doing it or exposing it to the user The Eclipse Plugin handles /proc specially by making it non expandable in the file manager 
+\end{DoxyWarning}
+
+
+Definition at line 35 of file ls.\+c.
+
+
+
+\subsection{Function Documentation}
+\hypertarget{ls_8c_a64193a68d358fe65a676df8ddf361244}{}\index{ls.\+c@{ls.\+c}!ls@{ls}}
+\index{ls@{ls}!ls.\+c@{ls.\+c}}
+\subsubsection[{ls(const char $\ast$path)}]{\setlength{\rightskip}{0pt plus 5cm}int ls (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path}
+\end{DoxyParamCaption}
+)}\label{ls_8c_a64193a68d358fe65a676df8ddf361244}
+
+
+list contents of remote directory {\ttfamily rem} 
+
+
+
+Definition at line 36 of file ls.\+c.
+

@@ -1,0 +1,65 @@
+\hypertarget{tunnel_8c}{}\section{src/tunnel.c File Reference}
+\label{tunnel_8c}\index{src/tunnel.\+c@{src/tunnel.\+c}}
+
+
+tunnel stdio to established ev3 connection  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$unistd.\+h$>$}\\*
+{\ttfamily \#include $<$ctype.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}ev3\+\_\+io.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packets.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}funcs.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{tunnel_8c_a2d7e17d44f1fcc848db77cc9b8d3b1d0}{tunnel} ()
+\begin{DoxyCompactList}\small\item\em tunnels from stdio to ev3 \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+tunnel stdio to established ev3 connection 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 3.\+0 
+\end{DoxyCopyright}
+\begin{DoxySeeAlso}{See also}
+rc.\+pl for a \hyperlink{main_8c_ab879c8fbae669c13a54421b2a9effa55}{usage} scenario 
+\end{DoxySeeAlso}
+
+
+\subsection{Function Documentation}
+\hypertarget{tunnel_8c_a2d7e17d44f1fcc848db77cc9b8d3b1d0}{}\index{tunnel.\+c@{tunnel.\+c}!tunnel@{tunnel}}
+\index{tunnel@{tunnel}!tunnel.\+c@{tunnel.\+c}}
+\subsubsection[{tunnel()}]{\setlength{\rightskip}{0pt plus 5cm}int tunnel (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{tunnel_8c_a2d7e17d44f1fcc848db77cc9b8d3b1d0}
+
+
+tunnels from stdio to ev3 
+
+tunnel stdio to established ev3 connection
+
+
+\begin{DoxyRetVals}{Return values}
+{\em err\+\_\+code} & An error code according to {\ttfamily enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R}}
+\begin{DoxyItemize}
+\item If stdio is connected to a terminal, packets can be entered in hex and submitted with a line break. non-\/graphical characters, including whitespace, are ignored. If the first 4 bytes can\textquotesingle{}t be parsed as hex digits, they are replaced with the binary length. Any other character is replaced with a nibble rounded up.
+\item If stdio is a pipe, the first 2 bytes are read to acquire packet length and then an equal amount of bytes is read and sent to the ev3 
+\end{DoxyItemize}\\
+\hline
+\end{DoxyRetVals}
+
+
+Definition at line 35 of file tunnel.\+c.
+

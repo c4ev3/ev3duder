@@ -47,8 +47,6 @@ Temporary Items
 *.d
 *.a
 ev3duder
-#doxygen
-doc
 #vim
 *.sw*
 *.pyc

@@ -1,0 +1,298 @@
+\hypertarget{btserial_8h}{}\section{src/btserial.h File Reference}
+\label{btserial_8h}\index{src/btserial.\+h@{src/btserial.\+h}}
+
+
+Input/\+Output wrappers for Bluetooth.  
+
+
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void $\ast$ \hyperlink{btserial_8h_a9d1ed570025eb554c752cea2bf974251}{bt\+\_\+open} (const char $\ast$file\+\_\+in, const char $\ast$file\+\_\+out)
+\begin{DoxyCompactList}\small\item\em open a bluetooth device described by device. {\ttfamily N\+U\+L\+L} leads to default action \end{DoxyCompactList}\item 
+int \hyperlink{btserial_8h_ac9b25cd932b8c5a842d1cd96e22fd200}{bt\+\_\+write} (void $\ast$device, const \hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8} $\ast$buf, size\+\_\+t count)
+\begin{DoxyCompactList}\small\item\em writes buf\mbox{[}1\mbox{]} till buf\mbox{[}count -\/ 2\mbox{]} to device \end{DoxyCompactList}\item 
+int \hyperlink{btserial_8h_a1b964cfcb627fd4cda8298d8f2d9f0d3}{bt\+\_\+read} (void $\ast$device, \hyperlink{defs_8h_a92c50087ca0e64fa93fc59402c55f8ca}{u8} $\ast$buf, size\+\_\+t count, int milliseconds)
+\begin{DoxyCompactList}\small\item\em writes buf\mbox{[}1\mbox{]} till buf\mbox{[}count -\/ 2\mbox{]} to device \end{DoxyCompactList}\item 
+void \hyperlink{btserial_8h_ac55022b02ba1040cb1ee132abd82e989}{bt\+\_\+close} (void $\ast$)
+\begin{DoxyCompactList}\small\item\em Closes the resource opened by {\ttfamily bt\+\_\+open}. \end{DoxyCompactList}\item 
+const wchar\+\_\+t $\ast$ \hyperlink{btserial_8h_ad7be1494a76a1058ec4ba51588a09109}{bt\+\_\+error} (void $\ast$device)
+\begin{DoxyCompactList}\small\item\em Returns an error string describing the last error occured. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+Input/\+Output wrappers for Bluetooth. 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 3.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Function Documentation}
+\hypertarget{btserial_8h_ac55022b02ba1040cb1ee132abd82e989}{}\index{btserial.\+h@{btserial.\+h}!bt\+\_\+close@{bt\+\_\+close}}
+\index{bt\+\_\+close@{bt\+\_\+close}!btserial.\+h@{btserial.\+h}}
+\subsubsection[{bt\+\_\+close(void $\ast$)}]{\setlength{\rightskip}{0pt plus 5cm}void bt\+\_\+close (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{handle}
+\end{DoxyParamCaption}
+)}\label{btserial_8h_ac55022b02ba1040cb1ee132abd82e989}
+
+
+Closes the resource opened by {\ttfamily bt\+\_\+open}. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by bt\+\_\+open \\
+\hline
+\end{DoxyParams}
+\begin{DoxySeeAlso}{See also}
+implementation at \hyperlink{bt-win_8c}{bt-\/win.\+c} and \hyperlink{bt-unix_8c}{bt-\/unix.\+c}
+\end{DoxySeeAlso}
+Closes the resource opened by {\ttfamily bt\+\_\+open}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by \hyperlink{btserial_8h_a9d1ed570025eb554c752cea2bf974251}{bt\+\_\+open()}\\
+\hline
+\end{DoxyParams}
+Closes the resource opened by {\ttfamily bt\+\_\+open}.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em handle} & handle returned by bt\+\_\+open \\
+\hline
+\end{DoxyParams}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000006}{Bug}]It takes whopping 3 seconds for the C\+O\+M port to be reclaimable. If opened before that, the device is unusable for a minute. \end{DoxyRefDesc}
+
+
+Definition at line 116 of file bt-\/unix.\+c.
+
+\hypertarget{btserial_8h_ad7be1494a76a1058ec4ba51588a09109}{}\index{btserial.\+h@{btserial.\+h}!bt\+\_\+error@{bt\+\_\+error}}
+\index{bt\+\_\+error@{bt\+\_\+error}!btserial.\+h@{btserial.\+h}}
+\subsubsection[{bt\+\_\+error(void $\ast$device)}]{\setlength{\rightskip}{0pt plus 5cm}const wchar\+\_\+t$\ast$ bt\+\_\+error (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{fd\+\_\+}
+\end{DoxyParamCaption}
+)}\label{btserial_8h_ad7be1494a76a1058ec4ba51588a09109}
+
+
+Returns an error string describing the last error occured. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by bt\+\_\+open \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+message An error string 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+implementation at \hyperlink{bt-win_8c}{bt-\/win.\+c} and \hyperlink{bt-unix_8c}{bt-\/unix.\+c} 
+\end{DoxySeeAlso}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000009}{Bug}]it\textquotesingle{}s useless \end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by \hyperlink{bt-win_8c_a4926e3ba996c4e77d68845713a09db0c}{bt\+\_\+open()} \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+message An error string
+\end{DoxyReturn}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by bt\+\_\+open \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+message An error string 
+\end{DoxyReturn}
+
+
+Definition at line 127 of file bt-\/unix.\+c.
+
+\hypertarget{btserial_8h_a9d1ed570025eb554c752cea2bf974251}{}\index{btserial.\+h@{btserial.\+h}!bt\+\_\+open@{bt\+\_\+open}}
+\index{bt\+\_\+open@{bt\+\_\+open}!btserial.\+h@{btserial.\+h}}
+\subsubsection[{bt\+\_\+open(const char $\ast$file\+\_\+in, const char $\ast$file\+\_\+out)}]{\setlength{\rightskip}{0pt plus 5cm}void$\ast$ bt\+\_\+open (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{device, }
+\item[{const char $\ast$}]{unused}
+\end{DoxyParamCaption}
+)}\label{btserial_8h_a9d1ed570025eb554c752cea2bf974251}
+
+
+open a bluetooth device described by device. {\ttfamily N\+U\+L\+L} leads to default action 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em file\+\_\+in} & string describing the bluetooth device \\
+\hline
+\mbox{\tt in}  & {\em only} & for $\ast$nix\+: non-\/\+N\+U\+L\+L for cases where read/write files differ \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+handle a opaque handle for use with bt\+\_\+\{read,write,close,error\} 
+\end{DoxyReturn}
+\begin{DoxySeeAlso}{See also}
+implementation at \hyperlink{bt-win_8c}{bt-\/win.\+c} and \hyperlink{bt-unix_8c}{bt-\/unix.\+c}
+\end{DoxySeeAlso}
+open a bluetooth device described by device. {\ttfamily N\+U\+L\+L} leads to default action
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em virtual} & C\+O\+M port or N\+U\+L\+L \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+H\+A\+N\+D\+L\+E Windows H\+A\+N\+D\+L\+E to virtual C\+O\+M port for use with bt\+\_\+\{read,write,close,error\} 
+\end{DoxyReturn}
+
+
+Definition at line 29 of file bt-\/unix.\+c.
+
+\hypertarget{btserial_8h_a1b964cfcb627fd4cda8298d8f2d9f0d3}{}\index{btserial.\+h@{btserial.\+h}!bt\+\_\+read@{bt\+\_\+read}}
+\index{bt\+\_\+read@{bt\+\_\+read}!btserial.\+h@{btserial.\+h}}
+\subsubsection[{bt\+\_\+read(void $\ast$device, u8 $\ast$buf, size\+\_\+t count, int milliseconds)}]{\setlength{\rightskip}{0pt plus 5cm}int bt\+\_\+read (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{handle, }
+\item[{{\bf u8} $\ast$}]{buf, }
+\item[{size\+\_\+t}]{count, }
+\item[{int}]{milliseconds}
+\end{DoxyParamCaption}
+)}\label{btserial_8h_a1b964cfcb627fd4cda8298d8f2d9f0d3}
+
+
+writes buf\mbox{[}1\mbox{]} till buf\mbox{[}count -\/ 2\mbox{]} to device 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by bt\+\_\+open \\
+\hline
+\mbox{\tt in}  & {\em buf} & buffer to write to \\
+\hline
+\mbox{\tt in}  & {\em count} & number of characters to be read \\
+\hline
+\mbox{\tt in}  & {\em milliseconds} & number of milliseconds to wait at maximum. -\/1 is indefinitely \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+status -\/1 on error. bytes read otherwise. 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000008}{Bug}]the milliseconds part needs to be tested more throughly \begin{DoxySeeAlso}{See also}
+implementation at \hyperlink{bt-win_8c}{bt-\/win.\+c} and \hyperlink{bt-unix_8c}{bt-\/unix.\+c} 
+\end{DoxySeeAlso}
+\end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by \hyperlink{bt-win_8c_a4926e3ba996c4e77d68845713a09db0c}{bt\+\_\+open()} \\
+\hline
+\mbox{\tt in}  & {\em buf} & buffer to write to \\
+\hline
+\mbox{\tt in}  & {\em count} & number of characters to be read \\
+\hline
+\mbox{\tt in}  & {\em milliseconds} & number of milliseconds to wait at maximum. -\/1 is indefinitely \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+status -\/1 on error. bytes read otherwise. 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000003}{Bug}]the milliseconds part needs to be tested more throughly \end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by bt\+\_\+open \\
+\hline
+\mbox{\tt in}  & {\em buf} & buffer to write to \\
+\hline
+\mbox{\tt in}  & {\em count} & number of characters to be read \\
+\hline
+\mbox{\tt in}  & {\em milliseconds} & is ignored \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+status -\/1 on error. bytes read otherwise. 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000005}{Bug}]milliseconds is ignored \end{DoxyRefDesc}
+
+
+Definition at line 77 of file bt-\/unix.\+c.
+
+\hypertarget{btserial_8h_ac9b25cd932b8c5a842d1cd96e22fd200}{}\index{btserial.\+h@{btserial.\+h}!bt\+\_\+write@{bt\+\_\+write}}
+\index{bt\+\_\+write@{bt\+\_\+write}!btserial.\+h@{btserial.\+h}}
+\subsubsection[{bt\+\_\+write(void $\ast$device, const u8 $\ast$buf, size\+\_\+t count)}]{\setlength{\rightskip}{0pt plus 5cm}int bt\+\_\+write (
+\begin{DoxyParamCaption}
+\item[{void $\ast$}]{handle, }
+\item[{const {\bf u8} $\ast$}]{buf, }
+\item[{size\+\_\+t}]{count}
+\end{DoxyParamCaption}
+)}\label{btserial_8h_ac9b25cd932b8c5a842d1cd96e22fd200}
+
+
+writes buf\mbox{[}1\mbox{]} till buf\mbox{[}count -\/ 2\mbox{]} to device 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em device} & handle returned by bt\+\_\+open \\
+\hline
+\mbox{\tt in}  & {\em buf} & byte string to write, the first byte is omitted \\
+\hline
+\mbox{\tt in}  & {\em count} & number of characters to be written (including leading ignored byte) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+status -\/1 on error. bytes read otherwise. 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000007}{Bug}]the first byte is omitted for compatiblity with the leading report byte demanded by {\ttfamily hid\+\_\+write}. Wrapping H\+I\+D\+A\+P\+I could fix this. \begin{DoxySeeAlso}{See also}
+implementation at \hyperlink{bt-win_8c}{bt-\/win.\+c} and \hyperlink{bt-unix_8c}{bt-\/unix.\+c} 
+\end{DoxySeeAlso}
+\end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em handle} & handle returned by \hyperlink{bt-win_8c_a4926e3ba996c4e77d68845713a09db0c}{bt\+\_\+open()} \\
+\hline
+\mbox{\tt in}  & {\em buf} & byte string to write, the first byte is omitted \\
+\hline
+\mbox{\tt in}  & {\em count} & number of characters to be written (including leading ignored byte) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+status -\/1 on error. bytes read otherwise. 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000002}{Bug}]the first byte is omitted for compatiblity with the leading report byte demanded by {\ttfamily hid\+\_\+write}. Wrapping H\+I\+D\+A\+P\+I could fix this. \end{DoxyRefDesc}
+
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em handle} & handle returned by bt\+\_\+open \\
+\hline
+\mbox{\tt in}  & {\em buf} & byte string to write, the first byte is omitted \\
+\hline
+\mbox{\tt in}  & {\em count} & number of characters to be written (including leading ignored byte) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+status -\/1 on error. bytes read otherwise. 
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Bug}
+\item[\hyperlink{bug__bug000004}{Bug}]the first byte is omitted for compatiblity with the leading report byte demanded by {\ttfamily hid\+\_\+write}. Wrapping H\+I\+D\+A\+P\+I could fix this. \end{DoxyRefDesc}
+
+
+Definition at line 51 of file bt-\/unix.\+c.
+

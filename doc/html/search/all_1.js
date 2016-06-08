@@ -1,0 +1,26 @@
+var searchData=
+[
+  ['bailout',['bailout',['../tcp_8c.html#a0a138470b56ab4c559f4690342cc2ab3',1,'tcp.c']]],
+  ['begin_5fdownload',['BEGIN_DOWNLOAD',['../struct_b_e_g_i_n___d_o_w_n_l_o_a_d.html',1,'']]],
+  ['begin_5fdownload_5finit',['BEGIN_DOWNLOAD_INIT',['../packets_8c.html#a1a8e47c8020b4f9b9bdedad3e65bb076',1,'BEGIN_DOWNLOAD_INIT():&#160;packets.c'],['../packets_8h.html#a1a8e47c8020b4f9b9bdedad3e65bb076',1,'BEGIN_DOWNLOAD_INIT():&#160;packets.c']]],
+  ['begin_5fdownload_5freply',['BEGIN_DOWNLOAD_REPLY',['../struct_b_e_g_i_n___d_o_w_n_l_o_a_d___r_e_p_l_y.html',1,'']]],
+  ['begin_5fgetfile',['BEGIN_GETFILE',['../packets_8h.html#a6ceb579e59ce635ca6dca88e851a6aab',1,'packets.h']]],
+  ['begin_5fgetfile_5finit',['BEGIN_GETFILE_INIT',['../packets_8c.html#a0fedab4058d7adf4fe5cde7d3613efab',1,'BEGIN_GETFILE_INIT():&#160;packets.c'],['../packets_8h.html#a0fedab4058d7adf4fe5cde7d3613efab',1,'BEGIN_GETFILE_INIT():&#160;packets.c']]],
+  ['begin_5fupload',['BEGIN_UPLOAD',['../struct_b_e_g_i_n___u_p_l_o_a_d.html',1,'']]],
+  ['begin_5fupload_5finit',['BEGIN_UPLOAD_INIT',['../packets_8c.html#acc3a31580cb57d0ae2b4aedeca33ca06',1,'BEGIN_UPLOAD_INIT():&#160;packets.c'],['../packets_8h.html#acc3a31580cb57d0ae2b4aedeca33ca06',1,'BEGIN_UPLOAD_INIT():&#160;packets.c']]],
+  ['begin_5fupload_5freply',['BEGIN_UPLOAD_REPLY',['../struct_b_e_g_i_n___u_p_l_o_a_d___r_e_p_l_y.html',1,'']]],
+  ['bluetoothpin',['BLUETOOTHPIN',['../packets_8h.html#ac3a1ac8c2841ebbffc2c5b6aa98a167f',1,'packets.h']]],
+  ['bluetoothpin_5finit',['BLUETOOTHPIN_INIT',['../packets_8c.html#aca1d211b0e7261ae3c50d644eb91112b',1,'BLUETOOTHPIN_INIT():&#160;packets.c'],['../packets_8h.html#aca1d211b0e7261ae3c50d644eb91112b',1,'BLUETOOTHPIN_INIT():&#160;packets.c']]],
+  ['bluetoothpin_5freply',['BLUETOOTHPIN_REPLY',['../struct_b_l_u_e_t_o_o_t_h_p_i_n___r_e_p_l_y.html',1,'']]],
+  ['bt',['BT',['../bt-unix_8c.html#a9ed5212b4acf61bb0f7b9b9078ba67ae',1,'BT():&#160;bt-unix.c'],['../bt-win_8c.html#a9ed5212b4acf61bb0f7b9b9078ba67ae',1,'BT():&#160;bt-win.c']]],
+  ['bt_2dunix_2ec',['bt-unix.c',['../bt-unix_8c.html',1,'']]],
+  ['bt_2dwin_2ec',['bt-win.c',['../bt-win_8c.html',1,'']]],
+  ['bt_5fclose',['bt_close',['../bt-unix_8c.html#a66111b994dc31a22f27679a286c338e4',1,'bt_close(void *handle):&#160;bt-unix.c'],['../bt-win_8c.html#a66111b994dc31a22f27679a286c338e4',1,'bt_close(void *handle):&#160;bt-win.c'],['../btserial_8h.html#ac55022b02ba1040cb1ee132abd82e989',1,'bt_close(void *):&#160;bt-unix.c']]],
+  ['bt_5ferror',['bt_error',['../bt-unix_8c.html#a91cd0489b6e5dc0973109579ca9c7a55',1,'bt_error(void *fd_):&#160;bt-unix.c'],['../bt-win_8c.html#a91cd0489b6e5dc0973109579ca9c7a55',1,'bt_error(void *fd_):&#160;bt-win.c'],['../btserial_8h.html#ad7be1494a76a1058ec4ba51588a09109',1,'bt_error(void *device):&#160;bt-unix.c']]],
+  ['bt_5fopen',['bt_open',['../bt-unix_8c.html#a604b81ec74c835b44c026a6af353e8d6',1,'bt_open(const char *file, const char *file2):&#160;bt-unix.c'],['../bt-win_8c.html#a4926e3ba996c4e77d68845713a09db0c',1,'bt_open(const char *device, const char *unused):&#160;bt-win.c'],['../btserial_8h.html#a9d1ed570025eb554c752cea2bf974251',1,'bt_open(const char *file_in, const char *file_out):&#160;bt-unix.c']]],
+  ['bt_5fread',['bt_read',['../bt-unix_8c.html#a0100d3e3520a9b774896f6b2a2f589f5',1,'bt_read(void *fd_, u8 *buf, size_t count, int milliseconds):&#160;bt-unix.c'],['../bt-win_8c.html#a5861a216864bb97223f98e631f0c667c',1,'bt_read(void *handle, u8 *buf, size_t count, int milliseconds):&#160;bt-win.c'],['../btserial_8h.html#a1b964cfcb627fd4cda8298d8f2d9f0d3',1,'bt_read(void *device, u8 *buf, size_t count, int milliseconds):&#160;bt-unix.c']]],
+  ['bt_5fwrite',['bt_write',['../bt-unix_8c.html#acbb62c11a110c097a4a9be010af9c4e7',1,'bt_write(void *fd_, const u8 *buf, size_t count):&#160;bt-unix.c'],['../bt-win_8c.html#a4da84bfe7c552c082e73af8f28ff2af5',1,'bt_write(void *handle, const u8 *buf, size_t count):&#160;bt-win.c'],['../btserial_8h.html#ac9b25cd932b8c5a842d1cd96e22fd200',1,'bt_write(void *device, const u8 *buf, size_t count):&#160;bt-unix.c']]],
+  ['btserial_2eh',['btserial.h',['../btserial_8h.html',1,'']]],
+  ['bug_20list',['Bug List',['../bug.html',1,'']]],
+  ['bytes',['bytes',['../struct_s_y_s_t_e_m___c_m_d.html#a2d91cb3d17029658efa97c43e22379f0',1,'SYSTEM_CMD::bytes()'],['../struct_s_y_s_t_e_m___r_e_p_l_y.html#aca67a2a7a200b0c2fa5e935065359910',1,'SYSTEM_REPLY::bytes()'],['../struct_b_e_g_i_n___u_p_l_o_a_d___r_e_p_l_y.html#a1fdde1580342b6b1df0d8f5213c45107',1,'BEGIN_UPLOAD_REPLY::bytes()'],['../struct_c_o_n_t_i_n_u_e___u_p_l_o_a_d___r_e_p_l_y.html#a1fdde1580342b6b1df0d8f5213c45107',1,'CONTINUE_UPLOAD_REPLY::bytes()'],['../struct_v_m___c_m_d.html#a8e19d282af2481cb27f08a7de26a8e6a',1,'VM_CMD::bytes()'],['../struct_v_m___r_e_p_l_y.html#a1fdde1580342b6b1df0d8f5213c45107',1,'VM_REPLY::bytes()']]]
+];

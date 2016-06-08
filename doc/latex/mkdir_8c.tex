@@ -1,0 +1,68 @@
+\hypertarget{mkdir_8c}{}\section{src/mkdir.c File Reference}
+\label{mkdir_8c}\index{src/mkdir.\+c@{src/mkdir.\+c}}
+
+
+creates a directory structure on the ev3  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}ev3\+\_\+io.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packets.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}funcs.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{mkdir_8c_afeb6cbc06f4dc89199e2c33561b2f77e}{mkdir} (const char $\ast$path)
+\begin{DoxyCompactList}\small\item\em creates directory structures relative to {\itshape /home/root/lms2012/prjs/sys/{\itshape  }}\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+creates a directory structure on the ev3 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 3.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Function Documentation}
+\hypertarget{mkdir_8c_afeb6cbc06f4dc89199e2c33561b2f77e}{}\index{mkdir.\+c@{mkdir.\+c}!mkdir@{mkdir}}
+\index{mkdir@{mkdir}!mkdir.\+c@{mkdir.\+c}}
+\subsubsection[{mkdir(const char $\ast$path)}]{\setlength{\rightskip}{0pt plus 5cm}int mkdir (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path}
+\end{DoxyParamCaption}
+)}\label{mkdir_8c_afeb6cbc06f4dc89199e2c33561b2f77e}
+
+
+creates directory structures relative to {\itshape /home/root/lms2012/prjs/sys/{\itshape  }}
+
+create directory {\ttfamily rem} on remote system
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em path} & directory structure\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxySeeAlso}{See also}
+your man pages for {\ttfamily \hyperlink{funcs_8h_a433be27a0f3e031bf4b8aca1c53284cb}{mkdir}} 
+\end{DoxySeeAlso}
+\begin{DoxyNote}{Note}
+The V\+M will choke to death when you excede the A\+S\+C\+I\+I subset of U\+T\+F-\/8 Do N\+O\+T use any non A\+S\+C\+I\+I letters if you want the L\+E\+G\+O menu to stay responsible. In case of fudging up, {\ttfamily ev3duder} \hyperlink{funcs_8h_ae815743b20ac09451a0c027c8ad6b57e}{rm()} can delete directories too 
+\end{DoxyNote}
+
+
+Definition at line 29 of file mkdir.\+c.
+

@@ -1,0 +1,68 @@
+\hypertarget{run_8c}{}\section{src/run.c File Reference}
+\label{run_8c}\index{src/run.\+c@{src/run.\+c}}
+
+
+runs rbf file via V\+M facilities  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$hidapi/hidapi.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packets.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}funcs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}ev3\+\_\+io.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{run_8c_a19dc04db398bcfa861086cc19853ce6d}{run} (const char $\ast$exec, unsigned \hyperlink{main_8c_a7bd15b1b4bbdd7329986c9c4af33d10d}{timeout})
+\begin{DoxyCompactList}\small\item\em run rbf file \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+runs rbf file via V\+M facilities 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 3.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Function Documentation}
+\hypertarget{run_8c_a19dc04db398bcfa861086cc19853ce6d}{}\index{run.\+c@{run.\+c}!run@{run}}
+\index{run@{run}!run.\+c@{run.\+c}}
+\subsubsection[{run(const char $\ast$exec, unsigned timeout)}]{\setlength{\rightskip}{0pt plus 5cm}int run (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{exec, }
+\item[{unsigned}]{timeout}
+\end{DoxyParamCaption}
+)}\label{run_8c_a19dc04db398bcfa861086cc19853ce6d}
+
+
+run rbf file 
+
+run remote .rbf file {\ttfamily rem} via V\+M
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em path} & path to file to execute\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxySeeAlso}{See also}
+\href{http://ev3.fantastic.computer/doxygen/buildinapps.html}{\tt http\+://ev3.\+fantastic.\+computer/doxygen/buildinapps.\+html} 
+
+\hyperlink{funcs_8h_a575ddc806cdf31e8ac769e9dc21f6e57}{mkrbf()} 
+\end{DoxySeeAlso}
+
+
+Definition at line 30 of file run.\+c.
+

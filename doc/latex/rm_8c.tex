@@ -1,0 +1,65 @@
+\hypertarget{rm_8c}{}\section{src/rm.c File Reference}
+\label{rm_8c}\index{src/rm.\+c@{src/rm.\+c}}
+
+
+removes files and directories see rm(1)  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$errno.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}ev3\+\_\+io.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}defs.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}packets.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}error.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}funcs.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \hyperlink{rm_8c_a3abe826d85bb2b4c4d85f3983d5fa6ec}{rm} (const char $\ast$path)
+\begin{DoxyCompactList}\small\item\em removes files and directories at {\ttfamily path}. path is always relative to {\itshape /home/root/lms2012/prjs/sys/{\itshape  }}\end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+removes files and directories see rm(1) 
+
+\begin{DoxyAuthor}{Author}
+Ahmad Fatoum 
+\end{DoxyAuthor}
+\begin{DoxyCopyright}{Copyright}
+(c) 2015 Ahmad Fatoum. Code available under terms of the G\+N\+U General Public License 3.\+0 
+\end{DoxyCopyright}
+
+
+\subsection{Function Documentation}
+\hypertarget{rm_8c_a3abe826d85bb2b4c4d85f3983d5fa6ec}{}\index{rm.\+c@{rm.\+c}!rm@{rm}}
+\index{rm@{rm}!rm.\+c@{rm.\+c}}
+\subsubsection[{rm(const char $\ast$path)}]{\setlength{\rightskip}{0pt plus 5cm}int rm (
+\begin{DoxyParamCaption}
+\item[{const char $\ast$}]{path}
+\end{DoxyParamCaption}
+)}\label{rm_8c_a3abe826d85bb2b4c4d85f3983d5fa6ec}
+
+
+removes files and directories at {\ttfamily path}. path is always relative to {\itshape /home/root/lms2012/prjs/sys/{\itshape  }}
+
+remove remote file or directory {\ttfamily rem} 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em path} & path/file to remove\\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em error} & according to enum \hyperlink{error_8h_a50d8f4457c9217d584d36a3352a55103}{E\+R\+R} \\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyWarning}{Warning}
+removing system files will lock up the device/\+V\+M. don\textquotesingle{}t do it 
+\end{DoxyWarning}
+
+
+Definition at line 27 of file rm.\+c.
+
