@@ -12,13 +12,11 @@
 #include "defs.h"
 
 #define BT "COM1"
-// ^ FIXME: add multiple COM ports (enumerate them)
 
 /**
  * \param [in] virtual COM port or NULL
  * \return HANDLE Windows HANDLE to virtual COM port for use with bt_{read,write,close,error}
  * \brief opens COM Porte described by device. `NULL` leads to default action
- * \bug default value should be enumerating. Not hardcoded like in \p BT
  */ 
 void *bt_open(const char *device , const char* unused)
 {
@@ -77,7 +75,6 @@ void bt_close(void *handle)
  * \param [in] device handle returned by bt_open
  * \return message An error string
  * \brief Returns an error string describing the last error occured
- * \bug it's useless. Could be done with GetLastError + FormatMessageW
  */
 const wchar_t *bt_error(void* fd_) { 
 	(void)fd_;

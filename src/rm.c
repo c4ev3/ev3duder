@@ -43,7 +43,7 @@ int rm(const char *path)
 	res = ev3_read_timeout(handle, (u8 *)&rmrep, sizeof rmrep, TIMEOUT);
 	if (res <= 0)
 	{
-		errmsg = "Unable to read DELETE_FILEhiderr";
+		errmsg = "Unable to read DELETE_FILE";
 		return ERR_COMM;
 	}
 
