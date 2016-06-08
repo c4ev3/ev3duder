@@ -52,13 +52,3 @@ doc
 #vim
 *.sw*
 *.pyc
-
-doc/
-html/
-latex/
-s/
-
-tags
-GTAGS
-GRTAGS
-GPATH
