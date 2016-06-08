@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <string.h>
 
 // shorter type names
 typedef uint8_t u8;
@@ -25,7 +26,9 @@ typedef int64_t i64;
 
 #ifndef _GNU_SOURCE
 //! \brief returns dst+len instead of len for easiert chaining
-#define mempcpy(dst, src, len) ((char*)memcpy((dst), (src), (len)) + (len))
+static inline void *mempcpy(void * restrict dst, const void * restrict src, size_t len) {
+    return (char*)memcpy(dst, src, len) + len;
+}
 #endif
 
 #define print_bytes(buf, len) \
