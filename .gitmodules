@@ -4,3 +4,4 @@
 [submodule "EV3-API"]
 	path = EV3-API
 	url = https://github.com/c4ev3/EV3-API
+	master = master
