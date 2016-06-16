@@ -121,14 +121,14 @@ cross: HIDFLAGS += `pkg-config libusb-1.0 --cflags`
 cross: LDFLAGS += `pkg-config libusb-1.0 --libs` -lrt -lpthread
 cross: $(BIN_NAME)
 
+ifneq ($(OS),Windows_NT)
 .PHONY: install
 install: $(BIN_NAME) ev3-udev.rules udev.sh
-	ifneq ($(OS),Windows_NT)
 	-@mkdir /usr/lib/ev3duder/
 	cp $(BIN_NAME) /usr/lib/ev3duder
 	ln -s /usr/lib/ev3duder/$(BIN_NAME) /usr/bin/ev3
 	$(INSTALL)
-	endif
+endif
 
 .PHONY: clean
 clean:
