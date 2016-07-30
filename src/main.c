@@ -135,10 +135,10 @@ int main(int argc, char *argv[])
                 strcmp(argv[1], "/?") == 0))
     {
         printf("%s (%s; %s) v%s\n"
-               "Copyright (C) 2015 Ahmad Fatoum\n"
+               "Copyright (C) 2016 Ahmad Fatoum\n"
                "This is free software; see the source for copying conditions.   There is NO\n"
                "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-               "Source is available under the GNU GPL v3.0 https://github.com/a3f/ev3duder/\n\n",
+               "Source is available under the GNU GPL v3.0 https://github.com/c4ev3/ev3duder/\n\n",
                argv[0], CONFIGURATION, SYSTEM, VERSION);
         puts(usage);
         puts(usage_desc);

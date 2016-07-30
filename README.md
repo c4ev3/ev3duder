@@ -17,9 +17,9 @@ Also required is GNU Make.
 ### Getting the source
 Get the source with git:
 
-    $ git clone --recursive https://github.com/a3f/ev3duder
+    $ git clone --recursive https://github.com/c4ev3/ev3duder
 If you haven't got git, you will have to download these seperately:
-	https://github.com/a3f/ev3duder/archive/master.zip
+	https://github.com/c4ev3/ev3duder/archive/master.zip
 and
 	https://github.com/signal11/hidapi/archive/master.zip
 then unpack the hidapi archive into the hidapi directory of the ev3duder extraction path.
