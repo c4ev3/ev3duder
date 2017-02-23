@@ -90,7 +90,7 @@ int up(FILE *fp, const char *dst)
 	}
 	cd->packetLen = sizeof(CONTINUE_DOWNLOAD) + final_chunk_sz - PREFIX_SIZE;
 	fread(cd->fileChunk, 1, final_chunk_sz, fp);
-	ev3_write(handle, (u8*)cd, cd->packetLen + PREFIX_SIZE);
+	res = ev3_write(handle, (u8*)cd, cd->packetLen + PREFIX_SIZE);
 	if (res < 0)
 	{
 		errmsg = "Unable to write CONTINUE_DOWNLOAD.";
