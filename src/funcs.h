@@ -53,8 +53,8 @@ extern int mkdir(const char *rem);
 extern size_t mkrbf(char **buf, const char *cmd);
 
 //! tunnel stdio to established ev3 connection
-extern int tunnel();
-extern int listen();
+extern int tunnelMode();
+extern int listenMode();
 
 
 #if 0 // not yet implemented

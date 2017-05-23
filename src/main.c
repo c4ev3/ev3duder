@@ -321,10 +321,10 @@ int main(int argc, char *argv[])
         ret = ls(argv[0] ?: "/");
         break;
     case ARG_tunnel:
-        ret = tunnel();
+        ret = tunnelMode();
         break;
     case ARG_listen:
-        ret = listen();
+        ret = listenMode();
         break;
     case ARG_send:
         ;

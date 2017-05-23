@@ -31,8 +31,8 @@ static int hex2nib(char hex);
  *
  *	- If stdio is connected to a terminal, packets can be entered in hex and submitted with a line break. non-graphical characters, including whitespace, are ignored. If the first 4 bytes can't be parsed as hex digits, they are replaced with the binary length. Any other character is replaced with a nibble rounded up.
  *	- If stdio is a pipe, the first 2 bytes are read to acquire packet length and then an equal amount of bytes is read and sent to the ev3
- */ 
-int tunnel()
+ */
+int tunnelMode()
 {
 	int res;
 	(void)res;
