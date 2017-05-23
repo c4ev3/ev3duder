@@ -14,6 +14,7 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/select.h>
 
 #include "defs.h"
 //! default serial port name on OS X
@@ -72,15 +73,26 @@ int bt_write(void* fd_, const u8* buf, size_t count)
  * \param [in] milliseconds number of milliseconds to wait at maximum. -1 is indefinitely
  * \return status -1 on error. bytes read otherwise.	
  * \brief writes buf[1] till buf[count - 2] to device
- * \bug the milliseconds part needs to be tested more throughly
- */ 
+ * \bug timeout only applies to first byte read; once something is read, the whole packed is read in a blocking way
+ */
 int bt_read(void* fd_, u8* buf, size_t count, int milliseconds)
 {
-	(void) milliseconds;
 	int fd = ((int*)fd_)[READ];
 	size_t recvd =0;
 	size_t packet_len = 2;
 	ssize_t ret;
+
+	if (milliseconds >= 0) {
+		struct timeval timeout;
+		timeout.tv_sec = milliseconds/1000;
+		timeout.tv_usec = (milliseconds%1000)*1000;
+		fd_set fdset;
+		FD_ZERO(&fdset);
+		FD_SET(fd, &fdset);
+		select(fd+1, &fdset, NULL, NULL, &timeout);
+		if (!FD_ISSET(fd, &fdset)) return 0;
+	}
+
 	do {
 		ret = read(fd, buf+recvd, packet_len-recvd);
 		if (ret <= 0)
