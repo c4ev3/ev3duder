@@ -61,7 +61,7 @@ const char* const usage =
     "USAGE: ev3duder " "[ --tcp | --usb | --serial ] [=dev1,dev2] \n"
     "                " "[ up loc rem | dl rem loc | rm rem | ls [rem] |\n"
     "                " "  mkdir rem | mkrbf rem loc | run rem | exec cmd |\n"
-    "                " "  wpa2 SSID [pass] | info | tunnel ]\n"
+    "                " "  wpa2 SSID [pass] | info | tunnel | bridge ]\n"
     "       "
     "rem = remote (EV3) path, loc = local path, dev = device identifier"	"\n";
 const char* const usage_desc =
@@ -81,6 +81,7 @@ const char* const usage_desc =
     "exec\t"	"pass cmd to root shell. Handle with caution\n"
     "wpa2\t"	"connect to WPA-Network SSID, if pass isn't specified, read from stdin\n"
     "tunnel\t"	"connects stdout/stdin to the ev3 VM\n"
+    "bridge\t"	"simulates a WiFi-connected device bridged to the real ev3 VM\n"
     ;
 
 #define FOREACH_ARG(ARG) \
@@ -93,6 +94,7 @@ ARG(rm)              \
 ARG(mkdir)           \
 ARG(mkrbf)           \
 ARG(tunnel)			\
+ARG(bridge)			\
 ARG(listen)			\
 ARG(send)			\
 ARG(exec)            \
@@ -325,6 +327,9 @@ int main(int argc, char *argv[])
         break;
     case ARG_listen:
         ret = listenMode();
+        break;
+    case ARG_bridge:
+        ret = bridgeMode();
         break;
     case ARG_send:
         ;
