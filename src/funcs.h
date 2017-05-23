@@ -55,6 +55,7 @@ extern size_t mkrbf(char **buf, const char *cmd);
 //! tunnel stdio to established ev3 connection
 extern int tunnelMode();
 extern int listenMode();
+extern int bridgeMode();
 
 
 #if 0 // not yet implemented
