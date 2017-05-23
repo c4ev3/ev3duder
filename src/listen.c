@@ -4,7 +4,7 @@
 #include "defs.h"
 #include "ev3_io.h"
 
-int listen()
+int listenMode()
 {
 	u8 buffer[1280] = {0};
 	int read;
