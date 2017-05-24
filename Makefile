@@ -13,7 +13,7 @@ FLAGS += -std=c99 -Wall -Wextra -DVERSION='"$(VERSION)"'
 SRCDIR = src
 OBJDIR = build
 
-SRCS = src/main.c src/packets.c src/run.c src/info.c src/up.c src/ls.c src/rm.c src/mkdir.c src/mkrbf.c src/dl.c src/listen.c src/send.c src/tunnel.c src/tcp.c src/bridge.c
+SRCS = src/main.c src/packets.c src/run.c src/info.c src/up.c src/ls.c src/rm.c src/mkdir.c src/mkrbf.c src/dl.c src/listen.c src/send.c src/tunnel.c src/tcp.c
 
 INC += -Ihidapi/ -Ihidapi/hidapi/
  
@@ -79,7 +79,8 @@ endif
 endif
 
 ## ALL UNICES
-SRCS += src/bt-unix.c
+FLAGS += -DBRIDGE_MODE
+SRCS += src/bt-unix.c src/bridge.c
 endif
 
 CROSS_PREFIX ?= arm-linux-gnueabi-g

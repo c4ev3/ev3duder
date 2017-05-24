@@ -1,5 +1,5 @@
 /*
- * LEGOÃÂÃÂ® MINDSTORMS EV3
+ * LEGO® MINDSTORMS EV3
  *
  * Copyright (C) 2010-2013 The LEGO Group
  *
@@ -17,6 +17,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
+ */
+
+/*
+ * Note: This is a heavily stripped down and edited version of
+ * https://github.com/mindboards/ev3sources/blob/master/lms2012/c_com/source/c_wifi.c
  */
 
 #include <time.h>
@@ -369,7 +374,7 @@ static bool cNetInitUdp(void) {
 	return true;
 }
 
-int bridgeMode() {
+int bridge_mode() {
 	if (!cNetInitUdp()) return ERR_IO;
 	if (!cNetInitTcpServer()) return ERR_IO;
 
