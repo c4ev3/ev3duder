@@ -73,7 +73,7 @@ int bt_write(void* fd_, const u8* buf, size_t count)
  * \param [in] milliseconds number of milliseconds to wait at maximum. -1 is indefinitely
  * \return status -1 on error. bytes read otherwise.	
  * \brief writes buf[1] till buf[count - 2] to device
- * \bug timeout only applies to first byte read; once something is read, the whole packed is read in a blocking way
+ * \bug timeout only applies to first byte read; once something is read, the whole packet is read in a blocking way
  */
 int bt_read(void* fd_, u8* buf, size_t count, int milliseconds)
 {
