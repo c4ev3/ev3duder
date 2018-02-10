@@ -14,7 +14,7 @@
 	char *buf; \
 	int error = WSAGetLastError(); \
 	if (FormatMessageA( FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,\
-    NULL, error, 0, (char*)&buf, 0, NULL) && error) \
+	NULL, error, 0, (char*)&buf, 0, NULL) && error) \
 		fprintf(stderr, "%s. Error message: %s\n", (msg), buf);\
 	else \
 		fprintf(stderr, "%s. Error code: %d\n", (msg), error); \
@@ -28,7 +28,7 @@ static inline int inet_pton(int af, const char *src, void *dst);
 typedef int socklen_t;
 
 #define socksetblock(sock, y_n) \
-    ioctlsocket((sock), FIONBIO, &(unsigned long){!(y_n)})
+	ioctlsocket((sock), FIONBIO, &(unsigned long){!(y_n)})
 
 #else /* POSIX */
 
@@ -39,7 +39,7 @@ typedef int SOCKET;
 #define closesocket close
 #define socksetblock(sock, y_n) ((y_n) ? \
 	fcntl((sock), F_SETFL, fcntl((sock), F_GETFL, 0) & ~O_NONBLOCK) : \
-    fcntl((sock), F_SETFL, O_NONBLOCK))
+	fcntl((sock), F_SETFL, O_NONBLOCK))
 
 #include <unistd.h>
 #include <sys/types.h>
@@ -53,6 +53,7 @@ typedef int SOCKET;
 #include "btserial.h"
 
 #endif
+
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -66,6 +67,7 @@ typedef int SOCKET;
 
 #define UDP_RECV_TIMEOUT 6
 #define TCP_CONNECT_TIMEOUT 1
+
 /**
  * \param [in] serial IP-Address or Serial-Number of Ev3. `NULL` connects to the first available
  * \return &fd pointer to file descriptor for use with tcp_{read,write,close,error}
@@ -79,7 +81,7 @@ typedef int SOCKET;
  * Afterwards the Ev3 starts listening on the port it broadcasted.  
  * Then a GET request is sent and the VM starts listening and business is as usual
  * \see http://www.monobrick.dk/guides/how-to-establish-a-wifi-connection-with-the-ev3-brick/
- */ 
+ */
 
 void *tcp_open(const char *serial, unsigned timeout)
 {
@@ -110,18 +112,26 @@ void *tcp_open(const char *serial, unsigned timeout)
 		 * success if its found. This isn't guaranteed to stay, however
 		 */
 		servaddr.sin_family = AF_INET;
-		switch(inet_pton(AF_INET, serial, &servaddr.sin_addr)){
-			case 1: break;
-			case 0: fprintf(stderr, "Invalid IP specified '%s'\n", serial); return NULL;
-			case -1: bailout("Parsing IP failed"); return NULL;
+		switch (inet_pton(AF_INET, serial, &servaddr.sin_addr))
+		{
+			case 1:
+				break;
+			case 0:
+				fprintf(stderr, "Invalid IP specified '%s'\n", serial);
+				return NULL;
+			case -1:
+				bailout("Parsing IP failed");
+				return NULL;
 		}
 		strncpy(fdp->name, "[n/a]", sizeof fdp->name);
 		strncpy(fdp->protocol, "[n/a]", sizeof fdp->protocol);
 		strncpy(fdp->serial, "[n/a]", sizeof fdp->serial);
 		servaddr.sin_port = htons(fdp->tcp_port = TCP_PORT);
 		strncpy(fdp->ip, serial, sizeof fdp->ip);
-		
-	}else{ // we need to search for it
+
+	}
+	else
+	{ // we need to search for it
 		if ((fd = socket(AF_INET, SOCK_DGRAM, 0)) == INVALID_SOCKET)
 		{
 			bailout("Failed to create socket");
@@ -129,9 +139,9 @@ void *tcp_open(const char *serial, unsigned timeout)
 		}
 
 		servaddr.sin_family = AF_INET;
-		servaddr.sin_addr.s_addr=htonl(INADDR_ANY);
+		servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
 		servaddr.sin_port = htons(UDP_PORT);
-		if (bind(fd, (struct sockaddr *)&servaddr, sizeof servaddr) == SOCKET_ERROR)
+		if (bind(fd, (struct sockaddr *) &servaddr, sizeof servaddr) == SOCKET_ERROR)
 		{
 			closesocket(fd);
 			bailout("Failed to bind");
@@ -140,9 +150,10 @@ void *tcp_open(const char *serial, unsigned timeout)
 
 		struct sockaddr_in cliaddr;
 		socklen_t len = sizeof cliaddr;
-		do {
-			setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (void*)&tv_udp, sizeof tv_udp);
-			n = recvfrom(fd, buffer,sizeof buffer,0,(struct sockaddr *)&cliaddr,&len);
+		do
+		{
+			setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (void *) &tv_udp, sizeof tv_udp);
+			n = recvfrom(fd, buffer, sizeof buffer, 0, (struct sockaddr *) &cliaddr, &len);
 			if (n == SOCKET_ERROR)
 			{
 				closesocket(fd);
@@ -151,15 +162,15 @@ void *tcp_open(const char *serial, unsigned timeout)
 			}
 
 			buffer[n] = '\0';
-			sscanf(buffer, 
-					"Serial-Number: %s\r\n"
-					"Port: %u\r\n"
-					"Name: %s\r\n"
-					"Protocol: %s\r\n",
-					fdp->serial, &fdp->tcp_port, fdp->name, fdp->protocol);
-		}while(serial && strcmp(serial, fdp->serial) != 0);
+			sscanf(buffer,
+				   "Serial-Number: %s\r\n"
+						   "Port: %u\r\n"
+						   "Name: %s\r\n"
+						   "Protocol: %s\r\n",
+				   fdp->serial, &fdp->tcp_port, fdp->name, fdp->protocol);
+		} while (serial && strcmp(serial, fdp->serial) != 0);
 
-		n = sendto(fd, (char[]){0x00}, 1, 0, (struct sockaddr *)&cliaddr, sizeof cliaddr);
+		n = sendto(fd, (char[]) {0x00}, 1, 0, (struct sockaddr *) &cliaddr, sizeof cliaddr);
 		closesocket(fd);
 		if (n == SOCKET_ERROR)
 		{
@@ -175,12 +186,12 @@ void *tcp_open(const char *serial, unsigned timeout)
 		inet_ntop(AF_INET, &cliaddr.sin_addr, fdp->ip, sizeof fdp->ip);
 		servaddr.sin_port = htons(fdp->tcp_port);
 	}
-		
+
 	fd = socket(AF_INET, SOCK_STREAM, 0);
 
 	socksetblock(fd, 0);
 
-	n = connect(fd, (struct sockaddr *)&servaddr, sizeof servaddr);
+	n = connect(fd, (struct sockaddr *) &servaddr, sizeof servaddr);
 	fd_set fdset;
 	FD_ZERO(&fdset);
 	FD_SET(fd, &fdset);
@@ -193,7 +204,7 @@ void *tcp_open(const char *serial, unsigned timeout)
 		getsockopt(fd, SOL_SOCKET, SO_ERROR, &so_error, &len);
 		if (so_error == 0)
 #endif
-		   n = 0; 
+			n = 0;
 	}
 	socksetblock(fd, 1);
 
@@ -203,23 +214,23 @@ void *tcp_open(const char *serial, unsigned timeout)
 		bailout("Failed to initiate TCP connection");
 		return NULL;
 	}
-	
-	n = snprintf(buffer, sizeof buffer, 
-			"GET /target?sn=%s VMTP1.0\nProtocol: %s",
-			fdp->serial, fdp->protocol);
-	n = sendto(fd, buffer, n, 0, (struct sockaddr *)&servaddr, sizeof servaddr);
+
+	n = snprintf(buffer, sizeof buffer,
+				 "GET /target?sn=%s VMTP1.0\nProtocol: %s",
+				 fdp->serial, fdp->protocol);
+	n = sendto(fd, buffer, n, 0, (struct sockaddr *) &servaddr, sizeof servaddr);
 	if (n == SOCKET_ERROR)
 	{
 		closesocket(fd);
 		bailout("Failed to handshake over TCP");
 		return NULL;
 	}
-	
-	n=recvfrom(fd, buffer, sizeof buffer, 0, NULL, NULL);
+
+	n = recvfrom(fd, buffer, sizeof buffer, 0, NULL, NULL);
 	if (n == SOCKET_ERROR)
 	{
 		closesocket(fd);
-		bailout("Failed to recieve TCP-connection confirmation"); 
+		bailout("Failed to recieve TCP-connection confirmation");
 		return NULL;
 	}
 
@@ -240,20 +251,25 @@ void *tcp_open(const char *serial, unsigned timeout)
  */
 void tcp_close(void *sock)
 {
-	shutdown(*(SOCKET*)sock, SHUT_RDWR);
-	closesocket(*(SOCKET*)sock);
+	shutdown(*(SOCKET *) sock, SHUT_RDWR);
+	closesocket(*(SOCKET *) sock);
 	free(sock);
 #ifdef _WIN32
 	WSACleanup();
 #endif
 }
+
 /**
  * \param [in] device handle returned by tcp_open()
  * \return message An error string
  * \brief Returns an error string describing the last error occured
  * \bug it's useless. Could use \p wprintf and \p strerror
  */
-const wchar_t *tcp_error(void* fd_) { (void)fd_; return L"Errors not implemented yet";}
+const wchar_t *tcp_error(void *fd_)
+{
+	(void) fd_;
+	return L"Errors not implemented yet";
+}
 
 #ifdef _WIN32
 int tcp_write(void* sock, const u8* buf, size_t count) {
@@ -268,8 +284,9 @@ int tcp_read(void* sock, u8* buf, size_t count, int milliseconds) {
 }
 #else
 
-int (*tcp_write)(void* device, const u8* buf, size_t count) = bt_write;
-int (*tcp_read)(void* device, u8* buf, size_t count, int milliseconds) = bt_read;
+int (*tcp_write)(void *device, const u8 *buf, size_t count) = bt_write;
+
+int (*tcp_read)(void *device, u8 *buf, size_t count, int milliseconds) = bt_read;
 
 #endif
 

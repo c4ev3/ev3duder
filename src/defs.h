@@ -26,9 +26,11 @@ typedef int64_t i64;
 
 #if !defined(_GNU_SOURCE) && !defined(mempcpy) && !defined(__MINGW32__)
 //! \brief returns dst+len instead of len for easiert chaining
-static inline void *mempcpy(void * restrict dst, const void * restrict src, size_t len) {
-    return (char*)memcpy(dst, src, len) + len;
+static inline void *mempcpy(void *restrict dst, const void *restrict src, size_t len)
+{
+	return (char *) memcpy(dst, src, len) + len;
 }
+
 #endif
 
 #define print_bytes(buf, len) \

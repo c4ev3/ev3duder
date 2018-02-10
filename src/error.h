@@ -16,10 +16,17 @@
 #endif
 
 #include "defs.h"
+
 //! Errors returnable from \p main
-enum ERR {ERR_UNK = 0, ERR_ARG, ERR_IO, ERR_FTOOBIG, ERR_NOMEM, ERR_COMM, ERR_VM, ERR_SYS, ERR_END};
+enum ERR
+{
+	ERR_UNK = 0, ERR_ARG, ERR_IO, ERR_FTOOBIG, ERR_NOMEM, ERR_COMM, ERR_VM, ERR_SYS, ERR_END
+};
 //! Statuses from VM
-enum {VM_OK = 0x03, VM_ERROR = 0x05};
+enum
+{
+	VM_OK = 0x03, VM_ERROR = 0x05
+};
 
 //! global variable for last error message
 EXTERN const char *errmsg;
@@ -28,44 +35,45 @@ EXTERN const char *errmsg;
  * Errors returned from VM
  * \see https://github.com/mindboards/ev3sources/blob/master/lms2012/c_com/source/c_com.h 
  */
-enum {
-    SUCCESS = 0,
-    UNKNOWN_HANDLE,
-    HANDLE_NOT_READY,
-    CORRUPT_FILE,
-    NO_HANDLES_AVAILABLE,
-    NO_PERMISSION,
-    ILLEGAL_PATH,
-    FILE_EXITS,
-    END_OF_FILE,
-    SIZE_ERROR,
-    UNKNOWN_ERROR,
-    ILLEGAL_FILENAME,
-    ILLEGAL_CONNECTION,
+enum
+{
+	SUCCESS = 0,
+	UNKNOWN_HANDLE,
+	HANDLE_NOT_READY,
+	CORRUPT_FILE,
+	NO_HANDLES_AVAILABLE,
+	NO_PERMISSION,
+	ILLEGAL_PATH,
+	FILE_EXITS,
+	END_OF_FILE,
+	SIZE_ERROR,
+	UNKNOWN_ERROR,
+	ILLEGAL_FILENAME,
+	ILLEGAL_CONNECTION,
 
-    ERRORS_END
+	ERRORS_END
 };
 /**
  * \p ev3_error description strings, found by trial and error
  * \see https://github.com/mindboards/ev3sources/blob/master/lms2012/c_com/source/c_com.h 
  */
-EXTERN const char * const ev3_error_msgs[ERRORS_END + 1]
+EXTERN const char *const ev3_error_msgs[ERRORS_END + 1]
 #ifdef MAIN
 = {
-    [SUCCESS] 		        = "SUCCESS",
-    [UNKNOWN_HANDLE] 	    = "UNKNOWN_HANDLE: Path doesn't exist",
-    [HANDLE_NOT_READY] 	    = "HANDLE_NOT_READY",
-    [CORRUPT_FILE] 		    = "CORRUPT_FILE",
-    [NO_HANDLES_AVAILABLE] 	= "NO_HANDLES_AVAILABLE: Path doesn't resolve to a valid file",
-    [NO_PERMISSION] 	    = "NO_PERMISSION:  File doesn't exist",
-    [ILLEGAL_PATH] 		    = "ILLEGAL_PATH",
-    [FILE_EXITS] 	    	= "FILE_EXITS",
-    [END_OF_FILE] 	    	= "END_OF_FILE",
-    [SIZE_ERROR] 	    	= "SIZE_ERROR: Can't write here. Is SD Card properly inserted?",
-    [UNKNOWN_ERROR]     	= "UNKNOWN_ERROR: No such directory",
-    [ILLEGAL_FILENAME]  	= "ILLEGAL_FILENAME",
-    [ILLEGAL_CONNECTION]    = "ILLEGAL_CONNECTION",
-    [ERRORS_END]            = NULL,
+	[SUCCESS] 		        = "SUCCESS",
+	[UNKNOWN_HANDLE] 	    = "UNKNOWN_HANDLE: Path doesn't exist",
+	[HANDLE_NOT_READY] 	    = "HANDLE_NOT_READY",
+	[CORRUPT_FILE] 		    = "CORRUPT_FILE",
+	[NO_HANDLES_AVAILABLE] 	= "NO_HANDLES_AVAILABLE: Path doesn't resolve to a valid file",
+	[NO_PERMISSION] 	    = "NO_PERMISSION:  File doesn't exist",
+	[ILLEGAL_PATH] 		    = "ILLEGAL_PATH",
+	[FILE_EXITS] 	    	= "FILE_EXITS",
+	[END_OF_FILE] 	    	= "END_OF_FILE",
+	[SIZE_ERROR] 	    	= "SIZE_ERROR: Can't write here. Is SD Card properly inserted?",
+	[UNKNOWN_ERROR]     	= "UNKNOWN_ERROR: No such directory",
+	[ILLEGAL_FILENAME]  	= "ILLEGAL_FILENAME",
+	[ILLEGAL_CONNECTION]    = "ILLEGAL_CONNECTION",
+	[ERRORS_END]            = NULL,
 }
 #endif
 ;
