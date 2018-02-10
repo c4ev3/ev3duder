@@ -31,23 +31,24 @@ int run(const char *exec, unsigned timeout)
 {
 	timeout = timeout ?: TIMEOUT;
 	int res;
-	union {
+	union
+	{
 		VM_REPLY packet;
 		u8 bytes[1024];
-	}reply;
+	} reply;
 	size_t exec_sz = strlen(exec) + 1;
 
-	EXECUTE_FILE *run = packet_alloc(EXECUTE_FILE, sizeof (run1) + exec_sz + sizeof (run2));
+	EXECUTE_FILE *run = packet_alloc(EXECUTE_FILE, sizeof(run1) + exec_sz + sizeof(run2));
 
 	// *INDENT-OFF*
-	mempcpy(mempcpy(mempcpy((u8 *)&run->bytes, // run->bytes = [run1] + [exec] + [run2]
-				run1, sizeof run1),
-				exec,  exec_sz),
-				run2, sizeof run2);
+	mempcpy(mempcpy(mempcpy((u8 *) &run->bytes, // run->bytes = [run1] + [exec] + [run2]
+			run1, sizeof run1),
+			exec, exec_sz),
+			run2, sizeof run2);
 	// *INDENT-ON*
 
 	//FIXME: inquire whether start succeeded. check communicaton developer manual  pdf (debug mode maybe?)
-	res = ev3_write(handle, (u8 *)run, run->packetLen + PREFIX_SIZE);
+	res = ev3_write(handle, (u8 *) run, run->packetLen + PREFIX_SIZE);
 	if (res < 0)
 		return ERR_COMM;
 
@@ -59,24 +60,25 @@ int run(const char *exec, unsigned timeout)
 		errmsg = "`exec` has been successful.";
 		return ERR_UNK;
 	}
-	else if (ev3_close == (void (*)())hid_close) //FIXME: to more general solution after ev3 tunnel is fully implemented
+	else if (ev3_close ==
+			 (void (*)()) hid_close) //FIXME: to more general solution after ev3 tunnel is fully implemented
+	{
+		u32 len;
+		if (sscanf((const char *) reply.bytes, "\t%08x\n", &len))
 		{
-			u32 len;
-			if (sscanf((const char*)reply.bytes, "\t%08x\n", &len))
+			len += 10;
+			printf("%.*s", len > 1000 ? 1000 : len, (char *) reply.bytes + 10);
+			len -= 1000;
+			while ((res = hid_read_timeout(handle, reply.bytes,
+										   sizeof reply + 2, 100)) > 0)
 			{
-				len += 10;
-				printf("%.*s", len > 1000 ? 1000 : len, (char*)reply.bytes + 10);
-				len-=1000;
-				while ((res = hid_read_timeout(handle, reply.bytes,
-							   	sizeof reply + 2, 100)) > 0 )
-				{
-					printf("%.*s", len > 1000 ? 1000 : len, (char*)reply.bytes);
-					len-=1000;
-				}
-				if (res != 0)
-					return ERR_COMM;
+				printf("%.*s", len > 1000 ? 1000 : len, (char *) reply.bytes);
+				len -= 1000;
 			}
+			if (res != 0)
+				return ERR_COMM;
 		}
+	}
 
 	errmsg = "`exec` status unknown.";
 	return ERR_UNK;

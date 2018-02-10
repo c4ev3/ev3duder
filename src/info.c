@@ -19,7 +19,9 @@
 #include "funcs.h"
 
 #ifdef __linux__
+
 #include <sys/utsname.h>
+
 #endif
 
 //! Full HID packet for causing a beep
@@ -32,13 +34,13 @@ static const u8 tone[] = "\x0\x0F\x00\0\0\x80\x00\x00\x94\x01\x81\x02\x82\xE8\x0
  * \brief cause a beep and print HID information if applicable
  * \bug needs more detailed information for bluetooth/wlan
  * 		should print COM port, device name
- */ 
-int info(const char*arg)
+ */
+int info(const char *arg)
 {
 	wchar_t wstr[MAX_STR];
 	if (arg)
 	{
-		if((void*)ev3_close == (void*)hid_close)
+		if ((void *) ev3_close == (void *) hid_close)
 		{
 			if (strcmp(arg, "serial") == 0)
 			{
@@ -47,11 +49,12 @@ int info(const char*arg)
 				//fputwc(L'\n', stdout);
 				return ERR_UNK;
 			}
-		}else if(ev3_close == tcp_close)
+		}
+		else if (ev3_close == tcp_close)
 		{
 			if (strcmp(arg, "ip") == 0)
 			{
-				fputs(((struct tcp_handle*)handle)->ip, stdout);
+				fputs(((struct tcp_handle *) handle)->ip, stdout);
 				return ERR_UNK;
 			}
 		}
@@ -67,33 +70,35 @@ int info(const char*arg)
 		return ERR_COMM;
 	}
 	errmsg = "\nAttempting beep..";
-	if ((void*)ev3_close == (void*)hid_close)
+	if ((void *) ev3_close == (void *) hid_close)
 	{
 #ifdef __linux__
-	struct utsname utsname;
-	uname(&utsname);
-	int isOld = strcmp(utsname.release, "2.6.24") < 0;
-	//! Print udev rules
-	printf("SUBSYSTEM==\"%s\", ATTRS{idVendor}==\"0694\", ATTRS{idProduct}==\"0005\a, MODE=\"0666\"\n", isOld ? "usb_device" : "usb");
+		struct utsname utsname;
+		uname(&utsname);
+		int isOld = strcmp(utsname.release, "2.6.24") < 0;
+		//! Print udev rules
+		printf("SUBSYSTEM==\"%s\", ATTRS{idVendor}==\"0694\", ATTRS{idProduct}==\"0005\a, MODE=\"0666\"\n",
+			   isOld ? "usb_device" : "usb");
 #endif
-	res = hid_get_manufacturer_string(handle, wstr, MAX_STR);
-	printf("Manufacturer String: %ls\n", wstr);
-	res = hid_get_product_string(handle, wstr, MAX_STR);
-	printf("Product String: %ls\n", wstr);
-	res = hid_get_serial_number_string(handle, wstr, MAX_STR);
-	printf("Serial Number String: %ls\n", wstr);
-	}else if (ev3_close == tcp_close)
+		res = hid_get_manufacturer_string(handle, wstr, MAX_STR);
+		printf("Manufacturer String: %ls\n", wstr);
+		res = hid_get_product_string(handle, wstr, MAX_STR);
+		printf("Product String: %ls\n", wstr);
+		res = hid_get_serial_number_string(handle, wstr, MAX_STR);
+		printf("Serial Number String: %ls\n", wstr);
+	}
+	else if (ev3_close == tcp_close)
 	{
-		struct tcp_handle* h = (struct tcp_handle*)handle;
+		struct tcp_handle *h = (struct tcp_handle *) handle;
 		printf("Serial: %s\n"
-			   "Server:	%s:%u\n"
-			   "Name: %s\n"
-			   "Protocol: %s\n",
+					   "Server:	%s:%u\n"
+					   "Name: %s\n"
+					   "Protocol: %s\n",
 			   h->serial,
 			   h->ip, h->tcp_port,
 			   h->name,
 			   h->protocol
-			  );
+		);
 	}
 
 	return ERR_UNK;

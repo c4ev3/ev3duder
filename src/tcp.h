@@ -8,7 +8,8 @@
 #include "defs.h"
 
 //FIXME: encapsulate
-struct tcp_handle {
+struct tcp_handle
+{
 #ifdef _WIN32
 	void* sock; // HANDLE/SOCKET
 #else
@@ -27,7 +28,7 @@ struct tcp_handle {
  * \return handle a opaque handle for use with tcp_{read,write,close,error}
  * \brief open a bluetooth device described by device. `NULL` leads to default action
  * \see implementation at bt-win.c and bt-unix.c
- */ 
+ */
 void *tcp_open(const char *serial, unsigned timeout);
 
 /**
@@ -42,7 +43,9 @@ void *tcp_open(const char *serial, unsigned timeout);
 #ifdef _WIN32
 int tcp_write(void* device, const u8* buf, size_t count);
 #else
-extern int (*tcp_write)(void* device, const u8* buf, size_t count);
+
+extern int (*tcp_write)(void *device, const u8 *buf, size_t count);
+
 #endif
 /**
  * \param [in] device handle returned by bt_open
@@ -53,11 +56,13 @@ extern int (*tcp_write)(void* device, const u8* buf, size_t count);
  * \brief writes buf[1] till buf[count - 2] to device
  * \bug the milliseconds part needs to be tested more throughly
  * \see implementation at bt-win.c and bt-unix.c
- */ 
+ */
 #ifdef _WIN32
 extern int tcp_read(void* device, u8* buf, size_t count, int milliseconds);
 #else
-extern int (*tcp_read)(void* device, u8* buf, size_t count, int milliseconds);
+
+extern int (*tcp_read)(void *device, u8 *buf, size_t count, int milliseconds);
+
 #endif
 
 /**
@@ -65,15 +70,7 @@ extern int (*tcp_read)(void* device, u8* buf, size_t count, int milliseconds);
  * \brief Closes the resource opened by \p bt_open
  * \see implementation at bt-win.c and bt-unix.c
  */
-void tcp_close(void*);
-/**
- * \param [in] device handle returned by bt_open
- * \return message An error string
- * \brief Returns an error string describing the last error occured
- * \see implementation at bt-win.c and bt-unix.c
- * \bug it's useless
- */
-const wchar_t *tcp_error(void* device); 
+void tcp_close(void *);
 
 /**
  * \param [in] device handle returned by bt_open
@@ -82,5 +79,14 @@ const wchar_t *tcp_error(void* device);
  * \see implementation at bt-win.c and bt-unix.c
  * \bug it's useless
  */
-const wchar_t *tcp_info(void* device); 
+const wchar_t *tcp_error(void *device);
+
+/**
+ * \param [in] device handle returned by bt_open
+ * \return message An error string
+ * \brief Returns an error string describing the last error occured
+ * \see implementation at bt-win.c and bt-unix.c
+ * \bug it's useless
+ */
+const wchar_t *tcp_info(void *device);
 
