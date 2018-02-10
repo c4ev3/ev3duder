@@ -28,10 +28,10 @@
  */
 
 //! upload local file \p loc to remote destination \p rem
-extern int up(FILE* loc, const char *rem);
+extern int up(FILE *loc, const char *rem);
 
 //! download remote source \p rem to local file \p loc
-extern int dl(const char *rem, FILE* loc);
+extern int dl(const char *rem, FILE *loc);
 
 //! print connection information, beep and exit
 extern int info(const char *arg);
@@ -54,7 +54,9 @@ extern size_t mkrbf(char **buf, const char *cmd);
 
 //! tunnel stdio to established ev3 connection
 extern int tunnel_mode();
+
 extern int listen_mode();
+
 extern int bridge_mode();
 
 

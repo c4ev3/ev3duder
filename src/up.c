@@ -34,10 +34,10 @@ int up(FILE *fp, const char *dst)
 	long fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
-	if ((unsigned long)fsize > (u32)-1)
-		return ERR_FTOOBIG;   
+	if ((unsigned long) fsize > (u32) -1)
+		return ERR_FTOOBIG;
 
-	unsigned chunks   = fsize / CHUNK_SIZE;
+	unsigned chunks = fsize / CHUNK_SIZE;
 	unsigned final_chunk_sz = fsize % CHUNK_SIZE;
 
 	//fprintf(stderr, "Attempting file upload (%ldb total; %u chunks): \n", fsize, chunks + 1);
@@ -47,7 +47,7 @@ int up(FILE *fp, const char *dst)
 	bd->fileSize = fsize;
 	memcpy(bd->fileName, dst, dst_len);
 
-	res = ev3_write(handle, (u8 *)bd, bd->packetLen + PREFIX_SIZE);
+	res = ev3_write(handle, (u8 *) bd, bd->packetLen + PREFIX_SIZE);
 	if (res < 0)
 	{
 		errmsg = "Unable to write BEGIN_DOWNLOAD.";
@@ -55,7 +55,7 @@ int up(FILE *fp, const char *dst)
 	}
 
 	BEGIN_DOWNLOAD_REPLY bdrep;
-	res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+	res = ev3_read_timeout(handle, (u8 *) &bdrep, sizeof bdrep, TIMEOUT);
 	if (res <= 0)
 	{
 		errmsg = "Unable to read BEGIN_DOWNLOAD";
@@ -74,14 +74,14 @@ int up(FILE *fp, const char *dst)
 	{
 		cd->fileHandle = bdrep.fileHandle;
 		fread(cd->fileChunk, 1, CHUNK_SIZE, fp);
-		res = ev3_write(handle, (u8 *)cd, cd->packetLen + PREFIX_SIZE);
+		res = ev3_write(handle, (u8 *) cd, cd->packetLen + PREFIX_SIZE);
 
 		if (res < 0)
 		{
 			errmsg = "Unable to write CONTINUE_DOWNLOAD.";
 			return ERR_COMM;
 		}
-		res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+		res = ev3_read_timeout(handle, (u8 *) &bdrep, sizeof bdrep, TIMEOUT);
 		if (res <= 0)
 		{
 			errmsg = "Unable to read CONTINUE_DOWNLOAD";
@@ -90,13 +90,13 @@ int up(FILE *fp, const char *dst)
 	}
 	cd->packetLen = sizeof(CONTINUE_DOWNLOAD) + final_chunk_sz - PREFIX_SIZE;
 	fread(cd->fileChunk, 1, final_chunk_sz, fp);
-	res = ev3_write(handle, (u8*)cd, cd->packetLen + PREFIX_SIZE);
+	res = ev3_write(handle, (u8 *) cd, cd->packetLen + PREFIX_SIZE);
 	if (res < 0)
 	{
 		errmsg = "Unable to write CONTINUE_DOWNLOAD.";
 		return ERR_COMM;
 	}
-	res = ev3_read_timeout(handle, (u8 *)&bdrep, sizeof bdrep, TIMEOUT);
+	res = ev3_read_timeout(handle, (u8 *) &bdrep, sizeof bdrep, TIMEOUT);
 	if (res <= 0)
 	{
 		errmsg = "Unable to read CONTINUE_DOWNLOAD";

@@ -13,7 +13,7 @@
  * \return handle a opaque handle for use with bt_{read,write,close,error}
  * \brief open a bluetooth device described by device. `NULL` leads to default action
  * \see implementation at bt-win.c and bt-unix.c
- */ 
+ */
 void *bt_open(const char *file_in, const char *file_out);
 
 /**
@@ -24,8 +24,8 @@ void *bt_open(const char *file_in, const char *file_out);
  * \brief writes buf[1] till buf[count - 2] to device
  * \bug the first byte is omitted for compatiblity with the leading report byte demanded by \p hid_write. Wrapping HIDAPI could fix this.
  * \see implementation at bt-win.c and bt-unix.c
- */ 
-int bt_write(void* device, const u8* buf, size_t count);
+ */
+int bt_write(void *device, const u8 *buf, size_t count);
 
 /**
  * \param [in] device handle returned by bt_open
@@ -36,15 +36,16 @@ int bt_write(void* device, const u8* buf, size_t count);
  * \brief writes buf[1] till buf[count - 2] to device
  * \bug the milliseconds part needs to be tested more throughly
  * \see implementation at bt-win.c and bt-unix.c
- */ 
-int bt_read(void* device, u8* buf, size_t count, int milliseconds);
+ */
+int bt_read(void *device, u8 *buf, size_t count, int milliseconds);
 
 /**
  * \param [in] device handle returned by bt_open
  * \brief Closes the resource opened by \p bt_open
  * \see implementation at bt-win.c and bt-unix.c
  */
- void bt_close(void*);
+void bt_close(void *);
+
 /**
  * \param [in] device handle returned by bt_open
  * \return message An error string
@@ -52,5 +53,5 @@ int bt_read(void* device, u8* buf, size_t count, int milliseconds);
  * \see implementation at bt-win.c and bt-unix.c
  * \bug it's useless
  */
-const wchar_t *bt_error(void* device); 
+const wchar_t *bt_error(void *device);
 
