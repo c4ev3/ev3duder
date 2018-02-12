@@ -86,37 +86,56 @@ static const char EXEC_SUFFIX[] =
 				"' | dd bs=1000 of=/dev/lms_usbdev";
 
 const char *const usage =
-		"USAGE: ev3duder " "[ --tcp | --usb | --serial ] [=dev1,dev2] \n"
+		"USAGE: ev3duder " "[ --tcp[=ip] | --usb | --serial[=dev] | --serial[=inp,outp] ] \n"
 				"                " "[ up loc rem | dl rem loc | rm rem | ls [rem] |\n"
 				"                " "  mkdir rem | mkrbf rem loc | run rem | exec cmd |\n"
 #ifdef BRIDGE_MODE
 				"                " "  wpa2 SSID [pass] | info | tunnel | bridge ]\n"
 #else
+#ifdef WPA2_MODE
 				"                " "  wpa2 SSID [pass] | info | tunnel ]\n"
+#else
+				"                " "  info | tunnel ]\n"
+#endif
 #endif
 				"       "
-				"rem = remote (EV3) path, loc = local path, dev = device identifier"    "\n";
+				"rem = remote (EV3) path, loc = local path"    "\n";
 
 
-const char *const usage_desc =
-				" up\t"        "upload local file to remote ev3 brick\n"
-				" dl\t"        "download remote file to local system\n"
-				" rm\t"        "remove file on ev3 brick\n"
-				" ls\t"        "list files. Standard value is '/'\n"
-				" info\t"    "attempt a beep and print information about the connection\n"
-				" mkdir\t"    "create directory. Relative to path of VM.\n"
-				" mkrbf\t"    "create rbf (menu entry) file locally. Sensible upload paths are:\n"
-				"\t"        "\t../prjs/BrkProg_SAVE/ Internal memory\n"
-				"\t"        "\t../prjs/BrkProg_DL/ Internal memory\n"
-				"\t"        "\t./apps/ Internal memory - Applicatios (3rd tab)\n"
-				"\t"        "\t/media/card/myapps/ Memory card\n"
-				"\t"        "\t/media/usb/myappps/ USB stick\n"
-				"run\t"        "instruct the VM to run a rbf file\n"
-				"exec\t"    "pass cmd to root shell. Handle with caution\n"
-				"wpa2\t"    "connect to WPA-Network SSID, if pass isn't specified, read from stdin\n"
-				"tunnel\t"    "connects stdout/stdin to the ev3 VM\n"
+const char *const usage_desc = "Info:\n"
+		"--help | -h | /? Show this help\n"
+		"--version       Print version number\n"
+		"--printexits    Print a list of exit codes\n"
+		"\n"
+		"Parameters:\n"
+		"--tcp[=ip]      Connect to the EV3 over TCP. If no ip is specified,\n"
+		"                the auto-detection feature will be used\n"
+		"--usb           Connect to the EV3 over USB\n"
+		"--serial[=dev]  Connect to the EV3 over a serial port\n"
+		"--serial[=i,o]  Connect to the EV3 over a serial port,\n"
+		"                with different files for input and output streams\n"
+		"\n"
+		"Commands:\n"
+		" up             upload local file to remote ev3 brick\n"
+		" dl             download remote file to local system\n"
+		" rm             remove file on ev3 brick\n"
+		" ls             list files. Standard value is '/'\n"
+		" info           attempt a beep and print information about the connection\n"
+		" mkdir          create directory on the remote filesystem. Relative to path of VM.\n"
+		" mkrbf          create rbf (menu entry) file locally. Sensible upload paths are:\n"
+		"                ../prjs/BrkProg_SAVE/   Internal memory\n"
+		"                ../prjs/BrkProg_DL/     Internal memory\n"
+		"                ./apps/                 Internal memory - Applicatios (3rd tab)\n"
+		"                /media/card/myapps/     Memory card\n"
+		"                /media/usb/myappps/     USB stick\n"
+		"run             instruct the VM to run a rbf file\n"
+		"exec            pass cmd to root shell. Handle with caution\n"
+		"tunnel          connects stdout/stdin to the ev3 VM\n"
+#ifdef WPA2_MODE
+		"wpa2            connect to WPA-Network SSID, if pass isn't specified, read from stdin\n"
+#endif
 #ifdef BRIDGE_MODE
-				"bridge\t"	"simulates a WiFi-connected device bridged to a real ev3 VM\n"
+		"bridge          simulates a WiFi-connected device bridged to a real ev3 VM\n"
 #endif
 ;
 
@@ -156,20 +175,38 @@ int main(int argc, char *argv[])
 	handle = NULL;
 
 	// Handle -h/--help params
-	if (argc == 2 && (
-			strcmp(argv[1], "-h") == 0 ||
-			strcmp(argv[1], "--help") == 0 ||
-			strcmp(argv[1], "/?") == 0))
-	{
-		printf("%s (%s; %s) v%s\n"
-					   "Copyright (C) 2016 Ahmad Fatoum\n"
-					   "This is free software; see the source for copying conditions.   There is NO\n"
-					   "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
-					   "Source is available under the GNU GPL v3.0 https://github.com/c4ev3/ev3duder/\n\n",
-			   argv[0], CONFIGURATION, SYSTEM, VERSION);
-		puts(usage);
-		puts(usage_desc);
-		return ERR_UNK;
+	if (argc == 2) {
+		if(strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0 || strcmp(argv[1], "/?") == 0)
+		{
+			printf("%s (%s; %s) v%s\n"
+						   "Copyright (C) 2016 Ahmad Fatoum\n"
+						   "This is free software; see the source for copying conditions.   There is NO\n"
+						   "warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n"
+						   "Source is available under the GNU GPL v3.0 https://github.com/c4ev3/ev3duder/\n\n",
+				   argv[0], CONFIGURATION, SYSTEM, VERSION);
+			puts(usage);
+			puts(usage_desc);
+			return ERR_UNK;
+		}
+		else if (strcmp(argv[1], "--printexits") == 0)
+		{
+			printf("Exit status:\n");
+			printf("%d  ERR_ARG     Wrong argument\n", ERR_ARG);
+			printf("%d  ERR_IO      IO operation failed\n", ERR_IO);
+			printf("%d  ERR_FTOOBIG File too big\n", ERR_FTOOBIG);
+			printf("%d  ERR_NOMEM   No memory available\n", ERR_NOMEM);
+			printf("%d  ERR_COMM    Communication failed\n", ERR_COMM);
+			printf("%d  ERR_VM      EV3 VM returned an error\n", ERR_VM);
+			printf("%d  ERR_SYS     System error\n", ERR_SYS);
+			printf("%d  ERR_END     \n", ERR_END);
+
+			return ERR_UNK;
+		}
+		else if (strcmp(argv[1], "--version") == 0)
+		{
+			printf("%s\n", VERSION);
+			return ERR_UNK;
+		}
 	}
 
 	while (argv[1] && *argv[1] == '-')	// Handle parameters and flags starting with - and --
@@ -245,6 +282,7 @@ int main(int argc, char *argv[])
 	if (argc == 1)	// After parameter parsing no command parameter is left
 	{
 		puts(usage);
+		puts(usage_desc);
 		return ERR_ARG;
 	}
 
@@ -411,6 +449,7 @@ int main(int argc, char *argv[])
 			fclose(fp);
 			return ERR_UNK;
 
+#ifdef WPA2_MODE
 		case ARG_wpa2:
 			assert(argc >= 1);
 			/*{
@@ -427,7 +466,7 @@ int main(int argc, char *argv[])
 
 			}*/
 			return ERR_UNK;
-
+#endif
 		case ARG_exec:
 			assert(argc >= 1);
 			size_t len_cmd = strlen(argv[0]),

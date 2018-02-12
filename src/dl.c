@@ -58,7 +58,7 @@ int dl(const char *path, FILE *fp)
 		errmsg = "`BEGIN_UPLOAD` was denied.";
 		return ERR_VM;
 	}
-	unsigned read_so_far = burep->packetLen + 2 - offsetof(BEGIN_UPLOAD_REPLY, bytes);
+	unsigned read_so_far = burep->packetLen + 2 - (unsigned) offsetof(BEGIN_UPLOAD_REPLY, bytes);
 	fwrite(burep->bytes, read_so_far, 1, fp);
 
 	unsigned total = burep->fileSize;
