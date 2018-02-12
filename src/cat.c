@@ -7,7 +7,6 @@
 #include <string.h>
 
 #include "ev3_io.h"
-
 #include "defs.h"
 #include "packets.h"
 #include "error.h"
@@ -28,4 +27,3 @@ extern int cat(const char *rem, size_t count)
 
 
 }
-

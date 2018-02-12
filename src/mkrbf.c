@@ -10,7 +10,6 @@
 
 
 #include "defs.h"
-#include "error.h"
 #include "funcs.h"
 
 //calling with buf = null is undefined behaviour

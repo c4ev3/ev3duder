@@ -10,8 +10,6 @@
 #include <errno.h>
 
 #include "ev3_io.h"
-
-#include "defs.h"
 #include "packets.h"
 #include "error.h"
 #include "funcs.h"
@@ -43,12 +41,14 @@ int ls(const char *path)
 	memcpy(list->path, path, path_sz);
 
 	print_bytes(list, list->packetLen + PREFIX_SIZE);
+
 	res = ev3_write(handle, (u8 *) list, list->packetLen + PREFIX_SIZE);
 	if (res < 0)
 	{
 		errmsg = "Unable to write LIST_FILES.";
 		return ERR_COMM;
 	}
+
 	fputs("Checking reply: \n", stderr);
 	size_t listrep_sz = sizeof(LIST_FILES_REPLY) + list->maxBytes;
 	LIST_FILES_REPLY *listrep = calloc(listrep_sz, 1);
@@ -72,11 +72,11 @@ int ls(const char *path)
 
 	fwrite(listrep->list, 1, listrep->packetLen - 10 <= MAX_READ ? listrep->packetLen - 10 : 1024,
 		   stdout); // No NUL Termination over Serial COM for whatever reason.
-	//
-	// Excerpt from the lms2012O sources:  - LIST_FILES should work as long as list does not exceed 1014 bytes. CONTINUE_LISTFILES has NOT been implemented yet.
-#if !LEGO_FIXED_CONTINUE_LIST_FILES
 
-#else
+	//
+	// Excerpt from the lms2012O sources:  - LIST_FILES should work as long as list does not exceed 1014 bytes.
+	// CONTINUE_LISTFILES has NOT been implemented yet.
+#if LEGO_FIXED_CONTINUE_LIST_FILES
 	size_t read_so_far = listrep->packetLen + 2 - offsetof(LIST_FILES_REPLY, list);
 	size_t total = listrep->listSize;
 	CONTINUE_LIST_FILES listcon = CONTINUE_LIST_FILES_INIT;
@@ -111,7 +111,7 @@ int ls(const char *path)
 
 			errmsg = "`LIST_FILES` was denied.";
 			return ERR_VM;
-		}	
+		}
 		fprintf(stdout, "%s", listconrep->list);
 		listcon.handle = listconrep->handle;
 		listcon.listSize = MAX_READ;
@@ -126,4 +126,3 @@ int ls(const char *path)
 	return ERR_UNK;
 
 }
-

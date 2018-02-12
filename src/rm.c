@@ -61,4 +61,3 @@ int rm(const char *path)
 	return ERR_UNK;
 
 }
-

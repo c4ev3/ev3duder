@@ -10,8 +10,6 @@
 #include <errno.h>
 
 #include "ev3_io.h"
-
-#include "defs.h"
 #include "packets.h"
 #include "error.h"
 #include "funcs.h"
@@ -39,6 +37,7 @@ int mkdir(const char *path)
 		errmsg = "Unable to write CREATE_DIR.";
 		return ERR_COMM;
 	}
+
 	fputs("Checking reply: \n", stderr);
 	CREATE_DIR_REPLY mkrep;
 
@@ -63,4 +62,3 @@ int mkdir(const char *path)
 	errmsg = "`CREATE_DIR` was successful.";
 	return ERR_UNK;
 }
-

@@ -7,6 +7,8 @@
 
 #ifndef EV3DUDER_ERROR_H
 #define EV3DUDER_ERROR_H
+
+
 #undef EXTERN
 //! For avoiding the need to separately define and declare stuff
 #ifdef MAIN
@@ -22,6 +24,7 @@ enum ERR
 {
 	ERR_UNK = 0, ERR_ARG, ERR_IO, ERR_FTOOBIG, ERR_NOMEM, ERR_COMM, ERR_VM, ERR_SYS, ERR_END
 };
+
 //! Statuses from VM
 enum
 {
@@ -53,6 +56,7 @@ enum
 
 	ERRORS_END
 };
+
 /**
  * \p ev3_error description strings, found by trial and error
  * \see https://github.com/mindboards/ev3sources/blob/master/lms2012/c_com/source/c_com.h 
@@ -79,4 +83,3 @@ EXTERN const char *const ev3_error_msgs[ERRORS_END + 1]
 ;
 
 #endif
-

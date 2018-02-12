@@ -89,4 +89,3 @@ const wchar_t *tcp_error(void *device);
  * \bug it's useless
  */
 const wchar_t *tcp_info(void *device);
-

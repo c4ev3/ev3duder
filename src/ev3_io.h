@@ -20,4 +20,3 @@ EXTERN void (*ev3_close)(void *);
 
 EXTERN void *handle;
 #endif
-

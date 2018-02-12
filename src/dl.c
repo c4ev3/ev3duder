@@ -5,13 +5,9 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <inttypes.h>
 #include <errno.h>
 
 #include "ev3_io.h"
-
-#include "defs.h"
 #include "packets.h"
 #include "error.h"
 #include "funcs.h"
@@ -107,5 +103,3 @@ int dl(const char *path, FILE *fp)
 	return ERR_UNK;
 
 }
-
-
