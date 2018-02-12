@@ -35,9 +35,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/socket.h>
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <sys/select.h>
+#include <arpa/inet.h>s
 
 #include "ev3_io.h"
 #include "error.h"

@@ -54,4 +54,3 @@ void bt_close(void *);
  * \bug it's useless
  */
 const wchar_t *bt_error(void *device);
-

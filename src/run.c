@@ -83,4 +83,3 @@ int run(const char *exec, unsigned timeout)
 	errmsg = "`exec` status unknown.";
 	return ERR_UNK;
 }
-

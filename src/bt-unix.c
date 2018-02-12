@@ -5,21 +5,20 @@
  * @brief Unix bluetooth I/O wrappers
  */
 #include <unistd.h>
-#include <termios.h>
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
 #include <stdlib.h>
 #include <errno.h>
 
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/select.h>
-
 #include "defs.h"
+
+
 //! default serial port name on OS X
 #define BT "/dev/cu.EV3-SerialPort"
 // ^ TODO: add ability to find differently named EV3's
+
+
 /**
  * \param [in] device path to SerialPort or \p NULL
  * \return &fd pointer to file descriptor for use with bt_{read,write,close,error}
@@ -156,4 +155,3 @@ const wchar_t *bt_error(void *fd_)
 		   werrstr :
 		   L"Error in printing error";
 }
-

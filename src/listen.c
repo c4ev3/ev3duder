@@ -18,4 +18,3 @@ int listen_mode()
 
 	return 0;
 }
-

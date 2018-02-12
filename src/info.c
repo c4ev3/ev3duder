@@ -10,11 +10,9 @@
 #include <string.h>
 
 #include <hidapi/hidapi.h>
+
 #include "tcp.h"
 #include "ev3_io.h"
-
-#include "defs.h"
-#include "packets.h"
 #include "error.h"
 #include "funcs.h"
 
@@ -25,7 +23,7 @@
 #endif
 
 //! Full HID packet for causing a beep
-static const u8 tone[] = "\x0\x0F\x00\0\0\x80\x00\x00\x94\x01\x81\x02\x82\xE8\x03\x82\xE8\x03";
+static const u8 tone[] = "\x00\x0F\x00\0\0\x80\x00\x00\x94\x01\x81\x02\x82\xE8\x03\x82\xE8\x03";
 
 #define MAX_STR 256
 
@@ -69,6 +67,7 @@ int info(const char *arg)
 	{
 		return ERR_COMM;
 	}
+
 	errmsg = "\nAttempting beep..";
 	if ((void *) ev3_close == (void *) hid_close)
 	{
@@ -103,4 +102,3 @@ int info(const char *arg)
 
 	return ERR_UNK;
 }
-
