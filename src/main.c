@@ -3,6 +3,7 @@
  * @author Ahmad Fatoum
  * @brief Argument parsing, device opening and file creation/openning
  */
+
 //! For avoiding the need to separately define and declare stuff
 #define MAIN
 
@@ -11,17 +12,46 @@
 #include <string.h>
 #include <errno.h>
 
-#undef assert
-//FIXME: add better error message
-#define assert(cond) do{ if (!(cond)) {if (handle) ev3_close(handle);exit(ERR_ARG);}}while(0)
-
 #include <hidapi/hidapi.h>
+
 #include "btserial.h"
 #include "tcp.h"
 #include "ev3_io.h"
-
 #include "error.h"
 #include "funcs.h"
+
+
+
+static struct
+{
+	unsigned select:1;
+	unsigned hid:1;
+	unsigned serial:1;
+	unsigned tcp:1;
+} switches;
+
+static struct
+{
+	char *tcp_id;
+	char *serial_id[2];
+	char *usb_id;
+	unsigned timeout;
+} params;
+
+
+static char *my_chrsub(char *s, char old, char new);
+
+//#undef assert
+//xFIXME: add better error message
+//#define assert(cond) do{ if (!(cond)) {if (handle) ev3_close(handle);exit(ERR_ARG);}}while(0)
+void assert(char cond);
+
+#ifdef _WIN32
+#define SANITIZE(s) (my_chrsub((s), '/', '\\'))
+#else
+#define SANITIZE
+#endif
+
 
 //! LEGO GROUP
 #define VendorID 0x694
@@ -30,6 +60,7 @@
 //! Filename used for executing command with `exec`
 #define ExecName  "/tmp/Executing shell cmd.rbf"
 // FIXME: general solution
+
 /**
  * suffix for commands executed with exec
  * problem: busybox dd doesn't support conv=sync (zero-padding blocks)
@@ -44,7 +75,7 @@
 0), $0}' | dd bs=1000 of=/dev/lms_usbdev
  */
 static const char EXEC_SUFFIX[] =
-/*cmd*/    " 2>&1 | awk '"
+/*cmd*/    		" 2>&1 | awk '"
 				"BEGIN{"
 				"RS=\"\\0\""
 				"};"
@@ -65,8 +96,10 @@ const char *const usage =
 #endif
 				"       "
 				"rem = remote (EV3) path, loc = local path, dev = device identifier"    "\n";
+
+
 const char *const usage_desc =
-		" up\t"        "upload local file to remote ev3 brick\n"
+				" up\t"        "upload local file to remote ev3 brick\n"
 				" dl\t"        "download remote file to local system\n"
 				" rm\t"        "remove file on ev3 brick\n"
 				" ls\t"        "list files. Standard value is '/'\n"
@@ -83,27 +116,28 @@ const char *const usage_desc =
 				"wpa2\t"    "connect to WPA-Network SSID, if pass isn't specified, read from stdin\n"
 				"tunnel\t"    "connects stdout/stdin to the ev3 VM\n"
 #ifdef BRIDGE_MODE
-"bridge\t"	"simulates a WiFi-connected device bridged to a real ev3 VM\n"
+				"bridge\t"	"simulates a WiFi-connected device bridged to a real ev3 VM\n"
 #endif
 ;
 
-#define FOREACH_ARG(ARG) \
-    ARG(info)            \
-ARG(up)              \
-ARG(dl)              \
-ARG(run)             \
-ARG(ls)              \
-ARG(rm)              \
-ARG(mkdir)           \
-ARG(mkrbf)           \
-ARG(tunnel)            \
-ARG(bridge)            \
-ARG(listen)            \
-ARG(send)            \
-ARG(exec)            \
-ARG(wpa2)            \
-ARG(nop)            \
-ARG(end)
+#define FOREACH_ARG(ARG)\
+    ARG(info)			\
+	ARG(up)				\
+	ARG(dl)				\
+	ARG(run)			\
+	ARG(ls)				\
+	ARG(rm)				\
+	ARG(mkdir)			\
+	ARG(mkrbf)			\
+	ARG(tunnel)			\
+	ARG(bridge)			\
+	ARG(listen)			\
+	ARG(send)			\
+	ARG(exec)			\
+	ARG(wpa2)			\
+	ARG(nop)			\
+	ARG(end)
+
 
 #define MK_ENUM(x) ARG_##x,
 #define MK_STR(x) #x,
@@ -114,28 +148,8 @@ enum ARGS
 static const char *args[] = {FOREACH_ARG(MK_STR)};
 static const char *offline_args[] = {MK_STR(mkrbf) /*MK_STR(tunnel)*/ };
 
-static char *my_chrsub(char *s, char old, char new);
 
-#ifdef _WIN32
-#define SANITIZE(s) (my_chrsub((s), '/', '\\'))
-#else
-#define SANITIZE
-#endif
-static struct
-{
-	unsigned select:1;
-	unsigned hid:1;
-	unsigned serial:1;
-	unsigned tcp:1;
-} switches;
 
-static struct
-{
-	char *tcp_id;
-	char *serial_id[2];
-	char *usb_id;
-	unsigned timeout;
-} params;
 
 int main(int argc, char *argv[])
 {
@@ -163,7 +177,7 @@ int main(int argc, char *argv[])
 
 		if (argv[1][1] == '-')	// Handle -- parameters
 		{   /* switches */
-			char *a = argv[1] + 2;
+			char *a = argv[1] + 2;	// Skip the --
 			strtok(a, "=");
 			char *device = strtok(NULL, ","),
 					*device2 = strtok(NULL, "");
@@ -190,12 +204,14 @@ int main(int argc, char *argv[])
 				params.serial_id[0] = device;
 				params.serial_id[1] = device2;
 			}
-			else if (strcmp("nop", a) == 0); /* So, this program doesn't handle empty *argv, which
+			else if (strcmp("nop", a) == 0)
+			{
+				/* So, this program doesn't handle empty *argv, which
 					 is understandable, but would ease programming the
 					 plugin a bit. So let the plugin just specify
 					 --nop. It's just a semicolon
-					 */
-
+				*/
+			}
 			else    // Unknown prameter starting with --
 			{
 				fprintf(stderr, "Invalid switch '%s'\n", argv[1]);
@@ -232,7 +248,7 @@ int main(int argc, char *argv[])
 		return ERR_ARG;
 	}
 
-	// Determin if the command is an offline command
+	// Determine if the command is an offline command
 	int i;
 	for (i = 0; i < (int) ARRAY_SIZE(offline_args); i++) {
 		if (strcmp(argv[1], offline_args[i]) == 0) break;
@@ -242,40 +258,40 @@ int main(int argc, char *argv[])
 	if (i == ARRAY_SIZE(offline_args))
 	{
 		if ((switches.hid || !switches.select) &&
-			(handle = hid_open(VendorID, ProductID,
-							   NULL))) // TODO: last one is SerialID, make it specifiable via commandline
+			(handle = hid_open(VendorID, ProductID, NULL)))
+			// TODO: last one is SerialID, make it specifiable via commandline
 		{
 			if (!switches.select)
 				fputs("USB connection established.\n", stderr);
 			// the things you do for type safety...
+
 			ev3_write = (int (*)(void *, const u8 *, size_t)) hid_write;
 			ev3_read_timeout = (int (*)(void *, u8 *, size_t, int)) hid_read_timeout;
 			ev3_error = (const wchar_t *(*)(void *)) hid_error;
 			ev3_close = (void (*)(void *)) hid_close;
 		}
-		else if ((switches.serial || !switches.select) &&
-				 (handle = bt_open(params.serial_id[0], params.serial_id[1])))
+		else if ((switches.serial || !switches.select) && (handle = bt_open(params.serial_id[0], params.serial_id[1])))
 		{
 			if (!switches.select)
 				fprintf(stderr, "Bluetooth serial connection established (%s).\n", params.serial_id[0]);
+
 			ev3_write = bt_write;
 			ev3_read_timeout = bt_read;
 			ev3_error = bt_error;
 			ev3_close = bt_close;
 		}
-		else if ((switches.tcp || !switches.select) &&
-				 (handle = tcp_open(params.tcp_id, params.timeout)))
+		else if ((switches.tcp || !switches.select) && (handle = tcp_open(params.tcp_id, params.timeout)))
 		{
 			if (!switches.select)
 			{
 				struct tcp_handle *info = (struct tcp_handle *) handle;
 				fprintf(stderr, "TCP connection established (%s@%s:%u).\n", info->name, info->ip, info->tcp_port);
 			}
+
 			ev3_write = tcp_write;
 			ev3_read_timeout = tcp_read;
 			ev3_error = tcp_error;
 			ev3_close = tcp_close;
-
 		}
 		else
 		{
@@ -448,9 +464,11 @@ int main(int argc, char *argv[])
 			break;
 	}
 
-	FILE *out = ret == ERR_UNK ? stderr : stdout;
+
+	FILE *out = ((ret == ERR_UNK) ? stderr : stdout);
 	if (ret == ERR_COMM)
 		fprintf(out, "%s (%ls)\n", errmsg ?: "-", ev3_error(handle) ?: L"-");
+
 	else if (ret == ERR_VM)
 	{
 		const char *err;
@@ -468,6 +486,7 @@ int main(int argc, char *argv[])
 
 // maybe \n to stderr?
 	if (handle) ev3_close(handle);
+
 	return ret;
 }
 
@@ -485,3 +504,10 @@ static char *my_chrsub(char *s, char old, char new)
 	return s;
 }
 
+void assert(char cond)
+{
+	if (!cond) {
+		if (handle) ev3_close(handle);
+		exit(ERR_ARG);
+	}
+}

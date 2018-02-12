@@ -87,4 +87,3 @@ const wchar_t *bt_error(void *fd_)
 
 	return buf ? *buf : L"Error in printing error";
 }
-

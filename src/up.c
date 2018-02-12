@@ -117,4 +117,3 @@ int up(FILE *fp, const char *dst)
 	errmsg = "`upload` was successful.";
 	return ERR_UNK;
 }
-

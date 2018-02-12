@@ -48,4 +48,3 @@ const EXECUTE_FILE
 
 const VM_REPLY
 		EXECUTE_FILE_REPLY_SUCCESS = {.packetLen = 3, .replyType = 0x02};
-

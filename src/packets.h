@@ -336,4 +336,3 @@ extern const VM_REPLY EXECUTE_FILE_REPLY_SUCCESS;
 	ptr;})
 
 #endif
-

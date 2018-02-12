@@ -112,7 +112,8 @@ int tunnel_mode()
 
 static int hex2nib(char hex)
 {
-	/**/ if ('a' <= hex && hex <= 'f')
+	/**/
+	if ('a' <= hex && hex <= 'f')
 		return hex - 'a' + 0x0a;
 	else if ('A' <= hex && hex <= 'F')
 		return hex - 'A' + 0x0a;
@@ -123,4 +124,3 @@ static int hex2nib(char hex)
 	else
 		return 0;
 }
-

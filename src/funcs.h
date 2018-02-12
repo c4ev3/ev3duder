@@ -64,5 +64,5 @@ extern int bridge_mode();
 //! concatenate contents of \p count of \p rem FILEs to the EV3's LCD
 extern int cat(const char *rem, size_t count);
 #endif
-#endif
 
+#endif
