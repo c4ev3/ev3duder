@@ -41,16 +41,19 @@ static inline void *mempcpy(void *restrict dst, const void *restrict src, size_t
 
 
 
-//#define print_chars(buf, len) \
-//	do {\
-//		char *ptr = buf;\
-//		for (int i = 0; i != len; i++, ptr++) fprintf(stderr, "%c ", *ptr);\
-//	} while (0*putc('\n', stderr))
+#if 0
+#define print_chars(buf, len) \
+	do {\
+		char *ptr = buf;\
+		for (int i = 0; i != len; i++, ptr++) fprintf(stderr, "%c ", *ptr);\
+	} while (0*putc('\n', stderr))
 
-//#define die(msg) \
-//	do {\
-//		fprintf(stderr, "[%s:%d]: %ls (%s)", __func__, __LINE__, hid_error(handle), msg);\
-//		exit(__LINE__);\
-//	} while (0)
+#define die(msg) \
+	do {\
+		fprintf(stderr, "[%s:%d]: %ls (%s)", __func__, __LINE__, hid_error(handle), msg);\
+		exit(__LINE__);\
+	} while (0)
+#endif
+
 
 #endif

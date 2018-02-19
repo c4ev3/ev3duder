@@ -3,3 +3,5 @@
 #eval "./ev3duder test 2>/dev/null | head -1 > /etc/udev/rules.d"
 sudo cp ev3-udev.rules /etc/udev/rules.d/ev3.rules
 
+sudo udevadm control --reload-rules
+sudo udevadm trigger
