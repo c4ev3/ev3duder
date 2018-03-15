@@ -29,7 +29,7 @@ then unpack the hidapi archive into the hidapi directory of the ev3duder extract
 #### Linux
 On Linux, you additionally need libusb-1.0 to be installed. On Ubuntu and other Debian-based system this can be done via
 
-    $ sudo apt-get install libusb-1.0.0-dev
+    $ sudo apt-get install libusb-1.0-0-dev
 Also to allow access to the ev3 over USB without requiring root, appropriate udev rules must be created. This can be easily done with
 
     $ make install

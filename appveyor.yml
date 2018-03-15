@@ -1,0 +1,34 @@
+clone_depth: 5
+
+cache:
+  - C:\ProgramData\chocolatey\bin -> appveyor.yml
+  - C:\ProgramData\chocolatey\lib -> appveyor.yml
+  - C:\mingw64
+
+
+init:
+  - cmake -E remove c:\programdata\chocolatey\bin\cpack.exe
+  - set PATH=%PATH:C:\Program Files (x86)\Git\usr\bin;=%
+  - set PATH=%PATH:C:\Program Files\Git\usr\bin;=%
+  - set PATH=%MINGW%\bin;%PATH%
+
+install:
+  - ps: |
+      if (-Not (Test-Path "C:\mingw64")) {
+        # Install MinGW.
+        $file = "x86_64-4.9.2-release-win32-seh-rt_v4-rev3.7z"
+        wget https://bintray.com/artifact/download/drewwells/generic/$file -OutFile $file
+        &7z x -oC:\ $file > $null
+      }
+  - set PATH=C:\mingw64\bin;%PATH%
+  - set CC=gcc
+  - git submodule update --init --recursive
+
+environment:
+  matrix:
+    - compiler: mingw
+
+before_build:
+
+build_script:
+  - mingw32-make

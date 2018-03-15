@@ -8,8 +8,8 @@
 
 BIN_NAME = ev3duder	
 VERSION = 0.3.0
-# tip: CC=clang FLAGS=-Weverything shows all GNU extensions
-FLAGS += -std=c99 -Wall -Wextra -DVERSION='"$(VERSION)"'
+# tip: CC=clang CFLAGS=-Weverything shows all GNU extensions
+CFLAGS += -std=gnu99 -Wall -Wextra -DVERSION='"$(VERSION)"'
 SRCDIR = src
 OBJDIR = build
 
@@ -33,9 +33,9 @@ endif
 
 ## Win32
 ifneq ($(MAKECMDGOALS),cross)
-FLAGS += -DCONFIGURATION='"HIDAPI/hid.dll"' -DSYSTEM='"Windows"'
+CFLAGS += -DCONFIGURATION='"HIDAPI/hid.dll"' -DSYSTEM='"Windows"'
 # TODO: remove all %zu prints altogether?
-FLAGS += -Wno-unused-value -D__USE_MINGW_ANSI_STDIO=1
+CFLAGS += -Wno-unused-value -D__USE_MINGW_ANSI_STDIO=1
 SRCS += src/bt-win.c
 HIDSRC += hidapi/windows/hid.c
 LDFLAGS += -lsetupapi -lws2_32 
@@ -48,7 +48,7 @@ UNAME = $(shell uname -s)
 
 ## Linux
 ifeq ($(UNAME),Linux)
-FLAGS += -DCONFIGURATION='"HIDAPI/libusb-1.0"' -DSYSTEM='"Linux"'
+CFLAGS += -DCONFIGURATION='"HIDAPI/libusb-1.0"' -DSYSTEM='"Linux"'
 HIDSRC += hidapi/libusb/hid.c
 HIDFLAGS += `pkg-config libusb-1.0 --cflags`
 LDFLAGS += `pkg-config libusb-1.0 --libs` -lrt -lpthread
@@ -60,7 +60,7 @@ endif
 ## OS X
 ifeq ($(UNAME),Darwin)
 ifneq ($(MAKECMDGOALS),cross)
-FLAGS += -DCONFIGURATION='"HIDAPI/IOHidManager"' -DSYSTEM='"OS X"'
+CFLAGS += -DCONFIGURATION='"HIDAPI/IOHidManager"' -DSYSTEM='"OS X"'
 HIDSRC += hidapi/mac/hid.c
 LDFLAGS += -framework IOKit -framework CoreFoundation
 # minot prefix
@@ -71,7 +71,7 @@ endif
 ## BSD
 ifeq ($(findstring BSD, $(UNAME)), BSD)
 ifneq ($(MAKECMDGOALS),cross)
-FLAGS += -DCONFIGURATION='"HIDAPI/libusb-1.0"' -DSYSTEM='"BSD"'
+CFLAGS += -DCONFIGURATION='"HIDAPI/libusb-1.0"' -DSYSTEM='"BSD"'
 HIDSRC += hidapi/libusb/hid.c
 LDFLAGS += -L/usr/local/lib -lusb -liconv -pthread
 INC += -I/usr/local/include
@@ -79,7 +79,7 @@ endif
 endif
 
 ## ALL UNICES
-FLAGS += -DBRIDGE_MODE
+CFLAGS += -DBRIDGE_MODE
 SRCS += src/bt-unix.c src/bridge.c
 endif
 
@@ -101,7 +101,7 @@ $(BIN_NAME): $(OBJS) $(OBJDIR)/hid.o
 # static enables valgrind to act better -DDEBUG!
 $(OBJS): $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(info $(DWS)CC$(DWS)$(DWS) $@)
-	@$(PREFIX)$(CC) -c $< -MMD $(FLAGS) $(INC) -o $@
+	@$(PREFIX)$(CC) -c $< -MMD $(CFLAGS) $(INC) -o $@
 
 -include $(OBJDIR)/*.d
 
@@ -110,13 +110,13 @@ $(OBJDIR)/hid.o: $(HIDSRC)
 	@$(PREFIX)$(CC) -c $< -o $@ $(INC) $(HIDFLAGS)
 
 
-debug: FLAGS += -g
+debug: CFLAGS += -g
 debug: LIBS := $(LIBS)
 debug: LIBS += 
 debug: $(BIN_NAME)
 
 cross: PREFIX ?= $(CROSS_PREFIX)
-cross: FLAGS += -DCONFIGURATION='"HIDAPI/libusb-1.0"' -DSYSTEM='"Linux"'
+cross: CFLAGS += -DCONFIGURATION='"HIDAPI/libusb-1.0"' -DSYSTEM='"Linux"'
 cross: HIDSRC += hidapi/libusb/hid.c
 cross: HIDFLAGS += `pkg-config libusb-1.0 --cflags`
 cross: LDFLAGS += `pkg-config libusb-1.0 --libs` -lrt -lpthread
@@ -135,4 +135,3 @@ endif
 clean:
 	$(RM) $(BIN_NAME) 
 	cd $(OBJDIR) && $(RM) *.o *.d 
-
