@@ -344,8 +344,8 @@ int main(int argc, char *argv[])
         break;
     case ARG_send:
         ;
-        int send(void);
-        ret = send();
+        int sendout(void);
+        ret = sendout();
         break;
     case ARG_mkdir:
         assert(argc == 1);

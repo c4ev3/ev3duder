@@ -3,7 +3,7 @@
 #include "defs.h"
 #include "ev3_io.h"
 
-int send()
+int sendout()
 {
 	char buffer[1023];
 	buffer[0] = 0;
