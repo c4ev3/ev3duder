@@ -41,6 +41,7 @@ static inline void *mempcpy(void *restrict dst, const void *restrict src, size_t
 
 
 
+/*
 //#define print_chars(buf, len) \
 //	do {\
 //		char *ptr = buf;\
@@ -52,5 +53,6 @@ static inline void *mempcpy(void *restrict dst, const void *restrict src, size_t
 //		fprintf(stderr, "[%s:%d]: %ls (%s)", __func__, __LINE__, hid_error(handle), msg);\
 //		exit(__LINE__);\
 //	} while (0)
+*/
 
 #endif

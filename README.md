@@ -62,13 +62,22 @@ Easiest way is via the CodeSourcery Lite package which can be gotten here:
 https://sourcery.mentor.com/GNUToolchain/package4574/public/arm-none-linux-gnueabi/arm-2009q1-203-arm-none-linux-gnueabi.exe
 
 #### Linux
+The easiest way on Linux systems is to also use the CodeSourcery toolchain, since it automatically provides the build environment:
+
+    $ wget -c http://www.codesourcery.com/sgpp/lite/arm/portal/package4571/public/arm-none-linux-gnueabi/arm-2009q1-203-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2
+    $ mkdir ~/CodeSourcery
+    $ tar -jxvf ~/arm-2009q1-203-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2 -C ~/CodeSourcery/
+    $ echo export PATH=~/CodeSourcery/arm-2009q1/bin/:$PATH >> ~/.bashrc && . ~/.bashrc
+
+You can also use the toolchain that is found in the repositories, but keep in mind that you might have to do some additional
+configuration with this toolchain.
 On Debian/Ubuntu the arm-linux toolchains can be installed using:
 
-    sudo apt install gcc-arm-linux-gnueabi
+    $ sudo apt install gcc-arm-linux-gnueabi
 
 For C++:
 
-    sudo apt install g++-arm-linux-gnueabi
+    $ sudo apt install g++-arm-linux-gnueabi
 
 #### OS X
 Carlson-Minot Inc. provides binary builds of CodeSourcery's GNU/ARM toolchain for OS X. It can be gotten here:
