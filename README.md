@@ -1,4 +1,4 @@
-# ev3duder
+# ev3duder [![Build Status](https://travis-ci.org/c4ev3/ev3duder.svg?branch=master)](https://travis-ci.org/c4ev3/ev3duder) [![https://ci.appveyor.com/api/projects/status/github/c4ev3/ev3duder?svg=true](https://ci.appveyor.com/api/projects/status/github/c4ev3/ev3duder?svg=true)](https://ci.appveyor.com/project/c4ev3/ev3duder)
 
 The LEGO® EV3 Downloader/Uploader utility.
 
