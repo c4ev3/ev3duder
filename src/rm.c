@@ -31,7 +31,7 @@ int rm(const char *path)
 	DELETE_FILE *rm_cmd = packet_alloc(DELETE_FILE, path_sz);
 	memcpy(rm_cmd->path, path, path_sz);
 
-	res = ev3_write(handle, (u8 *)rm_cmd, rm_cmd->packetLen + PREFIX_SIZE);
+	res = ev3_write(handle, (u8 *) rm_cmd, rm_cmd->packetLen + PREFIX_SIZE);
 	if (res < 0)
 	{
 		errmsg = "Unable to write DELETE_FILE.";
@@ -40,7 +40,7 @@ int rm(const char *path)
 	fputs("Checking reply: \n", stderr);
 	CREATE_DIR_REPLY rmrep;
 
-	res = ev3_read_timeout(handle, (u8 *)&rmrep, sizeof rmrep, TIMEOUT);
+	res = ev3_read_timeout(handle, (u8 *) &rmrep, sizeof rmrep, TIMEOUT);
 	if (res <= 0)
 	{
 		errmsg = "Unable to read DELETE_FILE";
@@ -61,4 +61,3 @@ int rm(const char *path)
 	return ERR_UNK;
 
 }
-

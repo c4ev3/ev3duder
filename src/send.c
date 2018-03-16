@@ -10,11 +10,10 @@ int sendout()
 	int written;
 	while (fgets(buffer + 1, sizeof buffer - 1, stdin))
 	{
-		size_t len = strlen(buffer+1) + 1;
-		written = ev3_write(handle, (u8*)buffer, len); 
+		size_t len = strlen(buffer + 1) + 1;
+		written = ev3_write(handle, (u8 *) buffer, len);
 		printf("%d bytes read.\n", written);
 	}
 
 	return 0;
 }
-

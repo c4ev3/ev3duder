@@ -51,7 +51,7 @@
  * 		Maybe wrap HIDAPI with a wrapper that prefixes zero automatically, instead of having
  * 		bt_write() omit the first byte
  */
-#define PREFIX_SIZE 3 
+#define PREFIX_SIZE 3
 
 /**
  * Padding might be inserted in order to allow for a favorable alignment
@@ -71,8 +71,8 @@ typedef struct
 //!base packet for SYSTEM REPLIES
 typedef struct
 {
-  EV3_REPLY_FIELDS
-  u8 bytes[];
+	EV3_REPLY_FIELDS
+	u8 bytes[];
 } SYSTEM_REPLY;
 
 //! upload to EV3
@@ -84,7 +84,7 @@ typedef struct
 	/** file name, relative to "lms2012/sys", First folder must be apps, prjs or tools according to docs
 	 * Ignore that and use proper absolute paths instead 
 	 */
-	char fileName[]; 
+	char fileName[];
 } BEGIN_DOWNLOAD;
 extern const BEGIN_DOWNLOAD BEGIN_DOWNLOAD_INIT;
 
@@ -127,7 +127,7 @@ typedef struct
 typedef struct
 {
 	EV3_REPLY_FIELDS
-		
+
 	/** Total file size **/
 	u32 fileSize;
 	/** Handle for use in successive operations **/
@@ -146,7 +146,7 @@ typedef struct
 	/** chunk size **/
 	u16 maxBytes;
 } CONTINUE_UPLOAD;
-	
+
 //! continue download from ev3 reply
 typedef struct
 {
@@ -157,7 +157,7 @@ typedef struct
 	/** successive chunks **/
 	u8 bytes[];
 } CONTINUE_UPLOAD_REPLY;
-	
+
 extern const CONTINUE_UPLOAD CONTINUE_UPLOAD_INIT;
 extern const BEGIN_UPLOAD BEGIN_UPLOAD_INIT;
 
@@ -165,11 +165,11 @@ extern const BEGIN_UPLOAD BEGIN_UPLOAD_INIT;
 //! List files on EV3
 typedef struct
 {
-    EV3_COMMAND_FIELDS
+	EV3_COMMAND_FIELDS
 	/** doesn't really matter as #CONTINUE_LIST_FILES isn't implemented in stock firmware */
-    u16 maxBytes;
+	u16 maxBytes;
 	/** path to list files for. relative to VM path */
-    u8 path[];
+	u8 path[];
 } LIST_FILES;
 extern const LIST_FILES LIST_FILES_INIT;
 
@@ -196,22 +196,22 @@ typedef struct
 {
 	EV3_REPLY_FIELDS
 
-    u32 listSize; // when listSize < maxBytes; reached EO List?
-    u8 handle; // for CONTINUE_LIST_FILES 
+	u32 listSize; // when listSize < maxBytes; reached EO List?
+	u8 handle; // for CONTINUE_LIST_FILES
 	/* files according to above description.
 	 * \n separated and UTF-8 encoded
 	 */
-    char list[]; 
+	char list[];
 } LIST_FILES_REPLY;
 
 /** not implemented in stock firmware */
 typedef struct
 {
-    EV3_COMMAND_FIELDS
+	EV3_COMMAND_FIELDS
 
-    u8 handle;
-    u32 listSize;
-} CONTINUE_LIST_FILES; 
+	u8 handle;
+	u32 listSize;
+} CONTINUE_LIST_FILES;
 extern const CONTINUE_LIST_FILES CONTINUE_LIST_FILES_INIT;
 
 /** not implemented in stock firmware */
@@ -219,19 +219,19 @@ typedef struct
 {
 	EV3_REPLY_FIELDS
 
-    u8 handle; // for CONTINUE_LIST_FILES 
-    char list[]; 
-    // \n seperated; UTF-8 encoded. 
+	u8 handle; // for CONTINUE_LIST_FILES
+	char list[];
+	// \n seperated; UTF-8 encoded.
 } CONTINUE_LIST_FILES_REPLY;
 
 //! create directory
 typedef struct
 {
-    EV3_COMMAND_FIELDS
+	EV3_COMMAND_FIELDS
 
 	/** @see mkdir() */
-    u8 path[];
-} CREATE_DIR; 
+	u8 path[];
+} CREATE_DIR;
 
 extern const CREATE_DIR CREATE_DIR_INIT;
 
@@ -240,10 +240,10 @@ typedef SYSTEM_REPLY CREATE_DIR_REPLY;
 //! delete file
 typedef struct
 {
-    EV3_COMMAND_FIELDS
+	EV3_COMMAND_FIELDS
 	/** @see rm() */
-    u8 path[];
-} DELETE_FILE; 
+	u8 path[];
+} DELETE_FILE;
 extern const DELETE_FILE DELETE_FILE_INIT;
 
 typedef SYSTEM_REPLY DELETE_FILE_REPLY;
@@ -252,25 +252,26 @@ typedef SYSTEM_REPLY DELETE_FILE_REPLY;
 typedef SYSTEM_CMD BLUETOOTHPIN;
 /*typedef struct
 {
-    EV3_COMMAND_FIELDS
+	EV3_COMMAND_FIELDS
 
-    u8 mac_len;
-    u8 mac[mac_len]; // asciiz hex; no colons
-    u8 pin_len;
-    u8 pen[pin_len]; // asciiz
-} BLUETOOTHPIN;*/ /* implement with mempcpy like in exec.c */ 
+	u8 mac_len;
+	u8 mac[mac_len]; // asciiz hex; no colons
+	u8 pin_len;
+	u8 pen[pin_len]; // asciiz
+} BLUETOOTHPIN;*/ /* implement with mempcpy like in exec.c */
 
 extern const BLUETOOTHPIN BLUETOOTHPIN_INIT;
 
 //! untested and unused
-typedef struct{
-  EV3_REPLY_FIELDS
+typedef struct
+{
+	EV3_REPLY_FIELDS
 
-  BLUETOOTHPIN echo; // GNU C extension
+	BLUETOOTHPIN echo; // GNU C extension
 } BLUETOOTHPIN_REPLY;
 
 //! Force brick into Firmware update mode, untested and unused
-typedef SYSTEM_CMD ENTERFWUPDATE; 
+typedef SYSTEM_CMD ENTERFWUPDATE;
 extern const ENTERFWUPDATE ENTERFWUPDATE_INIT;
 
 //
@@ -280,7 +281,7 @@ extern const ENTERFWUPDATE ENTERFWUPDATE_INIT;
 	EV3_PACKET_FIELDS \
 	u8 replyType; \
 	u16 alloc;
-	 
+
 //! base packet
 typedef struct
 {
@@ -325,14 +326,13 @@ extern const VM_REPLY EXECUTE_FILE_REPLY_SUCCESS;
 
 //! for variably sized packets. Allocates space, initializes and adjusts packetLen field
 //! \note employs the compound statement expression GNU extension
-#define packet_alloc(type, extra) ({ 				         	\
-    void *ptr = NULL;                                 \
-    if ((sizeof(type) + extra < (u16)-1)              \
-   	&& (ptr = malloc(sizeof(type) + extra))) {     		\
-   	memcpy(ptr, &type##_INIT, sizeof(type));					\
+#define packet_alloc(type, extra) ({                            \
+	void *ptr = NULL;                                 \
+	if ((sizeof(type) + extra < (u16)-1)              \
+	&& (ptr = malloc(sizeof(type) + extra))) {            \
+	memcpy(ptr, &type##_INIT, sizeof(type));                    \
 	((SYSTEM_CMD *)ptr)->packetLen = (u16)(sizeof(type) + extra - PREFIX_SIZE);                                          \
   }                                                   \
 	ptr;})
 
 #endif
-

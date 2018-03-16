@@ -35,7 +35,7 @@ static int hex2nib(char hex);
 int tunnel_mode()
 {
 	int res;
-	(void)res;
+	(void) res;
 	u8 binbuf[1280];
 	binbuf[0] = 0x00;
 #if 0
@@ -43,8 +43,8 @@ int tunnel_mode()
 	tcgetattr(0, &old);
 	new = old;
 	new.c_lflag &= ~ICANON; /* disable buffered i/o */
-    new.c_lf lag &= ~ECHO; /* disable echoing input */
-    tcsetattr(0, TCSANOW, &new); /* use these new terminal i/o settings now */
+	new.c_lf lag &= ~ECHO; /* disable echoing input */
+	tcsetattr(0, TCSANOW, &new); /* use these new terminal i/o settings now */
 #endif
 	if (isatty(STDIN_FILENO) || 1)
 	{
@@ -52,21 +52,24 @@ int tunnel_mode()
 		while (fgets(hexbuf, sizeof hexbuf, stdin))
 		{
 			int prefix_len = 0;
-			const char *hp; u8 *bp;
+			const char *hp;
+			u8 *bp;
 			int tmp;
-			for (hp = hexbuf, bp = binbuf+1; *hp != '\0'; hp++)
+			for (hp = hexbuf, bp = binbuf + 1; *hp != '\0'; hp++)
 			{
 				if ((tmp = hex2nib(*hp)) == -1) continue;
 				if (tmp == 0 && *hp != '0')
-				{	
+				{
 					prefix_len++;
 					if (prefix_len == 4)
 						break;
-				}else break;
+				}
+				else break;
 			}
 
-			u8 byte = 0; int nibble = 0;
-			for (hp = hexbuf, bp = binbuf+1; *hp != '\0'; hp++)
+			u8 byte = 0;
+			int nibble = 0;
+			for (hp = hexbuf, bp = binbuf + 1; *hp != '\0'; hp++)
 			{
 				if ((tmp = hex2nib(*hp)) == -1) continue;
 				//printf("hp=[%c],tmp=%d\n", *hp, tmp);
@@ -74,39 +77,43 @@ int tunnel_mode()
 				{
 					*bp++ = byte + tmp;
 					nibble = 0;
-				}else
+				}
+				else
 				{
-					byte = (u8)tmp << 4;
+					byte = (u8) tmp << 4;
 					nibble = 1;
 				}
 			}
 
-			int len = bp - binbuf+1; //FIXME: size_t
-			if(prefix_len == 4)
-				memcpy(binbuf+1, (u16[]){len - 2}, 2);
+			int len = bp - binbuf + 1; //FIXME: size_t
+			if (prefix_len == 4)
+				memcpy(binbuf + 1, (u16[]) {len - 2}, 2);
 			printf("prefix_len=%d, len=%i\n", prefix_len, len);
 
 			// ev3_write then read
 			print_bytes(binbuf, len - 1);
-			ev3_write(handle, binbuf, len -1);
+			ev3_write(handle, binbuf, len - 1);
 		}
 	}
-	else{
-	/* FIXME: switch to binary setmode */
-		printf("%zu\n", fread(binbuf+1, 1, 2, stdin));
+	else
+	{
+		/* FIXME: switch to binary setmode */
+		printf("%zu\n", fread(binbuf + 1, 1, 2, stdin));
 		size_t len = (binbuf[1] | (binbuf[2] << 4));
 		printf("len%zu\n", len);
-		fread(binbuf+3, 1, len, stdin);
-		print_bytes(binbuf, (int)len+3);
+		fread(binbuf + 3, 1, len, stdin);
+		print_bytes(binbuf, (int) len + 3);
 
 	}
 
 
 	return ERR_UNK;
 }
+
 static int hex2nib(char hex)
 {
-	/**/ if ('a' <= hex && hex <= 'f')
+	/**/
+	if ('a' <= hex && hex <= 'f')
 		return hex - 'a' + 0x0a;
 	else if ('A' <= hex && hex <= 'F')
 		return hex - 'A' + 0x0a;
@@ -117,4 +124,3 @@ static int hex2nib(char hex)
 	else
 		return 0;
 }
-

@@ -8,14 +8,13 @@ int listen_mode()
 {
 	u8 buffer[1280] = {0};
 	int read;
-	while ( (read = hid_read(handle,buffer, sizeof buffer)) > 0)
+	while ((read = hid_read(handle, buffer, sizeof buffer)) > 0)
 	{
 		printf("%d bytes read.\n", read);
-		   //print_bytes(buffer, read);	
-		   printf("[%s]\n", buffer);
-		   memset(buffer, 0, sizeof buffer);
+		//print_bytes(buffer, read);
+		printf("[%s]\n", buffer);
+		memset(buffer, 0, sizeof buffer);
 	}
 
 	return 0;
 }
-

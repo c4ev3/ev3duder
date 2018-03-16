@@ -8,6 +8,7 @@
 
 BIN_NAME = ev3duder	
 VERSION = 0.3.0
+
 # tip: CC=clang CFLAGS=-Weverything shows all GNU extensions
 CFLAGS += -std=gnu99 -Wall -Wextra -DVERSION='"$(VERSION)"'
 SRCDIR = src
@@ -48,10 +49,10 @@ UNAME = $(shell uname -s)
 
 ## Linux
 ifeq ($(UNAME),Linux)
-CFLAGS += -DCONFIGURATION='"HIDAPI/libusb-1.0"' -DSYSTEM='"Linux"'
-HIDSRC += hidapi/libusb/hid.c
-HIDFLAGS += `pkg-config libusb-1.0 --cflags`
-LDFLAGS += `pkg-config libusb-1.0 --libs` -lrt -lpthread
+CFLAGS += -DCONFIGURATION='"HIDAPI/hidraw"' -DSYSTEM='"Linux"'
+HIDSRC += hidapi/linux/hid.c
+HIDFLAGS += `pkg-config libudev --cflags`
+LDFLAGS += `pkg-config libudev --libs` -lrt -lpthread
 INSTALL = $(shell sh udev.sh)
 # Linaro prefix
 CROSS_PREFIX = arm-linux-gnueabi-g

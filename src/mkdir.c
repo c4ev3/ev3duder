@@ -10,8 +10,6 @@
 #include <errno.h>
 
 #include "ev3_io.h"
-
-#include "defs.h"
 #include "packets.h"
 #include "error.h"
 #include "funcs.h"
@@ -33,15 +31,17 @@ int mkdir(const char *path)
 	CREATE_DIR *mk = packet_alloc(CREATE_DIR, path_sz);
 	memcpy(mk->path, path, path_sz);
 
-	res = ev3_write(handle, (u8 *)mk, mk->packetLen + PREFIX_SIZE);
-	if (res < 0) {
+	res = ev3_write(handle, (u8 *) mk, mk->packetLen + PREFIX_SIZE);
+	if (res < 0)
+	{
 		errmsg = "Unable to write CREATE_DIR.";
 		return ERR_COMM;
 	}
+
 	fputs("Checking reply: \n", stderr);
 	CREATE_DIR_REPLY mkrep;
 
-	res = ev3_read_timeout(handle, (u8 *)&mkrep, sizeof mkrep, TIMEOUT);
+	res = ev3_read_timeout(handle, (u8 *) &mkrep, sizeof mkrep, TIMEOUT);
 	if (res <= 0)
 	{
 		errmsg = "Unable to read CREATE_DIR_REPLY";
@@ -62,4 +62,3 @@ int mkdir(const char *path)
 	errmsg = "`CREATE_DIR` was successful.";
 	return ERR_UNK;
 }
-

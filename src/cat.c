@@ -7,7 +7,6 @@
 #include <string.h>
 
 #include "ev3_io.h"
-
 #include "defs.h"
 #include "packets.h"
 #include "error.h"
@@ -22,9 +21,9 @@
  * @see http://topikachu.github.io/python-ev3/UIdesign.html
  */
 #define MAX_READ 1024
+
 extern int cat(const char *rem, size_t count)
 {
-	
-	
-}
 
+
+}
