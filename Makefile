@@ -7,7 +7,7 @@
 ##################################################
 
 BIN_NAME = ev3duder	
-VERSION = 0.3.0
+VERSION = 0.4.0
 
 # tip: CC=clang CFLAGS=-Weverything shows all GNU extensions
 CFLAGS += -std=gnu99 -Wall -Wextra -DVERSION='"$(VERSION)"'
