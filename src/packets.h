@@ -10,6 +10,13 @@
 #define EV3DUDER_PACKETS_H
 
 #include "defs.h"
+
+#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#error "Big-endian systems not yet supported"
+/* This would require byte swapping those u16's below */
+#endif
+
+
 // inheritance :^)
 //! Is always zero. Also called HID report ID
 #define HID_LAYER \
