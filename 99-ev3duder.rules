@@ -1,0 +1,4 @@
+SUBSYSTEM=="usb",        ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0005", MODE="0666", TAG+="uaccess"
+SUBSYSTEM=="usb_device", ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0005", MODE="0666", TAG+="uaccess"
+
+KERNEL=="hidraw*",       ATTRS{idVendor}=="0694", ATTRS{idProduct}=="0005", MODE="0666", TAG+="uaccess"
