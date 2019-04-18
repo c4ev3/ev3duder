@@ -125,7 +125,7 @@ cross: $(BIN_NAME)
 
 ifneq ($(OS),Windows_NT)
 .PHONY: install
-install: $(BIN_NAME) ev3-udev.rules udev.sh
+install: $(BIN_NAME) 99-ev3duder.rules udev.sh
 	-@mkdir /usr/lib/ev3duder/
 	cp $(BIN_NAME) /usr/lib/ev3duder
 	ln -s /usr/lib/ev3duder/$(BIN_NAME) /usr/bin/ev3
