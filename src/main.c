@@ -219,7 +219,7 @@ int main(int argc, char *argv[])
 			char *device = strtok(NULL, ","),
 					*device2 = strtok(NULL, "");
 
-			if (a == '\0')
+			if (*a == '\0')
 			{
 				argc--, argv++;
 				break;
