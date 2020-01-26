@@ -17,20 +17,13 @@ OBJDIR = build
 SRCS = src/main.c src/packets.c src/run.c src/info.c src/up.c src/ls.c src/rm.c src/mkdir.c src/mkrbf.c src/dl.c src/listen.c src/send.c src/tunnel.c src/tcp.c
 
 INC += -Ihidapi/ -Ihidapi/hidapi/
- 
+
 ####################
 CREATE_BUILD_DIR := $(shell mkdir build 2>&1)
+CC ?= gcc
+
 ifeq ($(OS),Windows_NT)
-
-## No rm?
-ifeq (, $(shell where rm 2>NUL)) 
-RM = del /Q 2>NUL
-# Powershell, cygwin and msys all provide rm(1)
-endif
-
-ifeq (, $(shell where $(CC) 2>NUL)) 
-CC = gcc
-endif
+RM ?= del /Q
 
 ## Win32
 ifneq ($(MAKECMDGOALS),cross)
@@ -84,6 +77,7 @@ CFLAGS += -DBRIDGE_MODE
 SRCS += src/bt-unix.c src/bridge.c
 endif
 
+RM ?= rm -f
 CROSS_PREFIX ?= arm-linux-gnueabi-g
 
 OBJS = $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
