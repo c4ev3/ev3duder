@@ -71,6 +71,8 @@ extern int bootloader_info(void);
 //! exit from bootloader eeprom
 extern int bootloader_exit(void);
 
+extern u32 crc32(u32 crc, const void *buf, size_t size);
+
 #if 0 // not yet implemented
 //! concatenate contents of \p count of \p rem FILEs to the EV3's LCD
 extern int cat(const char *rem, size_t count);
