@@ -59,6 +59,17 @@ extern int listen_mode();
 
 extern int bridge_mode();
 
+//! reboot from Linux to bootloader eeprom
+static inline int bootloader_enter(void) { return 1; }
+
+//! install new firmware to the brick
+static inline int bootloader_install(FILE *fp) { (void) fp; return 1; }
+
+//! print brick hardware version
+static inline int bootloader_info(void) { return 1; }
+
+//! exit from bootloader eeprom
+static inline int bootloader_exit(void) { return 1; }
 
 #if 0 // not yet implemented
 //! concatenate contents of \p count of \p rem FILEs to the EV3's LCD
