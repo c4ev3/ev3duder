@@ -69,7 +69,7 @@ static inline int bootloader_install(FILE *fp) { (void) fp; return 1; }
 static inline int bootloader_info(void) { return 1; }
 
 //! exit from bootloader eeprom
-static inline int bootloader_exit(void) { return 1; }
+extern int bootloader_exit(void);
 
 #if 0 // not yet implemented
 //! concatenate contents of \p count of \p rem FILEs to the EV3's LCD
