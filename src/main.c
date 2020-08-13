@@ -209,6 +209,7 @@ int main(int argc, char *argv[])
 			printf("%d  ERR_COMM    Communication failed\n", ERR_COMM);
 			printf("%d  ERR_VM      EV3 VM returned an error\n", ERR_VM);
 			printf("%d  ERR_SYS     System error\n", ERR_SYS);
+			printf("%d  ERR_USBLOOP Received own message instead of a reply\n", ERR_USBLOOP);
 			printf("%d  ERR_END     \n", ERR_END);
 
 			return ERR_UNK;
@@ -587,6 +588,12 @@ int main(int argc, char *argv[])
 			err = "An unknown error occured";
 
 		fprintf(out, "%s (%s)\n", err ?: "-", errmsg ?: "-");
+	}
+	else if (ret == ERR_USBLOOP)
+	{
+		fputs("\nError: ev3duder received its own packet instead of a reply from the brick.\n\n", stderr);
+		fputs("If you have plugged the EV3 into a USB 3.0 port (usually red or blue),\n", stderr);
+		fputs("try plugging it into a USB 2.0 only port (usually black or white).\n", stderr);
 	}
 	else
 	{
