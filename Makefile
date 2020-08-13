@@ -14,7 +14,9 @@ CFLAGS += -std=gnu99 -Wall -Wextra -DVERSION='"$(VERSION)"'
 SRCDIR = src
 OBJDIR = build
 
-SRCS = src/main.c src/packets.c src/run.c src/info.c src/up.c src/ls.c src/rm.c src/mkdir.c src/mkrbf.c src/dl.c src/listen.c src/send.c src/tunnel.c src/tcp.c
+SRCS = src/main.c src/packets.c src/run.c src/info.c src/up.c src/ls.c \
+       src/rm.c src/mkdir.c src/mkrbf.c src/dl.c src/listen.c src/send.c \
+       src/tunnel.c src/tcp.c src/bl_enter.c
 
 INC += -Ihidapi/ -Ihidapi/hidapi/
 

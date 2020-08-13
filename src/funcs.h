@@ -60,7 +60,7 @@ extern int listen_mode();
 extern int bridge_mode();
 
 //! reboot from Linux to bootloader eeprom
-static inline int bootloader_enter(void) { return 1; }
+extern int bootloader_enter(void);
 
 //! install new firmware to the brick
 static inline int bootloader_install(FILE *fp) { (void) fp; return 1; }
