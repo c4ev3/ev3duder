@@ -66,7 +66,7 @@ extern int bootloader_enter(void);
 static inline int bootloader_install(FILE *fp) { (void) fp; return 1; }
 
 //! print brick hardware version
-static inline int bootloader_info(void) { return 1; }
+extern int bootloader_info(void);
 
 //! exit from bootloader eeprom
 extern int bootloader_exit(void);
