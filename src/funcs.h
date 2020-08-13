@@ -52,6 +52,9 @@ extern int mkdir(const char *rem);
 //! fill \p *buf with a rbf file executing \p cmd
 extern size_t mkrbf(char **buf, const char *cmd);
 
+//! execute direct command
+static inline int vmexec(FILE *in, FILE *out, int locals, int globals, int use_reply) { return -1; }
+
 //! tunnel stdio to established ev3 connection
 extern int tunnel_mode();
 
