@@ -53,7 +53,7 @@ extern int mkdir(const char *rem);
 extern size_t mkrbf(char **buf, const char *cmd);
 
 //! close given ev3 file handle range
-static inline int closehnd(int start, int end) { return 1; }
+extern int closehnd(int start, int end);
 
 //! tunnel stdio to established ev3 connection
 extern int tunnel_mode();
