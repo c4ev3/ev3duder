@@ -110,6 +110,9 @@ static int bootloader_erase(void)
 		return ERR_COMM;
 	}
 
+	if (reply->type == VM_SYS_RQ)
+		return ERR_USBLOOP;
+
 	if (reply->type != VM_OK)
 	{
 		errno = reply->ret;
@@ -141,6 +144,9 @@ static int bootloader_start(int offset, int length)
 		errmsg = "Unable to read FW_START_DOWNLOAD";
 		return ERR_COMM;
 	}
+
+	if (reply->type == VM_SYS_RQ)
+		return ERR_USBLOOP;
 
 	if (reply->type != VM_OK)
 	{
@@ -203,6 +209,9 @@ static int bootloader_send(FILE *fp, int length, u32* pCrc32)
 			return ERR_COMM;
 		}
 
+		if (reply->type == VM_SYS_RQ)
+			return ERR_USBLOOP;
+
 		if (reply->type != VM_OK)
 		{
 			errno = reply->ret;
@@ -246,6 +255,9 @@ static int bootloader_checksum(int offset, int length, u32 *pCrc32)
 		errmsg = "Unable to read FW_GETCRC32";
 		return ERR_COMM;
 	}
+
+	if (reply->type == VM_SYS_RQ)
+		return ERR_USBLOOP;
 
 	if (reply->type != VM_OK)
 	{

@@ -52,6 +52,9 @@ int bootloader_info(void)
 		return ERR_COMM;
 	}
 
+	if (reply->type == VM_SYS_RQ)
+		return ERR_USBLOOP;
+
 	if (reply->type != VM_OK)
 	{
 		errno = reply->ret;
