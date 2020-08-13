@@ -63,7 +63,7 @@ extern int bridge_mode();
 extern int bootloader_enter(void);
 
 //! install new firmware to the brick
-static inline int bootloader_install(FILE *fp) { (void) fp; return 1; }
+extern int bootloader_install(FILE *fp);
 
 //! print brick hardware version
 extern int bootloader_info(void);
