@@ -53,7 +53,7 @@ extern int mkdir(const char *rem);
 extern size_t mkrbf(char **buf, const char *cmd);
 
 //! execute direct command
-static inline int vmexec(FILE *in, FILE *out, int locals, int globals, int use_reply) { return -1; }
+extern int vmexec(FILE *in, FILE *out, int locals, int globals, int use_reply);
 
 //! tunnel stdio to established ev3 connection
 extern int tunnel_mode();
