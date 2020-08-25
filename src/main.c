@@ -479,7 +479,7 @@ int main(int argc, char *argv[])
 			if (strcmp(argv[2], "-") == 0) {
 				fp = stdin;
 			} else {
-				fp = fopen(argv[2], "rb");
+				fp = fopen(SANITIZE(argv[2]), "rb");
 				if (!fp) {
 					fprintf(stderr, "<%s> cannot be opened for bytecodes\n", argv[2]);
 					ret = ERR_IO;
@@ -492,7 +492,7 @@ int main(int argc, char *argv[])
 			} else if (strcmp(argv[3], "none") == 0) {
 				fp2 = NULL;
 			} else {
-				fp2 = fopen(argv[3], "wb");
+				fp2 = fopen(SANITIZE(argv[3]), "wb");
 				if (!fp) {
 					fprintf(stderr, "<%s> cannot be opened for writing\n", argv[3]);
 					ret = ERR_IO;
