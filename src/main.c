@@ -435,7 +435,7 @@ int main(int argc, char *argv[])
 
 		case ARG_mkdir:
 			assert(argc == 1);
-			ret = mkdir(argv[0]);
+			ret = mkdir_(argv[0]);
 			break;
 
 		case ARG_mkrbf:
