@@ -47,7 +47,7 @@ extern int ls(const char *rem);
 extern int rm(const char *rem);
 
 //! create directory \p rem on remote system
-extern int mkdir(const char *rem);
+extern int mkdir_(const char *rem);
 
 //! fill \p *buf with a rbf file executing \p cmd
 extern size_t mkrbf(char **buf, const char *cmd);

@@ -24,7 +24,7 @@
  *		Do NOT use any non ASCII letters if you want the LEGO menu to stay responsible.
  *		In case of fudging up, \p ev3duder rm() can delete directories too
  */
-int mkdir(const char *path)
+int mkdir_(const char *path)
 {
 	int res;
 	size_t path_sz = strlen(path) + 1;
