@@ -63,7 +63,7 @@ extern int bridge_mode();
 extern int uf2_pack(FILE *fp, const char *brickdir, const char **file_array, int files);
 
 //! Unpack files from a UF2 archive
-static inline int uf2_unpack(FILE *fp, const char *dstdir) { return -1; }
+extern int uf2_unpack(FILE *fp, const char *dstdir, int use_paths);
 
 #if 0 // not yet implemented
 //! concatenate contents of \p count of \p rem FILEs to the EV3's LCD
