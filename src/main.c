@@ -92,12 +92,12 @@ const char *const usage =
 				"                " "[ up loc rem | dl rem loc | rm rem | ls [rem] |\n"
 				"                " "  mkdir rem | mkrbf rem loc | run rem | exec cmd |\n"
 #ifdef BRIDGE_MODE
-				"                " "  wpa2 SSID [pass] | info | tunnel | bridge ]\n"
+				"                " "  wpa2 SSID [pass] | info | tunnel | bridge | closehnd num ]\n"
 #else
 #ifdef WPA2_MODE
-				"                " "  wpa2 SSID [pass] | info | tunnel ]\n"
+				"                " "  wpa2 SSID [pass] | info | tunnel | closehnd num ]\n"
 #else
-				"                " "  info | tunnel ]\n"
+				"                " "  info | tunnel | closehnd num ]\n"
 #endif
 #endif
 		"\n"
@@ -135,6 +135,7 @@ const char *const usage_desc = "Info:\n"
 		"                /media/usb/myappps/     USB stick\n"
 		"run             instruct the VM to run a rbf file\n"
 		"exec            pass cmd to root shell. Handle with caution\n"
+		"closehnd        close given ev3 file handle. \"all\" will close all handles.\n"
 		"tunnel          connects stdout/stdin to the ev3 VM\n"
 #ifdef WPA2_MODE
 		"wpa2            connect to WPA-Network SSID, if pass isn't specified, read from stdin\n"
@@ -157,6 +158,7 @@ const char *const usage_desc = "Info:\n"
 	ARG(ls)				\
 	ARG(rm)				\
 	ARG(mkdir)			\
+	ARG(closehnd)		\
 	ARG(mkrbf)			\
 	ARG(tunnel)			\
 	ARG(bridge)			\
@@ -392,6 +394,8 @@ int main(int argc, char *argv[])
 	FILE *fp = NULL;
 	char *buf = NULL;
 	size_t len = 0;
+	int start = 0, end = 0;
+	char *endptr = NULL;
 
 	// Switch between the different commands
 	switch (i)
@@ -448,6 +452,24 @@ int main(int argc, char *argv[])
 		case ARG_ls:
 			assert(argc <= 1);
 			ret = ls(argv[0] ?: "/");
+			break;
+
+		case ARG_closehnd:
+			assert(argc <= 1);
+
+			if (argc == 0 || strcmp(argv[0], "all") == 0) {
+				start = 0;
+				end = 256;
+			} else {
+				start = strtol(argv[0], &endptr, 10);
+				end = start + 1;
+				if (endptr == argv[0] || start > 255 || start < 0) {
+					printf("invalid handle <%s>\n", argv[0]);
+					ret = ERR_ARG;
+					break;
+				}
+			}
+			ret = closehnd(start, end);
 			break;
 
 		case ARG_tunnel:

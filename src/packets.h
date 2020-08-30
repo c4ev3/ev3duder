@@ -255,6 +255,19 @@ extern const DELETE_FILE DELETE_FILE_INIT;
 
 typedef SYSTEM_REPLY DELETE_FILE_REPLY;
 
+//! close handle
+typedef struct
+{
+	EV3_COMMAND_FIELDS
+	u8 handle;
+} CLOSE_HANDLE;
+extern const CLOSE_HANDLE CLOSE_HANDLE_INIT;
+typedef struct
+{
+	EV3_REPLY_FIELDS
+	u8 handle;
+} CLOSE_HANDLE_REPLY;
+
 //! set bluetooth pin, untested
 typedef SYSTEM_CMD BLUETOOTHPIN;
 /*typedef struct

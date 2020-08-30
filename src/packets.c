@@ -37,6 +37,9 @@ const CREATE_DIR
 const DELETE_FILE
 		DELETE_FILE_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0x9C};
 
+const CLOSE_HANDLE
+		CLOSE_HANDLE_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0x98};
+
 const BLUETOOTHPIN
 		BLUETOOTHPIN_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0x9F};
 
