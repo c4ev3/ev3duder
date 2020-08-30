@@ -22,13 +22,13 @@
 //! Errors returnable from \p main
 enum ERR
 {
-	ERR_UNK = 0, ERR_ARG, ERR_IO, ERR_FTOOBIG, ERR_NOMEM, ERR_COMM, ERR_VM, ERR_SYS, ERR_END
+	ERR_UNK = 0, ERR_ARG, ERR_IO, ERR_FTOOBIG, ERR_NOMEM, ERR_COMM, ERR_VM, ERR_SYS, ERR_USBLOOP, ERR_END
 };
 
 //! Statuses from VM
 enum
 {
-	VM_OK = 0x03, VM_ERROR = 0x05
+	VM_SYS_RQ = 0x01, VM_DIRECT_OK = 0x02, VM_OK = 0x03, VM_DIRECT_ERROR = 0x04, VM_ERROR = 0x05
 };
 
 //! global variable for last error message

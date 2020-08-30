@@ -37,11 +37,35 @@ const CREATE_DIR
 const DELETE_FILE
 		DELETE_FILE_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0x9C};
 
+const CLOSE_HANDLE
+		CLOSE_HANDLE_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0x98};
+
 const BLUETOOTHPIN
 		BLUETOOTHPIN_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0x9F};
 
 const ENTERFWUPDATE
-		ENTERFWUPDATE_INIT = {.hidLayer = 0x00, .replyType = 0x00, .cmd = 0xA0};
+		ENTERFWUPDATE_INIT = {.hidLayer = 0x00, .replyType = 0x81, .cmd = 0xA0};
+
+const FW_GETVERSION
+		FW_GETVERSION_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0xF6};
+
+const FW_GETCRC32
+		FW_GETCRC32_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0xF5};
+
+const FW_STARTAPP
+		FW_STARTAPP_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0xF4};
+
+const FW_ERASEFLASH
+		FW_ERASEFLASH_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0xF3};
+
+const FW_START_DOWNLOAD_WITH_ERASE
+		FW_START_DOWNLOAD_WITH_ERASE_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0xF0};
+
+const FW_START_DOWNLOAD
+		FW_START_DOWNLOAD_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0xF1};
+
+const FW_DOWNLOAD_DATA
+		FW_DOWNLOAD_DATA_INIT = {.hidLayer = 0x00, .replyType = 0x01, .cmd = 0xF2};
 
 const EXECUTE_FILE
 		EXECUTE_FILE_INIT = {.hidLayer = 0x00, .replyType = 0x00, .alloc = 0x0800};

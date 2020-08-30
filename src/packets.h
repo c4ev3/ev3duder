@@ -255,6 +255,19 @@ extern const DELETE_FILE DELETE_FILE_INIT;
 
 typedef SYSTEM_REPLY DELETE_FILE_REPLY;
 
+//! close handle
+typedef struct
+{
+	EV3_COMMAND_FIELDS
+	u8 handle;
+} CLOSE_HANDLE;
+extern const CLOSE_HANDLE CLOSE_HANDLE_INIT;
+typedef struct
+{
+	EV3_REPLY_FIELDS
+	u8 handle;
+} CLOSE_HANDLE_REPLY;
+
 //! set bluetooth pin, untested
 typedef SYSTEM_CMD BLUETOOTHPIN;
 /*typedef struct
@@ -277,9 +290,73 @@ typedef struct
 	BLUETOOTHPIN echo; // GNU C extension
 } BLUETOOTHPIN_REPLY;
 
-//! Force brick into Firmware update mode, untested and unused
+//! Force brick into Firmware update mode
 typedef SYSTEM_CMD ENTERFWUPDATE;
 extern const ENTERFWUPDATE ENTERFWUPDATE_INIT;
+
+//
+/// Firmware update
+
+//! FW version query
+typedef SYSTEM_CMD FW_GETVERSION;
+extern const FW_GETVERSION FW_GETVERSION_INIT;
+typedef struct
+{
+	EV3_REPLY_FIELDS
+	u32 hardwareVersion;
+	u32 eepromVersion;
+} FW_GETVERSION_REPLY;
+
+
+//! FW checksum request
+typedef struct
+{
+	EV3_COMMAND_FIELDS
+	u32 flashStart;
+	u32 flashLength;
+} FW_GETCRC32;
+extern const FW_GETCRC32 FW_GETCRC32_INIT;
+typedef struct
+{
+	EV3_REPLY_FIELDS
+	u32 crc32;
+} FW_GETCRC32_REPLY;
+
+//! FW reboot request
+typedef SYSTEM_CMD FW_STARTAPP;
+extern const FW_STARTAPP FW_STARTAPP_INIT;
+typedef SYSTEM_REPLY FW_STARTAPP_REPLY;
+
+//! FW flash erasure
+typedef SYSTEM_CMD FW_ERASEFLASH;
+extern const FW_ERASEFLASH FW_ERASEFLASH_INIT;
+typedef SYSTEM_REPLY FW_ERASEFLASH_REPLY;
+
+//! FW download request w/ erasure
+typedef struct {
+	EV3_COMMAND_FIELDS
+	u32 flashStart;
+	u32 flashLength;
+} FW_START_DOWNLOAD_WITH_ERASE;
+extern const FW_START_DOWNLOAD_WITH_ERASE FW_START_DOWNLOAD_WITH_ERASE_INIT;
+typedef SYSTEM_REPLY FW_START_DOWNLOAD_WITH_ERASE_REPLY;
+
+//! FW download request w/o erasure
+typedef struct {
+	EV3_COMMAND_FIELDS
+	u32 flashStart;
+	u32 flashLength;
+} FW_START_DOWNLOAD;
+extern const FW_START_DOWNLOAD FW_START_DOWNLOAD_INIT;
+typedef SYSTEM_REPLY FW_START_DOWNLOAD_REPLY;
+
+//! FW download data
+typedef struct {
+	EV3_COMMAND_FIELDS
+	u8 payload[];
+} FW_DOWNLOAD_DATA;
+extern const FW_DOWNLOAD_DATA FW_DOWNLOAD_DATA_INIT;
+typedef SYSTEM_REPLY FW_DOWNLOAD_DATA_REPLY;
 
 //
 /// VM stuff
