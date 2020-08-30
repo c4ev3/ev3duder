@@ -100,6 +100,10 @@ const char *const usage =
 				"                " "  info | tunnel | closehnd num ]\n"
 #endif
 #endif
+				"\n"
+				"       ev3duder [ --tcp[=ip] | --usb | --serial[=dev] | --serial[=inp,outp] ]\n"
+				"                vmexec <locals> <globals> <infile> <outfile> [noreply]\n"
+				"\n"
 		"\n"
 		"       ev3duder flash [ enter | install loc | info | reboot ] \n"
 		"\n"
@@ -135,6 +139,7 @@ const char *const usage_desc = "Info:\n"
 		"                /media/usb/myappps/     USB stick\n"
 		"run             instruct the VM to run a rbf file\n"
 		"exec            pass cmd to root shell. Handle with caution\n"
+		"vmexec          run given bytecode file as a direct command. Handle with caution\n"
 		"closehnd        close given ev3 file handle. \"all\" will close all handles.\n"
 		"tunnel          connects stdout/stdin to the ev3 VM\n"
 #ifdef WPA2_MODE
@@ -165,6 +170,7 @@ const char *const usage_desc = "Info:\n"
 	ARG(listen)			\
 	ARG(send)			\
 	ARG(exec)			\
+	ARG(vmexec)			\
 	ARG(wpa2)			\
 	ARG(flash)			\
 	ARG(nop)			\
@@ -392,10 +398,12 @@ int main(int argc, char *argv[])
 
 	int ret;
 	FILE *fp = NULL;
+	FILE *fp2 = NULL;
 	char *buf = NULL;
 	size_t len = 0;
-	int start = 0, end = 0;
 	char *endptr = NULL;
+	int locals = 0, globals = 0, vmexec_reply = 1;
+	int start = 0, end = 0;
 
 	// Switch between the different commands
 	switch (i)
@@ -509,6 +517,70 @@ int main(int argc, char *argv[])
 			fwrite(buf, len, 1, fp);
 			fclose(fp);
 			return ERR_UNK;
+
+		case ARG_vmexec:
+			assert(argc >= 4);
+			assert(argc <= 5);
+
+			locals = strtol(argv[0], &endptr, 10);
+			if (argv[0] == endptr) {
+				fprintf(stderr, "<%s> is invalid local variable count\n", argv[0]);
+				ret = ERR_ARG;
+				break;
+			}
+
+			globals = strtol(argv[1], &endptr, 10);
+			if (argv[1] == endptr) {
+				fprintf(stderr, "<%s> is invalid global variable count\n", argv[1]);
+				ret = ERR_ARG;
+				break;
+			}
+
+			if (strcmp(argv[2], "-") == 0) {
+				fp = stdin;
+			} else {
+				fp = fopen(SANITIZE(argv[2]), "rb");
+				if (!fp) {
+					fprintf(stderr, "<%s> cannot be opened for bytecodes\n", argv[2]);
+					ret = ERR_IO;
+					break;
+				}
+			}
+
+			if (strcmp(argv[3], "-") == 0) {
+				fp2 = stdout;
+			} else if (strcmp(argv[3], "none") == 0) {
+				fp2 = NULL;
+			} else {
+				fp2 = fopen(SANITIZE(argv[3]), "wb");
+				if (!fp) {
+					fprintf(stderr, "<%s> cannot be opened for writing\n", argv[3]);
+					ret = ERR_IO;
+					break;
+				}
+			}
+
+			if (argc == 5) {
+				if (strcmp(argv[4], "noreply") == 0) {
+					vmexec_reply = 0;
+				} else {
+					fprintf(stderr, "<%s> is invalid vmexec parameter\n", argv[4]);
+					ret = ERR_ARG;
+					break;
+				}
+			} else {
+				vmexec_reply = 1;
+			}
+
+			ret = vmexec(fp, fp2, locals, globals, vmexec_reply);
+
+			if (fp && fp != stdin)
+				fclose(fp);
+
+			if (fp2 && fp2 != stdout)
+				fclose(fp2);
+
+			break;
 
 #ifdef WPA2_MODE
 		case ARG_wpa2:

@@ -52,6 +52,9 @@ extern int mkdir(const char *rem);
 //! fill \p *buf with a rbf file executing \p cmd
 extern size_t mkrbf(char **buf, const char *cmd);
 
+//! execute direct command
+extern int vmexec(FILE *in, FILE *out, int locals, int globals, int use_reply);
+
 //! close given ev3 file handle range
 extern int closehnd(int start, int end);
 

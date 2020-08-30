@@ -28,7 +28,7 @@ enum ERR
 //! Statuses from VM
 enum
 {
-	VM_SYS_RQ = 0x01, VM_OK = 0x03, VM_ERROR = 0x05
+	VM_SYS_RQ = 0x01, VM_DIRECT_OK = 0x02, VM_OK = 0x03, VM_DIRECT_ERROR = 0x04, VM_ERROR = 0x05
 };
 
 //! global variable for last error message
