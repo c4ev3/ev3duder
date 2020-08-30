@@ -104,11 +104,12 @@ const char *const usage =
 				"       ev3duder [ --tcp[=ip] | --usb | --serial[=dev] | --serial[=inp,outp] ]\n"
 				"                vmexec <locals> <globals> <infile> <outfile> [noreply]\n"
 				"\n"
-		"\n"
-		"       ev3duder flash [ enter | install loc | info | reboot ] \n"
-		"\n"
-				"       "
-				"rem = remote (EV3) path, loc = local path"    "\n";
+				"       ev3duder flash [ enter | install loc | info | reboot ] \n"
+				"\n"
+				"       ev3duder uf2 pack   <archive.uf2> <brickdir> <file>...\n"
+				"       ev3duder uf2 unpack <archive.uf2> <outdir> [--with-paths]\n"
+				"\n"
+				"       rem = remote (EV3) path, loc = local path"    "\n";
 
 
 const char *const usage_desc = "Info:\n"
@@ -153,6 +154,11 @@ const char *const usage_desc = "Info:\n"
 		"flash install   install the given firmware file to the EV3\n"
 		"flash info      show hardware and EEPROM versions\n"
 		"flash exit      exit from the firmware update mode without installing new firmware\n"
+		"uf2 pack        pack files into a Microsoft UF2 container\n"
+		"                note: common brickdir options are: \n"
+		"                'Projects' (internal flash, default), 'SD Card', 'USB Stick',\n"
+		"                'Temporary Logs', 'Permanent Logs'\n"
+		"uf2 unpack      unpack files from a Microsoft UF2 container\n"
 ;
 
 #define FOREACH_ARG(ARG)\
@@ -173,6 +179,7 @@ const char *const usage_desc = "Info:\n"
 	ARG(vmexec)			\
 	ARG(wpa2)			\
 	ARG(flash)			\
+	ARG(uf2)			\
 	ARG(nop)			\
 	ARG(end)
 
@@ -184,7 +191,7 @@ enum ARGS
 	FOREACH_ARG(MK_ENUM)
 };
 static const char *args[] = {FOREACH_ARG(MK_STR)};
-static const char *offline_args[] = {MK_STR(mkrbf) /*MK_STR(tunnel)*/ };
+static const char *offline_args[] = {MK_STR(mkrbf) MK_STR(uf2) /*MK_STR(tunnel)*/ };
 
 
 
@@ -404,6 +411,7 @@ int main(int argc, char *argv[])
 	char *endptr = NULL;
 	int locals = 0, globals = 0, vmexec_reply = 1;
 	int start = 0, end = 0;
+	int uf2_paths = 0;
 
 	// Switch between the different commands
 	switch (i)
@@ -659,6 +667,58 @@ int main(int argc, char *argv[])
 			} else {
 				ret = ERR_ARG;
 				printf("<%s> is not a known flash command\n.", argv[0]);
+			}
+			break;
+
+		case ARG_uf2:
+			assert(argc >= 1);
+			if (strcmp(argv[0], "pack") == 0)
+			{
+				assert(argc >= 4);
+
+				fp = fopen(SANITIZE(argv[1]), "wb");
+				if (!fp)
+				{
+					errmsg = "error: cannot open UF2 file for writing";
+					ret = ERR_IO;
+					break;
+				}
+				ret = uf2_pack(fp, argv[2], (const char **) &argv[3], argc - 3);
+				fclose(fp);
+
+			}
+			else if (strcmp(argv[0], "unpack") == 0)
+			{
+				assert(argc == 3 || argc == 4);
+				if (argc == 4)
+				{
+					if (strcmp(argv[3], "--with-paths") == 0)
+					{
+						uf2_paths = 1;
+					}
+					else
+					{
+						ret = ERR_ARG;
+						printf("<%s> is not valid for `uf2 unpack`.\n", argv[3]);
+						break;
+					}
+				}
+
+				fp = fopen(SANITIZE(argv[1]), "rb");
+				if (!fp)
+				{
+					errmsg = "error: cannot open UF2 file for reading";
+					ret = ERR_IO;
+					break;
+				}
+				ret = uf2_unpack(fp, SANITIZE(argv[2]), uf2_paths);
+				fclose(fp);
+
+			}
+			else
+			{
+				ret = ERR_ARG;
+				printf("<uf2 %s> hasn't been implemented yet.\n", argv[0]);
 			}
 			break;
 
