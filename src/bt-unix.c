@@ -61,7 +61,7 @@ int bt_write(void *fd_, const u8 *buf, size_t count)
 	size_t sent;
 	for (ssize_t ret = sent = 0; sent < count; sent += ret)
 	{
-		ret = write(fd, buf, count - sent);
+		ret = write(fd, buf + sent, count - sent);
 		if (ret == -1)
 		{
 			// set some error msg
