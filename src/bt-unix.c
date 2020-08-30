@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <termios.h>
 
 #include "defs.h"
 
@@ -19,30 +20,57 @@
 // ^ TODO: add ability to find differently named EV3's
 
 
+typedef struct {
+	int read_fd;
+	int write_fd;
+	struct termios old_read_mode;
+	struct termios old_write_mode;
+} bt_handle_t;
+
+int set_termios(struct termios *old, int fd) {
+	if (tcgetattr(fd, old) < 0) {
+		perror("cannot get tty attributes");
+		return -1;
+	}
+
+	struct termios new = *old;
+	new.c_iflag &= ~(BRKINT | ICRNL | IGNBRK | IGNCR | IGNPAR | INLCR | INPCK | ISTRIP | IXOFF | IXON | PARMRK);
+	new.c_oflag &= ~(OPOST);
+	new.c_cflag |= (CREAD | CS8);
+	new.c_lflag &= ~(ECHO | ICANON | ISIG | IEXTEN);
+	new.c_cc[VMIN]  = 1;
+	new.c_cc[VTIME] = 0;
+
+	if (tcsetattr(fd, TCSAFLUSH, &new) < 0) {
+		perror("cannot set tty attributes");
+		return -1;
+	}
+	return 0;
+}
+
 /**
  * \param [in] device path to SerialPort or \p NULL
- * \return &fd pointer to file descriptor for use with bt_{read,write,close,error}
+ * \return bt_handle_t with file descriptors for use with bt_{read,write,close,error}
  * \brief open(2)s serial port  described by device. `NULL` leads to default action
  * \bug default value should be enumerating. Not hardcoded like in \p BT
  */
-enum
-{
-	READ = 0, WRITE = 1
-};
-
 void *bt_open(const char *file, const char *file2)
 {
-	int *fd = malloc(2 * sizeof(int));
+	bt_handle_t *cb = malloc(sizeof(bt_handle_t));
 	if (file2)
 	{
-		fd[READ] = open(file ?: BT, O_RDONLY);
-		fd[WRITE] = open(file ?: BT, O_WRONLY);
+		cb->read_fd = open(file ?: BT, O_RDONLY | O_NOCTTY);
+		cb->write_fd = open(file ?: BT, O_WRONLY | O_NOCTTY);
 	}
 	else
-		fd[0] = fd[1] = open(file ?: BT, O_RDWR);
+		cb->read_fd = cb->write_fd = open(file ?: BT, O_RDWR | O_NOCTTY);
 
-	if (fd[WRITE] == -1 || fd[READ] == -1) return NULL;
-	return fd;
+	if (cb->write_fd == -1 || cb->read_fd == -1) return NULL;
+
+	// order read -> write
+	if (set_termios(&cb->old_read_mode,  cb->read_fd)  < 0) return NULL;
+	if (set_termios(&cb->old_write_mode, cb->write_fd) < 0) return NULL;
+	return cb;
 }
 
 /**
@@ -55,13 +83,13 @@ void *bt_open(const char *file, const char *file2)
  */
 int bt_write(void *fd_, const u8 *buf, size_t count)
 {
-	int fd = ((int *) fd_)[WRITE];
+	bt_handle_t *cb = (bt_handle_t *) fd_;
 	buf++;
 	count--; // omit HID report number
 	size_t sent;
 	for (ssize_t ret = sent = 0; sent < count; sent += ret)
 	{
-		ret = write(fd, buf, count - sent);
+		ret = write(cb->write_fd, buf + sent, count - sent);
 		if (ret == -1)
 		{
 			// set some error msg
@@ -82,7 +110,8 @@ int bt_write(void *fd_, const u8 *buf, size_t count)
  */
 int bt_read(void *fd_, u8 *buf, size_t count, int milliseconds)
 {
-	int fd = ((int *) fd_)[READ];
+	bt_handle_t *cb = (bt_handle_t *) fd_;
+	int fd = cb->read_fd;
 	size_t recvd = 0;
 	size_t packet_len = 2;
 	ssize_t ret;
@@ -135,8 +164,16 @@ int bt_read(void *fd_, u8 *buf, size_t count, int milliseconds)
  */
 void bt_close(void *handle)
 {
-	close(((int *) handle)[WRITE]);
-	close(((int *) handle)[READ]);
+	bt_handle_t *cb = (bt_handle_t *) handle;
+
+	// reverse order (write -> read) is important
+	if (tcsetattr(cb->write_fd, TCSAFLUSH, &cb->old_write_mode) < 0)
+		perror("cannot revert tty attributes");
+	if (tcsetattr(cb->read_fd,  TCSAFLUSH, &cb->old_read_mode)  < 0)
+		perror("cannot revert tty attributes");
+
+	close(cb->write_fd);
+	close(cb->read_fd);
 	free(handle);
 }
 

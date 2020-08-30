@@ -55,6 +55,9 @@ extern size_t mkrbf(char **buf, const char *cmd);
 //! execute direct command
 extern int vmexec(FILE *in, FILE *out, int locals, int globals, int use_reply);
 
+//! close given ev3 file handle range
+extern int closehnd(int start, int end);
+
 //! tunnel stdio to established ev3 connection
 extern int tunnel_mode();
 
@@ -62,6 +65,19 @@ extern int listen_mode();
 
 extern int bridge_mode();
 
+//! reboot from Linux to bootloader eeprom
+extern int bootloader_enter(void);
+
+//! install new firmware to the brick
+extern int bootloader_install(FILE *fp);
+
+//! print brick hardware version
+extern int bootloader_info(void);
+
+//! exit from bootloader eeprom
+extern int bootloader_exit(void);
+
+extern u32 crc32(u32 crc, const void *buf, size_t size);
 
 #if 0 // not yet implemented
 //! concatenate contents of \p count of \p rem FILEs to the EV3's LCD

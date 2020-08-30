@@ -8,7 +8,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <Ws2tcpip.h>
+#include <ws2tcpip.h>
 
 #define bailout(msg) ({\
 	char *buf; \
