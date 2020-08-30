@@ -57,6 +57,8 @@ void assert(char cond);
 #define VendorID 0x694
 //! EV3
 #define ProductID 0x005 /* EV3 */
+//! EV3 Firmware Update Mode
+#define ProductID_FW 0x006 /* EV3 Firmware Update Mode */
 //! Filename used for executing command with `exec`
 #define ExecName  "/tmp/Executing shell cmd.rbf"
 // FIXME: general solution
@@ -67,8 +69,8 @@ void assert(char cond);
  * solution: prefix with length instead:
  * First pipe stderr to stdout then pipe to awk which prefixes a header
  * with the byte count to follow and then pipe that to  dd which writes
- * to the hid device driver in chunks of 1000 bytes. 
- * This is necessary as bs>1024 causes the system to stall 
+ * to the hid device driver in chunks of 1000 bytes.
+ * This is necessary as bs>1024 causes the system to stall
  * (driver buffer overflow maybe).
  * unescaped version:
  * echo "hey" 2>&1 | awk 'BEGIN{RS="\0"};{printf "%08x%s", length($
@@ -98,6 +100,9 @@ const char *const usage =
 				"                " "  info | tunnel ]\n"
 #endif
 #endif
+		"\n"
+		"       ev3duder flash [ enter | install loc | info | reboot ] \n"
+		"\n"
 				"       "
 				"rem = remote (EV3) path, loc = local path"    "\n";
 
@@ -137,6 +142,11 @@ const char *const usage_desc = "Info:\n"
 #ifdef BRIDGE_MODE
 		"bridge          simulates a WiFi-connected device bridged to a real ev3 VM\n"
 #endif
+		"flash enter     reboot from Linux to firmware update mode\n"
+		"                (alternatively Escape+Enter+Right on the brick)\n"
+		"flash install   install the given firmware file to the EV3\n"
+		"flash info      show hardware and EEPROM versions\n"
+		"flash exit      exit from the firmware update mode without installing new firmware\n"
 ;
 
 #define FOREACH_ARG(ARG)\
@@ -154,6 +164,7 @@ const char *const usage_desc = "Info:\n"
 	ARG(send)			\
 	ARG(exec)			\
 	ARG(wpa2)			\
+	ARG(flash)			\
 	ARG(nop)			\
 	ARG(end)
 
@@ -198,6 +209,7 @@ int main(int argc, char *argv[])
 			printf("%d  ERR_COMM    Communication failed\n", ERR_COMM);
 			printf("%d  ERR_VM      EV3 VM returned an error\n", ERR_VM);
 			printf("%d  ERR_SYS     System error\n", ERR_SYS);
+			printf("%d  ERR_USBLOOP Received own message instead of a reply\n", ERR_USBLOOP);
 			printf("%d  ERR_END     \n", ERR_END);
 
 			return ERR_UNK;
@@ -292,8 +304,14 @@ int main(int argc, char *argv[])
 		if (strcmp(argv[1], offline_args[i]) == 0) break;
 	}
 
+	int is_fw = (strcmp(argv[1], "flash") == 0);
+	if (is_fw) {
+		if (argc >= 3 && strcmp(argv[2], "enter") == 0)
+			is_fw = 0;
+	}
+
 	// If the command is not one of the offline commands, select transfer method
-	if (i == ARRAY_SIZE(offline_args))
+	if (i == ARRAY_SIZE(offline_args) && !is_fw)
 	{
 		if ((switches.hid || !switches.select) &&
 			(handle = hid_open(VendorID, ProductID, NULL)))
@@ -334,6 +352,27 @@ int main(int argc, char *argv[])
 		else
 		{
 			puts("EV3 not found. Either plug it into the USB port or pair over Bluetooth.\n");
+#ifdef __linux__
+			puts("Insufficient access to the usb device might be a reason too, try sudo.");
+#endif
+			return ERR_COMM;
+		}
+	}
+
+	if (is_fw) {
+		if ((handle = hid_open(VendorID, ProductID_FW, NULL)))
+			// TODO: last one is SerialID, make it specifiable via commandline
+		{
+			fputs("USB connection established.\n", stderr);
+
+			ev3_write = (int (*)(void *, const u8 *, size_t)) hid_write;
+			ev3_read_timeout = (int (*)(void *, u8 *, size_t, int)) hid_read_timeout;
+			ev3_error = (const wchar_t *(*)(void *)) hid_error;
+			ev3_close = (void (*)(void *)) hid_close;
+		}
+		else
+		{
+			puts("No updateable EV3 found. Plug it into a USB port and switch it to firmware update mode.\n");
 #ifdef __linux__
 			puts("Insufficient access to the usb device might be a reason too, try sudo.");
 #endif
@@ -497,6 +536,38 @@ int main(int argc, char *argv[])
 			ret = rm(argv[0]);
 			break;
 
+		case ARG_flash:
+			assert(argc >= 1);
+			if (strcmp(argv[0], "enter") == 0) {
+				assert(argc == 1);
+				ret = bootloader_enter();
+
+			} else if (strcmp(argv[0], "install") == 0) {
+				assert(argc == 2);
+
+				fp = fopen(SANITIZE(argv[1]), "rb");
+				if (!fp)
+				{
+					printf("File <%s> doesn't exist.\n", argv[1]);
+					return ERR_IO;
+				}
+
+				ret = bootloader_install(fp);
+
+			} else if (strcmp(argv[0], "info") == 0) {
+				assert(argc == 1);
+				ret = bootloader_info();
+
+			} else if (strcmp(argv[0], "exit") == 0) {
+				assert(argc == 1);
+				ret = bootloader_exit();
+
+			} else {
+				ret = ERR_ARG;
+				printf("<%s> is not a known flash command\n.", argv[0]);
+			}
+			break;
+
 		default:
 			ret = ERR_ARG;
 			printf("<%s> hasn't been implemented yet.\n", argv[0]);
@@ -517,6 +588,12 @@ int main(int argc, char *argv[])
 			err = "An unknown error occured";
 
 		fprintf(out, "%s (%s)\n", err ?: "-", errmsg ?: "-");
+	}
+	else if (ret == ERR_USBLOOP)
+	{
+		fputs("\nError: ev3duder received its own packet instead of a reply from the brick.\n\n", stderr);
+		fputs("If you have plugged the EV3 into a USB 3.0 port (usually red or blue),\n", stderr);
+		fputs("try plugging it into a USB 2.0 only port (usually black or white).\n", stderr);
 	}
 	else
 	{

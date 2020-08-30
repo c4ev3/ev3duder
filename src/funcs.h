@@ -59,6 +59,19 @@ extern int listen_mode();
 
 extern int bridge_mode();
 
+//! reboot from Linux to bootloader eeprom
+extern int bootloader_enter(void);
+
+//! install new firmware to the brick
+extern int bootloader_install(FILE *fp);
+
+//! print brick hardware version
+extern int bootloader_info(void);
+
+//! exit from bootloader eeprom
+extern int bootloader_exit(void);
+
+extern u32 crc32(u32 crc, const void *buf, size_t size);
 
 #if 0 // not yet implemented
 //! concatenate contents of \p count of \p rem FILEs to the EV3's LCD
