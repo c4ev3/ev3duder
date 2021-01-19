@@ -78,15 +78,25 @@ int bootloader_install(FILE *fp)
 
 	puts("Calculating flash checksum... (takes 17 seconds)");
 	err = bootloader_checksum(FLASH_START, FLASH_SIZE, &remote_crc32); // 16.7 seconds
-	if (err != ERR_UNK)
-		return err;
 
-	if (local_crc32 != remote_crc32) {
-		fprintf(stderr, "error: checksums do not match: remote %08X != local %08X\n",
-				remote_crc32, local_crc32);
-		return ERR_IO;
-	} else {
-		puts("Success! Local and remote checksums match. Rebooting.");
+	// handle usb 3.0 bug
+	if (err == ERR_USBLOOP)
+	{
+		puts("Checksum not checked, assuming update was OK. Rebooting.");
+	}
+	else if (err == ERR_UNK) // no error occurred
+	{
+		if (local_crc32 != remote_crc32) {
+			fprintf(stderr, "error: checksums do not match: remote %08X != local %08X\n",
+					remote_crc32, local_crc32);
+			return ERR_IO;
+		} else {
+			puts("Success! Local and remote checksums match. Rebooting.");
+		}
+	}
+	else // other error occurred
+	{
+		return err;
 	}
 
 	return bootloader_exit();
@@ -110,10 +120,8 @@ static int bootloader_erase(void)
 		return ERR_COMM;
 	}
 
-	if (reply->type == VM_SYS_RQ)
-		return ERR_USBLOOP;
-
-	if (reply->type != VM_OK)
+	// note: accept looped-back packets (usb 3.0 bug; reply not required here)
+	if (reply->type != VM_OK && reply->type != VM_SYS_RQ)
 	{
 		errno = reply->ret;
 		fputs("Operation failed.\nlast_reply=", stderr);
@@ -145,10 +153,8 @@ static int bootloader_start(int offset, int length)
 		return ERR_COMM;
 	}
 
-	if (reply->type == VM_SYS_RQ)
-		return ERR_USBLOOP;
-
-	if (reply->type != VM_OK)
+	// note: accept looped-back packets (usb 3.0 bug; reply not required here)
+	if (reply->type != VM_OK && reply->type != VM_SYS_RQ)
 	{
 		errno = reply->ret;
 		fputs("Operation failed.\nlast_reply=", stderr);
@@ -209,10 +215,8 @@ static int bootloader_send(FILE *fp, int length, u32* pCrc32)
 			return ERR_COMM;
 		}
 
-		if (reply->type == VM_SYS_RQ)
-			return ERR_USBLOOP;
-
-		if (reply->type != VM_OK)
+		// note: accept looped-back packets (usb 3.0 bug; reply not required here)
+		if (reply->type != VM_OK && reply->type != VM_SYS_RQ)
 		{
 			errno = reply->ret;
 			fputs("Operation failed.\nlast_reply=", stderr);
@@ -256,8 +260,11 @@ static int bootloader_checksum(int offset, int length, u32 *pCrc32)
 		return ERR_COMM;
 	}
 
+	// note: report loopback bug to outer code
 	if (reply->type == VM_SYS_RQ)
+	{
 		return ERR_USBLOOP;
+	}
 
 	if (reply->type != VM_OK)
 	{

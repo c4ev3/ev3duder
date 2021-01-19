@@ -52,6 +52,7 @@ int bootloader_info(void)
 		return ERR_COMM;
 	}
 
+	// forbid looped-back packets (usb 3.0 bug; reply *is* required here)
 	if (reply->type == VM_SYS_RQ)
 		return ERR_USBLOOP;
 

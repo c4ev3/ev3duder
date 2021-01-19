@@ -38,10 +38,8 @@ int bootloader_exit(void)
 		return ERR_COMM;
 	}
 
-	if (reply->type == VM_SYS_RQ)
-		return ERR_USBLOOP;
-
-	if (reply->type != VM_OK)
+	// note: accept looped-back packets (usb 3.0 bug; reply not required here)
+	if (reply->type != VM_OK && reply->type != VM_SYS_RQ)
 	{
 		errno = reply->ret;
 		fputs("Operation failed.\nlast_reply=", stderr);
@@ -51,6 +49,8 @@ int bootloader_exit(void)
 		return ERR_VM;
 	}
 
-	errmsg = "`FW_STARTAPP` was successful.";
+	puts("\nNote: if your EV3 isn't detected as a USB device now, try restarting the brick from its menu.\n");
+
+	errmsg = "Update mode was exited successfully.";
 	return ERR_UNK;
 }
