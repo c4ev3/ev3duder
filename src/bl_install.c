@@ -15,12 +15,6 @@
 #include "funcs.h"
 
 /**
- * @brief Erase internal flash
- * @retval error according to enum #ERR
- */
-static int bootloader_erase(void);
-
-/**
  * @brief Start the programming operation
  * @param offset Start of programmed region
  * @param length Length of programmed region
@@ -63,12 +57,7 @@ int bootloader_install(FILE *fp)
 	u32 local_crc32 = 0;
 	u32 remote_crc32 = 0;
 
-	puts("Erasing flash... (takes 1 minute 48 seconds)"); // 108 seconds
-	err = bootloader_erase();
-	if (err != ERR_UNK)
-		return err;
-
-	puts("Downloading...");
+	puts("Erasing and Downloading...");
 	err = bootloader_start(FLASH_START, FLASH_SIZE); // extremely short
 	if (err != ERR_UNK)
 		return err;
@@ -90,39 +79,6 @@ int bootloader_install(FILE *fp)
 	}
 
 	return bootloader_exit();
-}
-
-static int bootloader_erase(void)
-{
-	FW_ERASEFLASH *request = packet_alloc(FW_ERASEFLASH, 0);
-	int res = ev3_write(handle, (u8 *) request, request->packetLen + PREFIX_SIZE);
-	if (res < 0)
-	{
-		errmsg = "Unable to write FW_ERASEFLASH.";
-		return ERR_COMM;
-	}
-
-	FW_ERASEFLASH_REPLY *reply = malloc(sizeof(FW_ERASEFLASH_REPLY));
-	res = ev3_read_timeout(handle, (u8 *) reply, sizeof(FW_ERASEFLASH_REPLY), -1);
-	if (res <= 0)
-	{
-		errmsg = "Unable to read FW_ERASEFLASH";
-		return ERR_COMM;
-	}
-
-	if (reply->type == VM_SYS_RQ)
-		return ERR_USBLOOP;
-
-	if (reply->type != VM_OK)
-	{
-		errno = reply->ret;
-		fputs("Operation failed.\nlast_reply=", stderr);
-		print_bytes(reply, reply->packetLen + 2);
-
-		errmsg = "`FW_ERASEFLASH` was denied.";
-		return ERR_VM;
-	}
-	return ERR_UNK;
 }
 
 static int bootloader_start(int offset, int length)
