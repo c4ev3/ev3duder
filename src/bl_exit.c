@@ -49,6 +49,6 @@ int bootloader_exit(void)
 		return ERR_VM;
 	}
 
-	errmsg = "`FW_STARTAPP` was successful.";
+	errmsg = "Update mode was exited successfully.";
 	return ERR_UNK;
 }
