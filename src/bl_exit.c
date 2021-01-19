@@ -49,6 +49,8 @@ int bootloader_exit(void)
 		return ERR_VM;
 	}
 
+	puts("\nNote: if your EV3 isn't detected as a USB device now, try restarting the brick from its menu.\n");
+
 	errmsg = "Update mode was exited successfully.";
 	return ERR_UNK;
 }
