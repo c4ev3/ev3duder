@@ -127,7 +127,7 @@ static int bootloader_erase(void)
 
 static int bootloader_start(int offset, int length)
 {
-	FW_START_DOWNLOAD *request = packet_alloc(FW_START_DOWNLOAD, 0);
+	FW_START_DOWNLOAD_WITH_ERASE *request = packet_alloc(FW_START_DOWNLOAD_WITH_ERASE, 0);
 	request->flashStart = offset;
 	request->flashLength = length;
 	int res = ev3_write(handle, (u8 *) request, request->packetLen + PREFIX_SIZE);
