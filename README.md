@@ -31,6 +31,10 @@ On Linux, you additionally need libudev-dev to be installed. On Ubuntu and other
 
     $ sudo apt-get install libudev-dev
 
+If you used only a simple `git clone` earlier, you may also need to download some missing git modules:
+
+    $ git submodule update --init --recursive
+
 Also to allow access to the ev3 over USB without requiring root, appropriate udev rules must be created. This can be easily done with
 
     $ make install
