@@ -54,10 +54,6 @@ int uf2_unpack(FILE *fp, const char *dstdir, int use_paths)
 		    block->file_offset >= block->file_size)
 			continue;
 
-		uint32_t real_bytes = block->data_bytes;
-		if ((real_bytes + block->file_offset) > block->file_size)
-			real_bytes = block->file_size - block->file_offset;
-
 		block->data[475] = 0;
 		const char *name = (const char *) &block->data[block->data_bytes];
 		int name_chars = strlen(name);
@@ -73,7 +69,7 @@ int uf2_unpack(FILE *fp, const char *dstdir, int use_paths)
 			return -ret;
 		}
 
-		ret = uf2_write_into(realname, block->data, real_bytes, block->file_offset, block->file_size);
+		ret = uf2_write_into(realname, block->data, block->data_bytes, block->file_offset, block->file_size);
 		if (ret < 0) {
 			perror("cannot write uf2 file contents");
 			errmsg = "`uf2 unpack` has failed.";
