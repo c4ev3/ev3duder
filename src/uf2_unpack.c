@@ -32,30 +32,26 @@ static void uf2_map(char *dst, size_t dstlen, const char *dstdir, const char *fi
 int uf2_unpack(FILE *fp, const char *dstdir, int use_paths)
 {
 	char realname[256];
-	uf2_block_t *block = malloc(sizeof(uf2_block_t));
-	if (!block) return ERR_NOMEM;
+	uf2_block_t block = {0};
 
-	while (1)
+	while (fread(&block, sizeof(uf2_block_t), 1, fp) == 1)
 	{
-		if (fread(block, 512, 1, fp) < 1)
-			break;
-
-		if (block->magic1 != UF2_MAGIC_1 ||
-		    block->magic2 != UF2_MAGIC_2 ||
-		    block->magic3 != UF2_MAGIC_3)
+		if (block.magic1 != UF2_MAGIC_1 ||
+		    block.magic2 != UF2_MAGIC_2 ||
+		    block.magic3 != UF2_MAGIC_3)
 		    continue;
 
-		if ((block->flags & UF2_FLAG_IGNORE) != 0 ||
-		    (block->flags & UF2_FLAG_FILE)   == 0)
+		if ((block.flags & UF2_FLAG_IGNORE) != 0 ||
+		    (block.flags & UF2_FLAG_FILE)   == 0)
 			continue;
 
-		if (block->data_bytes > UF2_PAYLOAD_MAX ||
-		    block->file_size > UF2_FILE_MAX ||
-		    block->file_offset >= block->file_size)
+		if (block.data_bytes > UF2_PAYLOAD_MAX ||
+		    block.file_size > UF2_FILE_MAX ||
+		    block.file_offset >= block.file_size)
 			continue;
 
-		block->data[475] = 0;
-		const char *name = (const char *) &block->data[block->data_bytes];
+		block.data[475] = 0;
+		const char *name = (const char *) &block.data[block.data_bytes];
 		int name_chars = strlen(name);
 		if (name_chars > UF2_FILENAME_MAX)
 			continue;
