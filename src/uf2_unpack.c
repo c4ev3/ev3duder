@@ -33,6 +33,7 @@ int uf2_unpack(FILE *fp, const char *dstdir, int use_paths)
 {
 	char realname[256];
 	uf2_block_t block = {0};
+	int retval = ERR_UNK;
 
 	while (fread(&block, sizeof(uf2_block_t), 1, fp) == 1)
 	{
@@ -61,19 +62,24 @@ int uf2_unpack(FILE *fp, const char *dstdir, int use_paths)
 		int ret = uf2_mkdir_for(realname);
 		if (ret < 0) {
 			perror("cannot make directory for destination uf2 file");
-			errmsg = "`uf2 unpack` has failed.";
-			return -ret;
+			retval = ERR_IO;
+			break;
 		}
 
-		ret = uf2_write_into(realname, block->data, block->data_bytes, block->file_offset, block->file_size);
+		ret = uf2_write_into(realname, block.data, block.data_bytes, block.file_offset, block.file_size);
 		if (ret < 0) {
 			perror("cannot write uf2 file contents");
-			errmsg = "`uf2 unpack` has failed.";
-			return -ret;
+			retval = ERR_IO;
+			break;
 		}
 	}
-	errmsg = "`uf2 unpack` was successful.";
-	return ERR_UNK;
+
+	if (retval == ERR_UNK)
+		errmsg = "`uf2 unpack` was successful.";
+	else
+		errmsg = "`uf2 unpack` has failed.";
+
+	return retval;
 }
 
 void uf2_map(char *dst, size_t dstlen, const char *dstdir, const char *filename, int use_paths)
