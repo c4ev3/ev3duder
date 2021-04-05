@@ -22,7 +22,26 @@ void *bt_open(const char *device, const char *unused)
 {
 	(void) unused;
 	HANDLE handle = CreateFileA(device ?: BT, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-	return handle != INVALID_HANDLE_VALUE ? handle : NULL;
+
+	if (handle == INVALID_HANDLE_VALUE)
+		return NULL;
+
+	COMMTIMEOUTS timeouts = {0};
+	if (!GetCommTimeouts(handle, &timeouts))
+	{
+		CloseHandle(handle);
+		return NULL;
+	}
+
+	timeouts.ReadIntervalTimeout = 100;
+
+	if (!SetCommTimeouts(handle, &timeouts))
+	{
+		CloseHandle(handle);
+		return NULL;
+	}
+
+	return handle;
 }
 
 /**
@@ -57,6 +76,9 @@ int bt_write(void *handle, const u8 *buf, size_t count)
 int bt_read(void *handle, u8 *buf, size_t count, int milliseconds)
 {
 	(void) milliseconds; // https://msdn.microsoft.com/en-us/library/windows/desktop/aa363190%28v=vs.85%29.aspx
+
+	// TODO: read size header first, then read remaining bytes (Unix code does this)
+
 	DWORD dwBytesRead;
 	if (!ReadFile(handle, buf, count, &dwBytesRead, NULL))
 		return -1;
