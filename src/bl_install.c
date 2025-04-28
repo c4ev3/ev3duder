@@ -148,10 +148,7 @@ static int bootloader_send(u8 *buffer, int length, u32* pCrc32)
 	int total = length;
 	int sent_so_far = 0;
 	int res = 0;
-	int last_percent = 0;
 	u32 crc = 0;
-
-	printf("Progress: %3d %%\n", 0);
 
 	while (sent_so_far < total) {
 		int remaining = total - sent_so_far;
@@ -188,12 +185,6 @@ static int bootloader_send(u8 *buffer, int length, u32* pCrc32)
 		}
 
 		sent_so_far += this_block;
-
-		int new_percent = sent_so_far * 100 / total;
-		if (new_percent >= last_percent + 5) {
-			last_percent += ((new_percent - last_percent) / 5) * 5;
-			printf("Progress: %3d %%\n", last_percent);
-		}
 	}
 	*pCrc32 = crc;
 	return ERR_UNK;
