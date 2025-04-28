@@ -16,27 +16,21 @@
 #include "funcs.h"
 
 /**
- * @brief Erase internal flash
- * @retval error according to enum #ERR
- */
-static int bootloader_erase(void);
-
-/**
  * @brief Start the programming operation
  * @param offset Start of programmed region
  * @param length Length of programmed region
  * @retval error according to enum #ERR
  */
-static int bootloader_start(int offset, int length);
+static int bootloader_erase_and_start(int offset, int length);
 
 /**
  * @brief Send firmware to bootloader
- * @param fp Firmware file
+ * @param firmware Firmware image
  * @param length Length of programmed region
  * @param pCrc32 Locally-calculated CRC32 of the firmware
  * @retval error according to enum #ERR
  */
-static int bootloader_send(FILE *fp, int length, u32* pCrc32);
+static int bootloader_send(u8 *firmware, int length, u32* pCrc32);
 
 /**
  * @brief Request CRC32 verification from the bootloader
@@ -56,98 +50,96 @@ static int bootloader_checksum(int offset, int length, u32 *pCrc32);
  */
 int bootloader_install(FILE *fp)
 {
-	int err = ERR_UNK;
-	u32 local_crc32 = 0;
-	u32 remote_crc32 = 0;
-
-	puts("Erasing flash... (takes 1 minute 48 seconds)"); // 108 seconds
-	err = bootloader_erase();
-	if (err != ERR_UNK)
-		return err;
-
-	puts("Downloading...");
-	err = bootloader_start(FLASH_START, FLASH_SIZE); // extremely short
-	if (err != ERR_UNK)
-		return err;
-	err = bootloader_send(fp, FLASH_SIZE, &local_crc32); // variable time
-	if (err != ERR_UNK)
-		return err;
-
-	puts("Calculating flash checksum... (takes 17 seconds)");
-	err = bootloader_checksum(FLASH_START, FLASH_SIZE, &remote_crc32); // 16.7 seconds
-
-	// handle usb 3.0 bug
-	if (err == ERR_USBLOOP)
-	{
-		puts("Checksum not checked, assuming update was OK. Rebooting.");
+	u8 *firmware = calloc(FLASH_SIZE, 1);
+	if (!firmware) {
+		errmsg = "out of memory";
+		return ERR_NOMEM;
 	}
-	else if (err == ERR_UNK) // no error occurred
-	{
-		if (local_crc32 != remote_crc32) {
-			fprintf(stderr, "error: checksums do not match: remote %08X != local %08X\n",
-					remote_crc32, local_crc32);
-			return ERR_IO;
-		} else {
-			puts("Success! Local and remote checksums match. Rebooting.");
+
+	int read_bytes = fread(firmware, 1, FLASH_SIZE, fp); // this may be less than FLASH_SIZE (e.g. Pybricks has a small firmware image)
+	if (ferror(fp)) {
+		errmsg = "Reading of firmware file failed";
+		free(firmware);
+		return ERR_IO;
+	}
+
+	int sector_count = (read_bytes + FLASH_SECTOR_SIZE - 1) / FLASH_SECTOR_SIZE;
+
+	printf("Programming %d EV3 flash sectors...\n", sector_count);
+
+	int err = ERR_UNK;
+	for (int sector = 0; sector < sector_count; sector++) {
+		u32 local_crc32 = 0;
+		u32 remote_crc32 = 0;
+
+		printf("- Sector %3d (%2d %%)\n", sector, 100*sector/sector_count);
+		err = bootloader_erase_and_start(sector*FLASH_SECTOR_SIZE, FLASH_SECTOR_SIZE);
+		if (err != ERR_UNK) {
+			puts("Flash erase returned an error!");
+			break;
+		}
+
+		err = bootloader_send(firmware + sector*FLASH_SECTOR_SIZE, FLASH_SECTOR_SIZE, &local_crc32);
+		if (err != ERR_UNK) {
+			puts("Programming returned an error!");
+			break;
+		}
+
+		err = bootloader_checksum(sector*FLASH_SECTOR_SIZE, FLASH_SECTOR_SIZE, &remote_crc32);
+		if (err == ERR_USBLOOP && sector == 0)
+		{
+			puts("NOTE: CRC not checked, because the brick is likely plugged to a USB 3.0 port.");
+		}
+		else if (err == ERR_UNK) // no error occurred
+		{
+			if (local_crc32 != remote_crc32) {
+				printf("Checksum does not match: remote %08X != local %08X\n", remote_crc32, local_crc32);
+				err = ERR_COMM;
+				break;
+			}
+		}
+		else // other error occurred
+		{
+			puts("Checksum computation returned an error!");
+			break;
 		}
 	}
-	else // other error occurred
-	{
+
+	free(firmware);
+	if (err == ERR_UNK) {
+		puts("Flashing finished, rebooting the brick.");
+		return bootloader_exit();
+	} else {
+		puts("Some error occurred, leaving the brick in the bootloader mode.");
+		puts("To exit it manually, simply remove the EV3 battery and then put it back in.");
 		return err;
 	}
-
-	return bootloader_exit();
 }
 
-static int bootloader_erase(void)
+static int bootloader_erase_and_start(int offset, int length)
 {
-	FW_ERASEFLASH *request = packet_alloc(FW_ERASEFLASH, 0);
-	int res = ev3_write(handle, (u8 *) request, request->packetLen + PREFIX_SIZE);
-	if (res < 0)
-	{
-		errmsg = "Unable to write FW_ERASEFLASH.";
-		return ERR_COMM;
-	}
+	FW_START_DOWNLOAD_WITH_ERASE *request = NULL;
+	FW_START_DOWNLOAD_WITH_ERASE_REPLY *reply = NULL;
+	int err;
 
-	FW_ERASEFLASH_REPLY *reply = malloc(sizeof(FW_ERASEFLASH_REPLY));
-	res = ev3_read_timeout(handle, (u8 *) reply, sizeof(FW_ERASEFLASH_REPLY), -1);
-	if (res <= 0)
-	{
-		errmsg = "Unable to read FW_ERASEFLASH";
-		return ERR_COMM;
-	}
-
-	// note: accept looped-back packets (usb 3.0 bug; reply not required here)
-	if (reply->type != VM_OK && reply->type != VM_SYS_RQ)
-	{
-		errno = reply->ret;
-		fputs("Operation failed.\nlast_reply=", stderr);
-		print_bytes(reply, reply->packetLen + 2);
-
-		errmsg = "`FW_ERASEFLASH` was denied.";
-		return ERR_VM;
-	}
-	return ERR_UNK;
-}
-
-static int bootloader_start(int offset, int length)
-{
-	FW_START_DOWNLOAD *request = packet_alloc(FW_START_DOWNLOAD, 0);
+	request = packet_alloc(FW_START_DOWNLOAD_WITH_ERASE, 0);
 	request->flashStart = offset;
 	request->flashLength = length;
 	int res = ev3_write(handle, (u8 *) request, request->packetLen + PREFIX_SIZE);
 	if (res < 0)
 	{
 		errmsg = "Unable to write FW_START_DOWNLOAD.";
-		return ERR_COMM;
+		err = ERR_COMM;
+		goto exit;
 	}
 
-	FW_START_DOWNLOAD_REPLY *reply = malloc(sizeof(FW_START_DOWNLOAD_REPLY));
-	res = ev3_read_timeout(handle, (u8 *) reply, sizeof(FW_START_DOWNLOAD_REPLY), -1);
+	reply = malloc(sizeof(FW_START_DOWNLOAD_WITH_ERASE_REPLY));
+	res = ev3_read_timeout(handle, (u8 *) reply, sizeof(FW_START_DOWNLOAD_WITH_ERASE_REPLY), -1);
 	if (res <= 0)
 	{
 		errmsg = "Unable to read FW_START_DOWNLOAD";
-		return ERR_COMM;
+		err = ERR_COMM;
+		goto exit;
 	}
 
 	// note: accept looped-back packets (usb 3.0 bug; reply not required here)
@@ -157,43 +149,35 @@ static int bootloader_start(int offset, int length)
 		fputs("Operation failed.\nlast_reply=", stderr);
 		print_bytes(reply, reply->packetLen + 2);
 
-		errmsg = "`FW_START_DOWNLOAD` was denied.";
-		return ERR_VM;
+		errmsg = "`FW_START_DOWNLOAD_WITH_ERASE_REPLY` was denied.";
+		err = ERR_VM;
+		goto exit;
 	}
-	return ERR_UNK;
+	err = ERR_UNK;
+
+exit:
+	free(request);
+	free(reply);
+	return err;
 }
 
-static int bootloader_send(FILE *fp, int length, u32* pCrc32)
+static int bootloader_send(u8 *buffer, int length, u32* pCrc32)
 {
-	*pCrc32 = 0;
-
-	int max_payload = 1024 - (sizeof(FW_DOWNLOAD_DATA) - PREFIX_SIZE + 2);
+	const int max_payload = 1024 - (sizeof(FW_DOWNLOAD_DATA) - PREFIX_SIZE + 2);
 	FW_DOWNLOAD_DATA *request = packet_alloc(FW_DOWNLOAD_DATA, max_payload);
 	FW_DOWNLOAD_DATA_REPLY *reply = malloc(sizeof(FW_DOWNLOAD_DATA_REPLY));
 
 	int total = length;
 	int sent_so_far = 0;
-	int file_ended = 0;
-	int res = 0;
-	int last_percent = 0;
+	int err = ERR_UNK;
 	u32 crc = 0;
-
-	printf("Progress: %3d %%\n", 0);
 
 	while (sent_so_far < total) {
 		int remaining = total - sent_so_far;
 		int this_block = remaining <= max_payload ? remaining : max_payload;
+		int res;
 
-		if (!file_ended) {
-			int real = fread(request->payload, 1, this_block, fp);
-			if (real < this_block) {
-				file_ended = 1;
-				memset(request->payload + real, 0, this_block - real);
-			}
-		} else {
-			memset(request->payload, 0, this_block);
-		}
-
+		memcpy(request->payload, buffer + sent_so_far, this_block);
 		crc = crc32(crc, request->payload, this_block);
 
 		request->packetLen = sizeof(FW_DOWNLOAD_DATA) - PREFIX_SIZE + this_block;
@@ -202,14 +186,16 @@ static int bootloader_send(FILE *fp, int length, u32* pCrc32)
 		if (res < 0)
 		{
 			errmsg = "Unable to write FW_DOWNLOAD_DATA.";
-			return ERR_COMM;
+			err = ERR_COMM;
+			break;
 		}
 
 		res = ev3_read_timeout(handle, (u8 *) reply, sizeof(FW_DOWNLOAD_DATA_REPLY), -1);
 		if (res <= 0)
 		{
 			errmsg = "Unable to read FW_DOWNLOAD_DATA";
-			return ERR_COMM;
+			err = ERR_COMM;
+			break;
 		}
 
 		// note: accept looped-back packets (usb 3.0 bug; reply not required here)
@@ -220,19 +206,17 @@ static int bootloader_send(FILE *fp, int length, u32* pCrc32)
 			print_bytes(reply, reply->packetLen + 2);
 
 			errmsg = "`FW_DOWNLOAD_DATA` was denied.";
-			return ERR_VM;
+			err = ERR_VM;
+			break;
 		}
 
 		sent_so_far += this_block;
-
-		int new_percent = sent_so_far * 100 / total;
-		if (new_percent >= last_percent + 5) {
-			last_percent += ((new_percent - last_percent) / 5) * 5;
-			printf("Progress: %3d %%\n", last_percent);
-		}
 	}
+
 	*pCrc32 = crc;
-	return ERR_UNK;
+	free(request);
+	free(reply);
+	return err;
 }
 
 /**
@@ -310,30 +294,37 @@ int bootloader_crc(FILE *fp, u32 starting_sector, u32 num_sectors, bool verbose)
 
 static int bootloader_checksum(int offset, int length, u32 *pCrc32)
 {
+	FW_GETCRC32 *request = NULL;
+	FW_GETCRC32_REPLY *reply = NULL;
+	int err;
+
 	*pCrc32 = 0;
 
-	FW_GETCRC32 *request = packet_alloc(FW_GETCRC32, 0);
+	request = packet_alloc(FW_GETCRC32, 0);
 	request->flashStart = offset;
 	request->flashLength = length;
 	int res = ev3_write(handle, (u8 *) request, request->packetLen + PREFIX_SIZE);
 	if (res < 0)
 	{
 		errmsg = "Unable to write FW_GETCRC32.";
-		return ERR_COMM;
+		err = ERR_COMM;
+		goto exit;
 	}
 
-	FW_GETCRC32_REPLY *reply = malloc(sizeof(FW_GETCRC32_REPLY));
+	reply = malloc(sizeof(FW_GETCRC32_REPLY));
 	res = ev3_read_timeout(handle, (u8 *) reply, sizeof(FW_GETCRC32_REPLY), -1);
 	if (res <= 0)
 	{
 		errmsg = "Unable to read FW_GETCRC32";
-		return ERR_COMM;
+		err = ERR_COMM;
+		goto exit;
 	}
 
 	// note: report loopback bug to outer code
 	if (reply->type == VM_SYS_RQ)
 	{
-		return ERR_USBLOOP;
+		err = ERR_USBLOOP;
+		goto exit;
 	}
 
 	if (reply->type != VM_OK)
@@ -343,8 +334,14 @@ static int bootloader_checksum(int offset, int length, u32 *pCrc32)
 		print_bytes(reply, reply->packetLen + 2);
 
 		errmsg = "`FW_GETCRC32` was denied.";
-		return ERR_VM;
+		err = ERR_VM;
+		goto exit;
 	}
 	*pCrc32 = reply->crc32;
-	return ERR_UNK;
+	err = ERR_UNK;
+
+exit:
+	free(request);
+	free(reply);
+	return err;
 }
