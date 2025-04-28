@@ -43,6 +43,7 @@ static int bootloader_checksum(int offset, int length, u32 *pCrc32);
 /* this matches LEGO FW sizes */
 #define FLASH_START 0x00000000
 #define FLASH_SIZE (16 * 1000 * 1024)
+#define FLASH_SECTOR (64*1024) // N25Q128 datasheet says that it has 64-Kbyte sectors/eraseblocks
 
 /**
  * @brief Install new firmware binary to the internal flash.
@@ -60,42 +61,45 @@ int bootloader_install(FILE *fp)
 		printf("WARNING: firmware file might be truncated: %d bytes expected, %d bytes read\n", FLASH_SIZE, read_bytes);
 	}
 
-	int err = ERR_UNK;
-	u32 local_crc32 = 0;
-	u32 remote_crc32 = 0;
 
-	puts("Erasing flash... (takes 1 minute 48 seconds)"); // 108 seconds
-	err = bootloader_erase_and_start(FLASH_START, FLASH_SIZE);
-	if (err != ERR_UNK)
-		return err;
+	for (int sector = 0; sector < FLASH_SIZE/FLASH_SECTOR; sector++) {
+		int err = ERR_UNK;
+		u32 local_crc32 = 0;
+		u32 remote_crc32 = 0;
 
-	puts("Downloading...");
-	err = bootloader_send(firmware, FLASH_SIZE, &local_crc32); // variable time
-	if (err != ERR_UNK)
-		return err;
+		printf("Programming sector %d/%d...\n", sector+1, FLASH_SIZE/FLASH_SECTOR);
+		err = bootloader_erase_and_start(sector*FLASH_SECTOR, FLASH_SECTOR);
+		if (err != ERR_UNK) {
+			puts("ERASE FAILED, continuing");
+			continue;
+		}
 
-	puts("Calculating flash checksum... (takes 17 seconds)");
-	err = bootloader_checksum(FLASH_START, FLASH_SIZE, &remote_crc32); // 16.7 seconds
+		err = bootloader_send(firmware + sector*FLASH_SECTOR, FLASH_SECTOR, &local_crc32);
+		if (err != ERR_UNK) {
+			puts("PROGRAMMING FAILED, continuing");
+			continue;
+		}
 
-	// handle usb 3.0 bug
-	if (err == ERR_USBLOOP)
-	{
-		puts("Checksum not checked, assuming update was OK. Rebooting.");
-	}
-	else if (err == ERR_UNK) // no error occurred
-	{
-		if (local_crc32 != remote_crc32) {
-			fprintf(stderr, "error: checksums do not match: remote %08X != local %08X\n",
-					remote_crc32, local_crc32);
-			return ERR_IO;
-		} else {
-			puts("Success! Local and remote checksums match. Rebooting.");
+		err = bootloader_checksum(sector*FLASH_SECTOR, FLASH_SECTOR, &remote_crc32);
+		if (err == ERR_USBLOOP)
+		{
+			puts("WARNING: CRC not checked, because the brick is likely plugged to a USB 3.0 port.");
+		}
+		else if (err == ERR_UNK) // no error occurred
+		{
+			if (local_crc32 != remote_crc32) {
+				printf("CHECKSUM MISMATCH: remote %08X != local %08X, continuing\n", remote_crc32, local_crc32);
+				continue;
+			}
+		}
+		else // other error occurred
+		{
+			puts("CRC COMPUTATION FAILED, continuing");
+			continue;
 		}
 	}
-	else // other error occurred
-	{
-		return err;
-	}
+
+	puts("Flashing finished, rebooting the brick.");
 
 	return bootloader_exit();
 }
