@@ -24,12 +24,12 @@ static int bootloader_erase_and_start(int offset, int length);
 
 /**
  * @brief Send firmware to bootloader
- * @param fp Firmware file
+ * @param firmware Firmware image
  * @param length Length of programmed region
  * @param pCrc32 Locally-calculated CRC32 of the firmware
  * @retval error according to enum #ERR
  */
-static int bootloader_send(FILE *fp, int length, u32* pCrc32);
+static int bootloader_send(u8 *firmware, int length, u32* pCrc32);
 
 /**
  * @brief Request CRC32 verification from the bootloader
@@ -53,6 +53,13 @@ static int bootloader_checksum(int offset, int length, u32 *pCrc32);
  */
 int bootloader_install(FILE *fp)
 {
+	// leaking memory is not ideal, but the OS will handle it somewhat
+	u8 *firmware = calloc(FLASH_SIZE, 1);
+	int read_bytes = fread(firmware, 1, FLASH_SIZE, fp);
+	if (read_bytes != FLASH_SIZE) {
+		printf("WARNING: firmware file might be truncated: %d bytes expected, %d bytes read\n", FLASH_SIZE, read_bytes);
+	}
+
 	int err = ERR_UNK;
 	u32 local_crc32 = 0;
 	u32 remote_crc32 = 0;
@@ -63,7 +70,7 @@ int bootloader_install(FILE *fp)
 		return err;
 
 	puts("Downloading...");
-	err = bootloader_send(fp, FLASH_SIZE, &local_crc32); // variable time
+	err = bootloader_send(firmware, FLASH_SIZE, &local_crc32); // variable time
 	if (err != ERR_UNK)
 		return err;
 
@@ -126,7 +133,7 @@ static int bootloader_erase_and_start(int offset, int length)
 	return ERR_UNK;
 }
 
-static int bootloader_send(FILE *fp, int length, u32* pCrc32)
+static int bootloader_send(u8 *buffer, int length, u32* pCrc32)
 {
 	*pCrc32 = 0;
 
@@ -136,7 +143,6 @@ static int bootloader_send(FILE *fp, int length, u32* pCrc32)
 
 	int total = length;
 	int sent_so_far = 0;
-	int file_ended = 0;
 	int res = 0;
 	int last_percent = 0;
 	u32 crc = 0;
@@ -147,16 +153,7 @@ static int bootloader_send(FILE *fp, int length, u32* pCrc32)
 		int remaining = total - sent_so_far;
 		int this_block = remaining <= max_payload ? remaining : max_payload;
 
-		if (!file_ended) {
-			int real = fread(request->payload, 1, this_block, fp);
-			if (real < this_block) {
-				file_ended = 1;
-				memset(request->payload + real, 0, this_block - real);
-			}
-		} else {
-			memset(request->payload, 0, this_block);
-		}
-
+		memcpy(request->payload, buffer+sent_so_far, this_block);
 		crc = crc32(crc, request->payload, this_block);
 
 		request->packetLen = sizeof(FW_DOWNLOAD_DATA) - PREFIX_SIZE + this_block;
