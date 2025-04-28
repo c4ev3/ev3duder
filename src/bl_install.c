@@ -15,18 +15,12 @@
 #include "funcs.h"
 
 /**
- * @brief Erase internal flash
- * @retval error according to enum #ERR
- */
-static int bootloader_erase(void);
-
-/**
  * @brief Start the programming operation
  * @param offset Start of programmed region
  * @param length Length of programmed region
  * @retval error according to enum #ERR
  */
-static int bootloader_start(int offset, int length);
+static int bootloader_erase_and_start(int offset, int length);
 
 /**
  * @brief Send firmware to bootloader
@@ -64,14 +58,11 @@ int bootloader_install(FILE *fp)
 	u32 remote_crc32 = 0;
 
 	puts("Erasing flash... (takes 1 minute 48 seconds)"); // 108 seconds
-	err = bootloader_erase();
+	err = bootloader_erase_and_start(FLASH_START, FLASH_SIZE);
 	if (err != ERR_UNK)
 		return err;
 
 	puts("Downloading...");
-	err = bootloader_start(FLASH_START, FLASH_SIZE); // extremely short
-	if (err != ERR_UNK)
-		return err;
 	err = bootloader_send(fp, FLASH_SIZE, &local_crc32); // variable time
 	if (err != ERR_UNK)
 		return err;
@@ -102,40 +93,9 @@ int bootloader_install(FILE *fp)
 	return bootloader_exit();
 }
 
-static int bootloader_erase(void)
+static int bootloader_erase_and_start(int offset, int length)
 {
-	FW_ERASEFLASH *request = packet_alloc(FW_ERASEFLASH, 0);
-	int res = ev3_write(handle, (u8 *) request, request->packetLen + PREFIX_SIZE);
-	if (res < 0)
-	{
-		errmsg = "Unable to write FW_ERASEFLASH.";
-		return ERR_COMM;
-	}
-
-	FW_ERASEFLASH_REPLY *reply = malloc(sizeof(FW_ERASEFLASH_REPLY));
-	res = ev3_read_timeout(handle, (u8 *) reply, sizeof(FW_ERASEFLASH_REPLY), -1);
-	if (res <= 0)
-	{
-		errmsg = "Unable to read FW_ERASEFLASH";
-		return ERR_COMM;
-	}
-
-	// note: accept looped-back packets (usb 3.0 bug; reply not required here)
-	if (reply->type != VM_OK && reply->type != VM_SYS_RQ)
-	{
-		errno = reply->ret;
-		fputs("Operation failed.\nlast_reply=", stderr);
-		print_bytes(reply, reply->packetLen + 2);
-
-		errmsg = "`FW_ERASEFLASH` was denied.";
-		return ERR_VM;
-	}
-	return ERR_UNK;
-}
-
-static int bootloader_start(int offset, int length)
-{
-	FW_START_DOWNLOAD *request = packet_alloc(FW_START_DOWNLOAD, 0);
+	FW_START_DOWNLOAD_WITH_ERASE *request = packet_alloc(FW_START_DOWNLOAD_WITH_ERASE, 0);
 	request->flashStart = offset;
 	request->flashLength = length;
 	int res = ev3_write(handle, (u8 *) request, request->packetLen + PREFIX_SIZE);
@@ -145,8 +105,8 @@ static int bootloader_start(int offset, int length)
 		return ERR_COMM;
 	}
 
-	FW_START_DOWNLOAD_REPLY *reply = malloc(sizeof(FW_START_DOWNLOAD_REPLY));
-	res = ev3_read_timeout(handle, (u8 *) reply, sizeof(FW_START_DOWNLOAD_REPLY), -1);
+	FW_START_DOWNLOAD_WITH_ERASE_REPLY *reply = malloc(sizeof(FW_START_DOWNLOAD_WITH_ERASE_REPLY));
+	res = ev3_read_timeout(handle, (u8 *) reply, sizeof(FW_START_DOWNLOAD_WITH_ERASE_REPLY), -1);
 	if (res <= 0)
 	{
 		errmsg = "Unable to read FW_START_DOWNLOAD";
@@ -160,7 +120,7 @@ static int bootloader_start(int offset, int length)
 		fputs("Operation failed.\nlast_reply=", stderr);
 		print_bytes(reply, reply->packetLen + 2);
 
-		errmsg = "`FW_START_DOWNLOAD` was denied.";
+		errmsg = "`FW_START_DOWNLOAD_WITH_ERASE_REPLY` was denied.";
 		return ERR_VM;
 	}
 	return ERR_UNK;
