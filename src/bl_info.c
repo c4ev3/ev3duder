@@ -52,11 +52,13 @@ int bootloader_info(void)
 		return ERR_COMM;
 	}
 
-	// forbid looped-back packets (usb 3.0 bug; reply *is* required here)
-	if (reply->type == VM_SYS_RQ)
-		return ERR_USBLOOP;
+	// Looped-back packets (e.g. reply->type == VM_SYS_RQ) are acceptable.
+	// According to https://github.com/pybricks/pybricksdev/commit/81f310da54ff40092bb4166226f8d52f943404c5
+	// the issue is less severe than originally anticipated. Only a part
+	// of the response buffer is overwritten by the PC's request and
+	// in this case the EEPROM version is preserved.
 
-	if (reply->type != VM_OK)
+	if (reply->type != VM_OK && reply->type != VM_SYS_RQ)
 	{
 		errno = reply->ret;
 		fputs("Operation failed.\nlast_reply=", stderr);
@@ -66,12 +68,23 @@ int bootloader_info(void)
 		return ERR_VM;
 	}
 
-	int name_idx = 0;
-	if (1 <= reply->hardwareVersion && reply->hardwareVersion <= 6)
-		name_idx = reply->hardwareVersion;
+	if (reply->type == VM_OK) {
+		int name_idx = 0;
+		if (1 <= reply->hardwareVersion && reply->hardwareVersion <= 6)
+			name_idx = reply->hardwareVersion;
 
-	printf("Hardware version : V%4.2f (%s)\n", reply->hardwareVersion / 10.0f, hw_names[name_idx]);
-	printf("EEPROM version   : V%4.2f\n",      reply->eepromVersion   / 10.0f);
+		printf("Hardware version : V%4.2f (%s)\n", reply->hardwareVersion / 10.0f, hw_names[name_idx]);
+		printf("EEPROM version   : V%4.2f\n",      reply->eepromVersion   / 10.0f);
+	} else { // VM_SYS_RQ
+		// hardwareVersion is corrupted, only eepromVersion is valid.
+		// However, in production HW versions it holds that eepromVersion == hardwareVersion
+		int name_idx = 0;
+		if (1 <= reply->eepromVersion && reply->eepromVersion <= 6)
+			name_idx = reply->eepromVersion;
+
+		printf("Hardware version : unknown (unable to query via USB 3.0)\n");
+		printf("EEPROM version   : V%4.2f (%s)\n", reply->eepromVersion / 10.0f, hw_names[name_idx]);
+	}
 
 	errmsg = "`FW_GETVERSION` was successful.";
 	return ERR_UNK;
