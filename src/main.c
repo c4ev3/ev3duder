@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <stdbool.h>
 
 #include <hidapi/hidapi.h>
 
@@ -154,6 +155,9 @@ const char *const usage_desc = "Info:\n"
 		"flash install   install the given firmware file to the EV3\n"
 		"flash info      show hardware and EEPROM versions\n"
 		"flash exit      exit from the firmware update mode without installing new firmware\n"
+		"flash crc       compares CRCs of the given firmware file and the EV3 installed firmware\n"
+		"flash crc f n   compares file/EV3 CRCs of a block of n 64k sectors, starting at sector #f (zero-based). Full size is 250 sectors.\n"
+		"flash crc f n v verbose (sector-by-sector) file/EV3 CRC comparison, starting at sector #f (zero-based) and doing n sectors (max 250).\n"
 		"uf2 pack        pack files into a Microsoft UF2 container\n"
 		"                note: common brickdir options are: \n"
 		"                'Projects' (internal flash, default), 'SD Card', 'USB Stick',\n"
@@ -655,6 +659,43 @@ int main(int argc, char *argv[])
 				}
 
 				ret = bootloader_install(fp);
+
+			} else if (strcmp(argv[0], "crc") == 0) {
+				// ev3duder --usb flash crc firmware.bin          Full CRC comparison
+				// ev3duder --usb flash crc firmware.bin f n      CRC comparison of n sectors, starting at sector f (zero-based)
+				// ev3duder --usb flash crc firmware.bin f n v    Verbose comparison: compare CRC of every sector, showing the results
+				bool verbose = argc == 5 && strcmp(argv[4], "v") == 0;
+				if (argc == 2) {
+					fp = fopen(SANITIZE(argv[1]), "rb");
+					if (!fp) {
+						printf("File <%s> doesn't exist.\n", argv[1]);
+						return ERR_IO;
+					}
+					printf("Comparing full device CRCs...\n");
+					ret = bootloader_crc(fp, 0, FLASH_SECTOR_COUNT, false);
+
+				} else if (argc == 4 || verbose) {
+					u32 first_sector = atol(argv[2]);
+					if (first_sector >= FLASH_SECTOR_COUNT) first_sector = FLASH_SECTOR_COUNT - 1;
+					u32 num_sectors = atol(argv[3]);
+					if (num_sectors == 0) num_sectors = 1;	// Doesn't make sense to do zero.
+					if (first_sector + num_sectors > FLASH_SECTOR_COUNT) {
+						num_sectors = FLASH_SECTOR_COUNT - first_sector;
+					}
+					fp = fopen(SANITIZE(argv[1]), "rb");
+					if (!fp)
+					{
+						printf("File <%s> doesn't exist.\n", argv[1]);
+						return ERR_IO;
+					}
+					printf("Comparing CRCs of sectors %d - %d (%d sectors)\n", first_sector,
+						first_sector + num_sectors - 1, num_sectors);
+					ret = bootloader_crc(fp, first_sector, num_sectors, verbose);
+
+				} else {
+					ret = ERR_ARG;
+					printf("Expected either <filename> or <filename firstsector numsectors>\n");
+				}
 
 			} else if (strcmp(argv[0], "info") == 0) {
 				assert(argc == 1);

@@ -17,6 +17,8 @@
 
 #include <stdio.h>
 #include <stddef.h>
+#include <stdbool.h>
+
 /**
  * @name    General Usage
  * @ingroup EV3 commands
@@ -70,6 +72,18 @@ extern int bootloader_enter(void);
 
 //! install new firmware to the brick
 extern int bootloader_install(FILE *fp);
+
+// First address of EV3 flash memory
+#define FLASH_START 0x00000000
+// Size of EV3 flash memory in bytes
+#define FLASH_SIZE (16 * 1000 * 1024)
+// Size of EV3 flash memory erase block
+#define FLASH_SECTOR_SIZE (64*1024) // N25Q128 datasheet says that it has 64-Kbyte sectors/eraseblocks
+// Number of sectors in EV3 flash memory
+#define FLASH_SECTOR_COUNT (FLASH_SIZE / FLASH_SECTOR_SIZE)
+
+//! compare device CRC to CRC from a file
+extern int bootloader_crc(FILE *fp, u32 starting_sector, u32 num_sectors, bool verbose);
 
 //! print brick hardware version
 extern int bootloader_info(void);

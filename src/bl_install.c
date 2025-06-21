@@ -6,6 +6,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 #include <errno.h>
 
@@ -45,10 +46,6 @@ static int bootloader_send(FILE *fp, int length, u32* pCrc32);
  * @retval error according to enum #ERR
  */
 static int bootloader_checksum(int offset, int length, u32 *pCrc32);
-
-/* this matches LEGO FW sizes */
-#define FLASH_START 0x00000000
-#define FLASH_SIZE (16 * 1000 * 1024)
 
 /**
  * @brief Install new firmware binary to the internal flash.
@@ -236,6 +233,79 @@ static int bootloader_send(FILE *fp, int length, u32* pCrc32)
 	}
 	*pCrc32 = crc;
 	return ERR_UNK;
+}
+
+/**
+ * @brief Compare CRCs of the flash memory and the firmware image.
+ * @param fp Firmware file that is supposed to be flashed in the brick.
+ * @param starting_sector First 64 KiB sector of the flash memory to check (0-based)
+ * @param num_sectors Number of 64 KiB sectors to check
+ * @param verbose If true, CRC is checked for each sector individually.
+ *                Otherwise, it is computed across all sectors at once.
+ * @retval error according to enum #ERR
+ */
+int bootloader_crc(FILE *fp, u32 starting_sector, u32 num_sectors, bool verbose)
+{
+	u8 *firmware = calloc(FLASH_SIZE, 1);
+	if (!firmware) {
+		errmsg = "out of memory";
+		return ERR_NOMEM;
+	}
+	u32 read_bytes = fread(firmware, 1, FLASH_SIZE, fp);
+	if (ferror(fp)) {
+		errmsg = "Reading of firmware file failed";
+		free(firmware);
+		return ERR_IO;
+	}
+	u32 wanted_bytes = (starting_sector + num_sectors) * FLASH_SECTOR_SIZE;
+	if (read_bytes < wanted_bytes) {
+		printf("WARNING: firmware file is truncated: %d bytes expected, %d bytes read\n", wanted_bytes, read_bytes);
+	}
+
+	int err = ERR_UNK;
+	if (verbose) {
+		// Sector-by-sector CRC comparison.
+		// Compares the remote and local CRCs of each sector, showing the results of each.
+		printf("Sector CRC comparison:\n");
+		bool all_ok = true;
+		for (u32 sector = starting_sector; sector < starting_sector + num_sectors; sector++) {
+			u32 local_sector_crc32 = crc32(0, firmware + sector * FLASH_SECTOR_SIZE, FLASH_SECTOR_SIZE);
+			u32 remote_sector_crc32 = 0;
+			int sector_err = bootloader_checksum(sector * FLASH_SECTOR_SIZE, FLASH_SECTOR_SIZE, &remote_sector_crc32);
+
+			bool this_ok = remote_sector_crc32 == local_sector_crc32;
+			all_ok = all_ok && this_ok;
+
+			if (sector_err == ERR_UNK) {
+				printf("Sector %3d: Remote CRC = %08X, local CRC = %08X%s\n", sector, remote_sector_crc32,
+					local_sector_crc32, this_ok ? "" : " ERR");
+			} else {
+				printf("Error requesting sector CRC.  Err = %i\n", sector_err);
+				err = sector_err;
+			}
+		}
+
+		if (all_ok) {
+			puts("All sectors match.");
+		} else {
+			puts("Some sectors do not match.");
+		}
+	} else {
+		// Do a single comparison, calculating the CRC over multiple sectors.
+		u32 local_crc32 = crc32(0, firmware + starting_sector * FLASH_SECTOR_SIZE, num_sectors * FLASH_SECTOR_SIZE);
+		printf("Requesting remote CRC...\n");
+		u32 remote_crc32 = 0;
+		err = bootloader_checksum(starting_sector * FLASH_SECTOR_SIZE, num_sectors * FLASH_SECTOR_SIZE, &remote_crc32);
+		if (err == ERR_UNK) {
+			printf("Remote CRC = %08X, local CRC = %08X%s\n", remote_crc32, local_crc32,
+				remote_crc32 == local_crc32 ? "" : " ERR");
+		} else {
+			printf("Error requesting full CRC.  Err = %i\n", err);
+		}
+	}
+
+	free(firmware);
+	return err;
 }
 
 static int bootloader_checksum(int offset, int length, u32 *pCrc32)
